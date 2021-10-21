@@ -127,41 +127,12 @@ class FmToBDD(ModelToModel):
                         self.clauses.append(cnf)
 
     def add_constraint(self, ctc: Constraint) -> None:
-        #We are only supporting requires or excludes
-        if ctc.ast.root.data.upper() == 'REQUIRES' or ctc.ast.root.data.upper() == 'IMPLIES':
-            dest = self.variables.get(
-                ctc.ast.root.right.data
-            )
-            orig = self.variables.get(
-                ctc.ast.root.left.data
-            )
-            if dest is None or orig is None:
-                print(self.source_model)
-                raise ElementNotFound
-            self.clauses.append([-1 * orig, dest])
-        elif ctc.ast.root.data.upper() == 'EQUIVALENCE':
-            dest = self.variables.get(
-                ctc.ast.root.right.data
-            )
-            orig = self.variables.get(
-                ctc.ast.root.left.data
-            )
-            if dest is None or orig is None:
-                print(self.source_model)
-                raise ElementNotFound
-            self.clauses.append([-1 * orig, dest])
-            self.clauses.append([-1 * dest, orig])
-        elif ctc.ast.root.data.upper() == 'EXCLUDES':
-            dest = self.variables.get(
-                ctc.ast.root.right.data
-            )
-            orig = self.variables.get(
-                ctc.ast.root.left.data
-            )
-            if dest is None or orig is None:
-                print(self.source_model)
-                raise ElementNotFound
-            self.clauses.append([-1 * orig, -1 * dest])
+        clauses = ctc.ast.get_clauses()
+        for clause in clauses:
+            c = list(map(lambda term: (-self.variables.get(term[1:]) 
+                                         if term.startswith('-') 
+                                         else self.variables.get(term)), clause))
+            self.clauses.append(c)
 
     def transform(self) -> VariabilityModel:
         for feature in self.source_model.get_features():
@@ -174,7 +145,6 @@ class FmToBDD(ModelToModel):
 
         for constraint in self.source_model.get_constraints():
             self.add_constraint(constraint)
-
 
         # Transform clauses to textual CNF notation required by the BDD
         not_connective = BDDModel.NOT
