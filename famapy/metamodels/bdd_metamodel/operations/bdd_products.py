@@ -17,17 +17,17 @@ class BDDProducts(Products):
 
     def execute(self, model: BDDModel) -> 'BDDProducts':
         self.bdd_model = model
-        self.result = get_products(self.bdd_model, self.partial_configuration)
+        self.result = products(self.bdd_model, self.partial_configuration)
         return self
 
     def get_result(self) -> list[Configuration]:
         return self.result
 
     def get_products(self) -> list[Configuration]:
-        return get_products(self.bdd_model, self.partial_configuration)
+        return products(self.bdd_model, self.partial_configuration)
 
 
-def get_products(bdd_model: BDDModel, partial_config: Configuration = None) -> list[Configuration]:
+def products(bdd_model: BDDModel, partial_config: Configuration = None) -> list[Configuration]:
     if partial_config is None:
         u_func = bdd_model.root
         care_vars = bdd_model.variables

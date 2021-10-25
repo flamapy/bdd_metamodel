@@ -22,17 +22,17 @@ class BDDProductDistributionBF(ProductDistribution):
 
     def execute(self, model: BDDModel) -> 'BDDProductDistributionBF':
         self.bdd_model = model
-        self.result = get_product_distribution(self.bdd_model, self.partial_configuration)
+        self.result = product_distribution(self.bdd_model, self.partial_configuration)
         return self
 
     def get_result(self) -> list[int]:
         return self.result
 
     def product_distribution(self) -> list[int]:
-        return get_product_distribution(self.bdd_model, self.partial_configuration)
+        return product_distribution(self.bdd_model, self.partial_configuration)
 
 
-def get_product_distribution(bdd_model: BDDModel, p_config: Configuration = None) -> list[int]: 
+def product_distribution(bdd_model: BDDModel, p_config: Configuration = None) -> list[int]: 
     """It accounts for how many solutions have no variables, one variable, 
     two variables, ..., all variables.
 
