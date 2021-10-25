@@ -31,7 +31,7 @@ class BDDSampling(Sampling):
     def execute(self, model: BDDModel) -> 'BDDSampling':
         self.bdd_model = model
         self.result = sample(self.bdd_model, self.size, self.with_replacement, 
-                                 self.partial_configuration)
+                             self.partial_configuration)
         return self
 
     def get_result(self) -> list[Configuration]:
@@ -43,7 +43,7 @@ class BDDSampling(Sampling):
 
 
 def sample(bdd_model: BDDModel, size: int, with_replacement: bool = False, 
-               partial_configuration: Configuration = None) -> list[Configuration]:
+           partial_configuration: Configuration = None) -> list[Configuration]:
     nof_configs = BDDProductsNumber(partial_configuration).execute(bdd_model).get_result()
     if size < 0 or (size > nof_configs and not with_replacement):
         raise ValueError('Sample larger than population or is negative.')
