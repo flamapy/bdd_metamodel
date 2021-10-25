@@ -4,13 +4,17 @@ from famapy.core.operations import Operation
 
 
 class ProductDistribution(Operation):
-    """The Product Distribution (PD) operation determines the number of products having a given number of features.
+    """The Product Distribution (PD) operation determines the number of products 
+    having a given number of features.
 
-    It accounts for how many products have no features, one features, two features, ..., all features.
- 
+    It accounts for how many products have no features, one features, 
+    two features, ..., all features.
+
     This operation in combination with the Feature Inclusion Probability (FIP) operation
-    provides a clear picture of the products' homogeneity (i.e., how much does one product differ from the others).
-    The product's homogeneity is one the three core metrics that characterize the complexity of a SPL.
+    provides a clear picture of the products' homogeneity (i.e., how much does one product 
+    differ from the others).
+    The product's homogeneity is one the three core metrics that characterize 
+    the complexity of a SPL.
     The other two core metrics are the number of features the SPL manages, 
     and the number of valid product that can be derived.
 

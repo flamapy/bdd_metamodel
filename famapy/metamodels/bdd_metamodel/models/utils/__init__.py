@@ -5,4 +5,4 @@ from .txtcnf import (
 )
 
 
-__all__ = ['BDDModel', 'CNFLogicConnective', 'TextCNFNotation', 'TextCNFModel']
+__all__ = ['CNFLogicConnective', 'TextCNFNotation', 'TextCNFModel']
