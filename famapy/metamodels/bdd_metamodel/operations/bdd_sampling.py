@@ -22,7 +22,7 @@ class BDDSampling(Sampling):
 
     def __init__(self, size: int, with_replacement: bool = False, 
                  partial_configuration: Configuration = None) -> None:
-        self.result = []
+        self.result: list[Configuration] = []
         self.bdd_model = None
         self.size = size 
         self.with_replacement = with_replacement 
@@ -30,7 +30,8 @@ class BDDSampling(Sampling):
 
     def execute(self, model: BDDModel) -> 'BDDSampling':
         self.bdd_model = model
-        self.result = self.sample(self.size, self.with_replacement, self.partial_configuration)
+        self.result = get_sample(self.bdd_model, self.size, self.with_replacement, 
+                                 self.partial_configuration)
         return self
 
     def get_result(self) -> list[Configuration]:
@@ -38,52 +39,54 @@ class BDDSampling(Sampling):
 
     def sample(self, size: int, with_replacement: bool = False, 
                partial_configuration: Configuration = None) -> list[Configuration]:
-        nof_configs = BDDProductsNumber(partial_configuration).execute(self.bdd_model).get_result()
-        if size < 0 or (size > nof_configs and not with_replacement):
-            raise ValueError('Sample larger than population or is negative.')
+        return get_sample(self.bdd_model, size, with_replacement, partial_configuration)
 
-        configurations = []
-        for _ in range(size):
-            config = self.get_random_configuration(partial_configuration)
-            configurations.append(config)
 
-        if not with_replacement:
-            configurations = set(configurations)
-            while len(configurations) < size:
-                config = self.get_random_configuration(partial_configuration)
-                configurations.add(config)
+def get_sample(bdd_model: BDDModel, size: int, with_replacement: bool = False, 
+               partial_configuration: Configuration = None) -> list[Configuration]:
+    nof_configs = BDDProductsNumber(partial_configuration).execute(bdd_model).get_result()
+    if size < 0 or (size > nof_configs and not with_replacement):
+        raise ValueError('Sample larger than population or is negative.')
 
-        return list(configurations)
+    configurations = []
+    for _ in range(size):
+        config = get_random_configuration(bdd_model, partial_configuration)
+        configurations.append(config)
 
-    def get_random_configuration(self, 
-                                 partial_configuration: Configuration = None) -> Configuration:
-        # Initialize the configurations and values for BDD nodes with already known features
-        if partial_configuration is None:
-            values = {}
-        else:
-            dict(partial_configuration.elements.items())
+    if not with_replacement:
+        set_configurations = set(configurations)
+        while len(set_configurations) < size:
+            config = get_random_configuration(bdd_model, partial_configuration)
+            set_configurations.add(config)
 
-        # Set the BDD nodes with the already known features values
-        u_func = self.bdd_model.bdd.let(values, self.bdd_model.root)
+    return list(set_configurations)
 
-        care_vars = set(self.bdd_model.variables) - values.keys()
-        n_vars = len(care_vars)
-        for feature in care_vars:
-            # Number of configurations with the feature selected
-            v_sel = self.bdd_model.bdd.let({feature: True}, u_func)
-            nof_configs_var_selected = self.bdd_model.bdd.count(v_sel, nvars=n_vars - 1)
-            # Number of configurations with the feature unselected
-            v_unsel = self.bdd_model.bdd.let({feature: False}, u_func)
-            nof_configs_var_unselected = self.bdd_model.bdd.count(v_unsel, nvars=n_vars - 1)
 
-            # Randomly select or not the feature
-            selected = random.choices([True, False], 
-                                      [nof_configs_var_selected, nof_configs_var_unselected], 
-                                      k=1)[0]
+def get_random_configuration(bdd_model: BDDModel, p_config: Configuration = None) -> Configuration:
+    # Initialize the configurations and values for BDD nodes with already known features
+    values = {} if p_config is None else dict(p_config.elements.items())
 
-            # Update configuration and BDD node for the new feature
-            values[feature] = selected
-            u_func = self.bdd_model.bdd.let({feature: selected}, u_func)
+    # Set the BDD nodes with the already known features values
+    u_func = bdd_model.bdd.let(values, bdd_model.root)
 
-            n_vars -= 1
-        return Configuration(values)
+    care_vars = set(bdd_model.variables) - values.keys()
+    n_vars = len(care_vars)
+    for feature in care_vars:
+        # Number of configurations with the feature selected
+        v_sel = bdd_model.bdd.let({feature: True}, u_func)
+        nof_configs_var_selected = bdd_model.bdd.count(v_sel, nvars=n_vars - 1)
+        # Number of configurations with the feature unselected
+        v_unsel = bdd_model.bdd.let({feature: False}, u_func)
+        nof_configs_var_unselected = bdd_model.bdd.count(v_unsel, nvars=n_vars - 1)
+
+        # Randomly select or not the feature
+        selected = random.choices([True, False], 
+                                  [nof_configs_var_selected, nof_configs_var_unselected], 
+                                  k=1)[0]
+
+        # Update configuration and BDD node for the new feature
+        values[feature] = selected
+        u_func = bdd_model.bdd.let({feature: selected}, u_func)
+
+        n_vars -= 1
+    return Configuration(values)

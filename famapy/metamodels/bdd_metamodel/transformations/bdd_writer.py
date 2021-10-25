@@ -1,3 +1,4 @@
+from typing import Optional
 from enum import Enum
 
 from dd.autoref import Function
@@ -29,19 +30,19 @@ class BDDWriter(ModelToText):
 
     @staticmethod
     def get_destination_extension() -> str:
-        return BDDDumpFormat.DDDMPv3
+        return BDDDumpFormat.DDDMP_V3.value
 
-    def __init__(self, path: str, source_model: BDDModel, roots: list[Function] = None, 
+    def __init__(self, path: str, source_model: BDDModel, roots: Optional[list[Function]] = None, 
                  output_format: BDDDumpFormat = BDDDumpFormat.DDDMP_V3) -> None:
         self._path = path
         self._source_model = source_model
         self._output_format = output_format
         self._roots = roots
 
-    def set_format(self, output_format: BDDDumpFormat):
+    def set_format(self, output_format: BDDDumpFormat) -> None:
         self._output_format = output_format
 
-    def set_roots(self, roots: list[Function]):
+    def set_roots(self, roots: list[Function]) -> None:
         self._roots = roots
 
     def transform(self) -> None:
@@ -51,7 +52,7 @@ class BDDWriter(ModelToText):
             dddmp_v2_to_v3(self._path)
 
 
-def dddmp_v2_to_v3(filepath: str):
+def dddmp_v2_to_v3(filepath: str) -> None:
     """Convert the file with the BDD dump in format dddmp version 2 to version 3.
 
     The difference between versions 2.0 and 3.0 is the addition of the '.varnames' field.

@@ -18,22 +18,23 @@ class BDDProductsNumber(ProductsNumber):
 
     def execute(self, model: BDDModel) -> 'BDDProductsNumber':
         self.bdd_model = model
-        self.result = self.get_number_of_configurations(self.partial_configuration)
+        self.result = get_products_number(self.bdd_model, self.partial_configuration)
         return self
 
     def get_result(self) -> int:
         return self.result
 
-    def get_number_of_configurations(self, partial_configuration: Configuration = None) -> int:
-        if partial_configuration is None:
-            u_func = self.bdd_model.root
-            n_vars = len(self.bdd_model.variables)
-        else:
-            values = dict(partial_configuration.elements.items())
-            u_func = self.bdd_model.bdd.let(values, self.bdd_model.root)
-            n_vars = len(self.bdd_model.variables) - len(values)
-
-        return self.bdd_model.bdd.count(u_func, nvars=n_vars)
-
     def get_products_number(self) -> int:
-        return self.get_number_of_configurations()
+        return get_products_number(self.bdd_model, self.partial_configuration)
+
+
+def get_products_number(bdd_model: BDDModel, partial_configuration: Configuration = None) -> int:
+    if partial_configuration is None:
+        u_func = bdd_model.root
+        n_vars = len(bdd_model.variables)
+    else:
+        values = dict(partial_configuration.elements.items())
+        u_func = bdd_model.bdd.let(values, bdd_model.root)
+        n_vars = len(bdd_model.variables) - len(values)
+
+    return bdd_model.bdd.count(u_func, nvars=n_vars)

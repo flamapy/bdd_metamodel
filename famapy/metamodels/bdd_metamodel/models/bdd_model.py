@@ -1,3 +1,5 @@
+from typing import Optional
+
 from dd.autoref import BDD, Function
 
 from famapy.core.models import VariabilityModel
@@ -20,13 +22,13 @@ class BDDModel(VariabilityModel):
     def get_extension() -> str:
         return 'bdd'
 
-    def __init__(self):
+    def __init__(self) -> None:
         self.bdd = BDD()  # BDD manager
-        self.cnf_formula = None
+        self.cnf_formula: Optional[str] = None 
         self.root = None
-        self.variables = []
+        self.variables: list[str] = []
 
-    def from_textual_cnf(self, textual_cnf_formula: str, variables: list[str]):
+    def from_textual_cnf(self, textual_cnf_formula: str, variables: list[str]) -> None:
         """Build the BDD from a textual representation of the CNF formula,
         and the list of variables."""
         self.cnf_formula = textual_cnf_formula

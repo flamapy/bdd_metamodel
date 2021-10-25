@@ -1,3 +1,4 @@
+from typing import Optional
 from enum import Enum, auto
 
 
@@ -47,17 +48,17 @@ class TextCNFModel():
     where a clause is a disjunction of literals.
     """
 
-    def __init__(self):
-        self._cnf_formula = None
-        self._cnf_notation = None
-        self._variables = []  # list of str with variables' names
+    def __init__(self) -> None:
+        self._cnf_formula: Optional[str] = None
+        self._cnf_notation: Optional[TextCNFNotation] = None
+        self._variables: list[str] = []  # list of str with variables' names
 
-    def from_textual_cnf(self, cnf_formula: str):
+    def from_textual_cnf(self, cnf_formula: str) -> None:
         self._cnf_formula = cnf_formula
         self._cnf_notation = identify_notation(cnf_formula)
         self._variables = extract_variables(cnf_formula)
 
-    def from_textual_cnf_file(self, filepath: str):
+    def from_textual_cnf_file(self, filepath: str) -> None:
         """This method reads any of the available textual notations, 
         but only one notation at the same time,
         so the .txt file should include only one of the possible notations in a single line.
@@ -66,12 +67,12 @@ class TextCNFModel():
             self.from_textual_cnf(file.readline())
 
     def write_textual_cnf_file(self, filepath: str, 
-                               cnf_output_syntax: TextCNFNotation = TextCNFNotation.JAVA_SHORT):
+                               syntax: TextCNFNotation = TextCNFNotation.JAVA_SHORT) -> None:
         """Write the textual CNF formula as a string in a file. 
 
         Default syntax is TextCNFNotation.JAVA_SHORT: (A) & (!B | C) && ...
         """
-        cnf_formula = self.get_textual_cnf_formula(cnf_output_syntax)
+        cnf_formula = self.get_textual_cnf_formula(syntax)
         with open(filepath, 'w+', encoding='utf-8') as file:
             file.write(cnf_formula)
 
@@ -79,6 +80,7 @@ class TextCNFModel():
         """Return the notation used for the CNF formula."""
         if self._cnf_formula is None:
             raise Exception("CNF Model not initialized. Use a `from_` method first.") 
+        assert self._cnf_notation is not None
         return self._cnf_notation
 
     def get_textual_cnf_formula(self, 
@@ -89,6 +91,7 @@ class TextCNFModel():
         """
         if self._cnf_formula is None:
             raise Exception("CNF Model not initialized. Use a `from_` method first.") 
+        assert self._cnf_notation is not None 
 
         cnf_formula = self._cnf_formula
         cnf_notation = self._cnf_notation
@@ -150,7 +153,7 @@ def identify_notation(cnf_formula: str) -> TextCNFNotation:
     return notation
 
 
-def check_unary_connective(cnf_formula: str) -> TextCNFNotation:
+def check_unary_connective(cnf_formula: str) -> Optional[TextCNFNotation]:
     symbol = TextCNFNotation.LOGICAL.value[CNFLogicConnective.NOT]
     if ' ' + symbol in cnf_formula or '(' + symbol in cnf_formula:
         return TextCNFNotation.LOGICAL
@@ -170,7 +173,7 @@ def check_unary_connective(cnf_formula: str) -> TextCNFNotation:
     return None
 
 
-def check_binary_connective(cnf_formula: str) -> TextCNFNotation:
+def check_binary_connective(cnf_formula: str) -> Optional[TextCNFNotation]:
     for notation in TextCNFNotation:
         for connective in notation.value.keys():
             if connective != CNFLogicConnective.NOT:

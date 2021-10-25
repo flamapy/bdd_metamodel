@@ -2,8 +2,6 @@ strictness: high
 test-warnings: true
 doc-warnings: false
 
-ignore-paths:
-
 pep8:
   options:
     max-line-length: 100

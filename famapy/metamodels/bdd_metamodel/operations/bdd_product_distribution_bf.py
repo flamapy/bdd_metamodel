@@ -16,30 +16,30 @@ class BDDProductDistributionBF(ProductDistribution):
     """
 
     def __init__(self, partial_configuration: Configuration = None) -> None:
-        self.result = []
+        self.result: list[int] = []
         self.bdd_model = None
-        self.partial_config = partial_configuration
+        self.partial_configuration = partial_configuration
 
     def execute(self, model: BDDModel) -> 'BDDProductDistributionBF':
         self.bdd_model = model
-        self.result = self.product_distribution_from_partial_configuration(self.partial_config)
+        self.result = get_product_distribution(self.bdd_model, self.partial_configuration)
         return self
 
     def get_result(self) -> list[int]:
         return self.result
 
     def product_distribution(self) -> list[int]:
-        return self.product_distribution_from_partial_configuration()
+        return get_product_distribution(self.bdd_model, self.partial_configuration)
 
-    def product_distribution_from_partial_configuration(self, 
-                                                        conf: Configuration = None) -> list[int]:
-        """It accounts for how many solutions have no variables, one variable, 
-        two variables, ..., all variables.
 
-        It enumerates all solutions and filters them.
-        """
-        products = BDDProducts(conf).execute(self.bdd_model).get_result()
-        dist = []
-        for i in range(len(self.bdd_model.variables) + 1):
-            dist.append(sum(len(p.elements) == i for p in products))
-        return dist
+def get_product_distribution(bdd_model: BDDModel, p_config: Configuration = None) -> list[int]: 
+    """It accounts for how many solutions have no variables, one variable, 
+    two variables, ..., all variables.
+
+    It enumerates all solutions and filters them.
+    """
+    products = BDDProducts(p_config).execute(bdd_model).get_result()
+    dist = []
+    for i in range(len(bdd_model.variables) + 1):
+        dist.append(sum(len(p.elements) == i for p in products))
+    return dist

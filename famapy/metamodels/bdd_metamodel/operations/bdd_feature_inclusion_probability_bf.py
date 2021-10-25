@@ -18,27 +18,29 @@ class BDDFeatureInclusionProbabilityBF(FeatureInclusionProbability):
 
     def __init__(self, partial_configuration: Configuration = None) -> None:
         self.bdd_model = None
-        self.result = []
+        self.result: dict[str, float] = {}
         self.partial_configuration = partial_configuration
 
     def execute(self, model: BDDModel) -> 'BDDFeatureInclusionProbabilityBF':
         self.bdd_model = model
-        self.result = self.fip_from_partial_configuration(self.partial_configuration)
+        self.result = get_feature_inclusion_probability(self.bdd_model, self.partial_configuration)
         return self
 
-    def get_result(self) -> list[int]:
+    def get_result(self) -> dict[str, float]:
         return self.result
 
     def feature_inclusion_probability(self) -> dict[str, float]:
-        return self.fip_from_partial_configuration()
+        return get_feature_inclusion_probability(self.bdd_model, self.partial_configuration)
 
-    def fip_from_partial_configuration(self, conf: Configuration = None) -> dict[str, float]:
-        products = BDDProducts(conf).execute(self.bdd_model).get_result()
-        n_products = len(products)
-        if n_products == 0:
-            return {feature: 0.0 for feature in self.bdd_model.variables}
 
-        prob = {}
-        for feature in self.bdd_model.variables:
-            prob[feature] = sum(feature in p.elements for p in products) / n_products
-        return prob
+def get_feature_inclusion_probability(bdd_model: BDDModel, 
+                                      config: Configuration = None) -> dict[str, float]:
+    products = BDDProducts(config).execute(bdd_model).get_result()
+    n_products = len(products)
+    if n_products == 0:
+        return {feature: 0.0 for feature in bdd_model.variables}
+
+    prob = {}
+    for feature in bdd_model.variables:
+        prob[feature] = sum(feature in p.elements for p in products) / n_products
+    return prob
