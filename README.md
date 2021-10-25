@@ -4,16 +4,17 @@ This plugin supports Binary Decision Diagrams (BDDs) representations for feature
 The plugin is based on [FaMaPy](https://github.com/diverso-lab/core) and thus, it follows the same architecture:
 
 <p align="center">
-  <img width="250" src="doc/bdd_plugin.png">
+  <img width="750" src="doc/bdd_plugin.png">
 </p>
 
 ## Description
 The BDD plugin relies on the [dd](https://github.com/tulip-control/dd) library to manipulate BDDs.
 The complete documentation of such library is available [here](https://github.com/tulip-control/dd/blob/main/doc.md).
 
+The following is an example of feature model and its BDD using complemented arcs.
 <p align="center">
-  <img width="250" src="doc/fm_example.png">
-  <img width="250" src="doc/bdd_example.png">
+  <img width="750" src="doc/fm_example.png">
+  <img width="750" src="doc/bdd_example.svg">
 </p>
 
 
