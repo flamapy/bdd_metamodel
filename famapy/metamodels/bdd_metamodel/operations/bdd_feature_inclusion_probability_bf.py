@@ -34,7 +34,7 @@ class BDDFeatureInclusionProbabilityBF(FeatureInclusionProbability):
 
 
 def feature_inclusion_probability(bdd_model: BDDModel, 
-                                      config: Configuration = None) -> dict[str, float]:
+                                  config: Configuration = None) -> dict[str, float]:
     products = BDDProducts(config).execute(bdd_model).get_result()
     n_products = len(products)
     if n_products == 0:
