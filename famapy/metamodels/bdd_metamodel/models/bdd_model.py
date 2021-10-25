@@ -15,14 +15,14 @@ class BDDModel(VariabilityModel):
     NOT = CNF_NOTATION.value[CNFLogicConnective.NOT]
     AND = CNF_NOTATION.value[CNFLogicConnective.AND]
     OR = CNF_NOTATION.value[CNFLogicConnective.OR]
-    
+
     @staticmethod
     def get_extension() -> str:
         return 'bdd'
 
     def __init__(self):
         self.bdd = BDD()  # BDD manager
-        self.textual_cnf_formula = None
+        self.cnf_formula = None
         self.root = None
         self.variables = []
 
@@ -33,12 +33,12 @@ class BDDModel(VariabilityModel):
         self.variables = variables
 
         # Declare variables
-        for v in self.variables:
-            self.bdd.declare(v)
+        for var in self.variables:
+            self.bdd.declare(var)
 
         # Build the BDD
         self.root = self.bdd.add_expr(self.cnf_formula)
-        
+
         # Reorder variables
         # variable_order = self.bdd.vars 
         # var = self.bdd.var_at_level(0)
@@ -47,20 +47,22 @@ class BDDModel(VariabilityModel):
         # variable_order[var] = level
         # self.bdd.reorder(variable_order)
         # self.root = self.bdd.var(self.bdd.var_at_level(0))
-    
+
     def nof_nodes(self) -> int:
         """Return number of nodes in the BDD."""
         return len(self.bdd)
 
-    def level(self, n: Function) -> int:
+    @staticmethod
+    def level(node: Function) -> int:
         """Return the level of the node. 
-        
+
         Non-terminal nodes start at 0. 
         Terminal nodes have level `s' being the `s' the number of variables.
         """
-        return n.level
+        return node.level
 
-    def index(self, n: Function) -> int:
+    @staticmethod
+    def index(node: Function) -> int:
         """Position (index) of the variable that labels the node `n` in the ordering.
 
         Indexes start at 1. 
@@ -70,31 +72,32 @@ class BDDModel(VariabilityModel):
         Example: node `n4` is labeled `B`, and `B` is in the 2nd position in ordering `[A,B,C]`,
         thus level(n4) = 2.
         """
-        if n.node == -1 or n.node == 1:  # index(n0) = index(n1) = s + 1, s = number of variables
-            return len(self.bdd.vars) + 1
-        else:
-            return n.level + 1
-    
-    def is_terminal_node(self, node: Function) -> bool:
+        return node.level + 1
+
+    @staticmethod
+    def is_terminal_node(node: Function) -> bool:
         """Check if the node is a terminal node."""
         return node.var is None    
 
-    def is_terminal_n1(self, node: Function) -> bool:
+    @staticmethod
+    def is_terminal_n1(node: Function) -> bool:
         """Check if the node is the terminal node 1 (n1)."""
-        return self.is_terminal_node(node) and node.node == 1
+        return node.var is None and node.node == 1
 
-    def is_terminal_n0(self, node: Function) -> bool:
+    @staticmethod
+    def is_terminal_n0(node: Function) -> bool:
         """Check if the node is the terminal node 0 (n0)."""
-        return self.is_terminal_node(node) and node.node == -1
+        return node.var is None and node.node == -1
 
-    def get_high_node(self, node: Function) -> Function:
+    @staticmethod
+    def get_high_node(node: Function) -> Function:
         """Return the high (right, solid) node."""
         return node.high
 
-    def get_low_node(self, node: Function) -> Function:
+    @staticmethod
+    def get_low_node(node: Function) -> Function:
         """Return the low (left, dashed) node.
-        
+
         If the arc is complemented it returns the negation of the left node.
         """
-        return ~node.low if node.negated and not self.is_terminal_node(node.low) else node.low
-        
+        return ~node.low if node.negated and node.low.var is not None else node.low

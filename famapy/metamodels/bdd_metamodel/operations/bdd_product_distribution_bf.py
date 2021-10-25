@@ -15,25 +15,31 @@ class BDDProductDistributionBF(ProductDistribution):
     (https://doi.org/10.1109/ICSE.2019.00091)]
     """
 
-    def __init__(self, partial_configuration: Configuration=None) -> None:
+    def __init__(self, partial_configuration: Configuration = None) -> None:
         self.result = []
-        self.partial_configuration = partial_configuration
-    
-    def execute(self, bdd_model: BDDModel) -> 'BDDProductDistributionBF':
-        self.bdd_model = bdd_model
-        self.result = self.product_distribution(self.partial_configuration)
+        self.bdd_model = None
+        self.partial_config = partial_configuration
+
+    def execute(self, model: BDDModel) -> 'BDDProductDistributionBF':
+        self.bdd_model = model
+        self.result = self.product_distribution_from_partial_configuration(self.partial_config)
         return self
 
     def get_result(self) -> list[int]:
         return self.result
 
-    def product_distribution(self, partial_configuration: Configuration=None) -> list[int]:
-        """It accounts for how many solutions have no variables, one variable, two variables, ..., all variables.
+    def product_distribution(self) -> list[int]:
+        return self.product_distribution_from_partial_configuration()
+
+    def product_distribution_from_partial_configuration(self, 
+                                                        conf: Configuration = None) -> list[int]:
+        """It accounts for how many solutions have no variables, one variable, 
+        two variables, ..., all variables.
 
         It enumerates all solutions and filters them.
         """
-        products = BDDProducts(partial_configuration).execute(self.bdd_model).get_result()
+        products = BDDProducts(conf).execute(self.bdd_model).get_result()
         dist = []
-        for i in range(len(self.bdd_model.variables)+1):
-            dist.append(sum(len(p.elements)==i for p in products))
+        for i in range(len(self.bdd_model.variables) + 1):
+            dist.append(sum(len(p.elements) == i for p in products))
         return dist

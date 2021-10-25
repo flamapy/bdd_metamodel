@@ -1,10 +1,9 @@
 import itertools
 from typing import Any
 
-from famapy.core.exceptions import ElementNotFound
 from famapy.core.models import VariabilityModel
 from famapy.core.transformations import ModelToModel
-from famapy.metamodels.fm_metamodel.models.feature_model import (  # pylint: disable=import-error
+from famapy.metamodels.fm_metamodel.models.feature_model import (
     Constraint,
     Feature,
     Relation,
@@ -81,7 +80,7 @@ class FmToBDD(ModelToModel):
                 alt_cnf.append(self.variables.get(child.name))
             self.clauses.append(alt_cnf)
 
-            for i in range(len(relation.children)):
+            for i, _ in enumerate(relation.children):
                 for j in range(i + 1, len(relation.children)):
                     if i != j:
                         self.clauses.append([
@@ -129,10 +128,9 @@ class FmToBDD(ModelToModel):
     def add_constraint(self, ctc: Constraint) -> None:
         clauses = ctc.ast.get_clauses()
         for clause in clauses:
-            c = list(map(lambda term: (-self.variables.get(term[1:]) 
-                                         if term.startswith('-') 
-                                         else self.variables.get(term)), clause))
-            self.clauses.append(c)
+            cls = list(map(lambda term: -self.variables.get(term[1:]) if term.startswith('-') 
+                           else self.variables.get(term), clause))
+            self.clauses.append(cls)
 
     def transform(self) -> VariabilityModel:
         for feature in self.source_model.get_features():
@@ -153,9 +151,9 @@ class FmToBDD(ModelToModel):
         cnf_list = []
         for clause in self.clauses:
             cnf_list.append('(' + or_connective.join(list(map(lambda l: 
-                not_connective + self.features[abs(l)] if l < 0 else 
-                self.features[abs(l)], clause))) + ')')
-                
+                            not_connective + self.features[abs(l)] if l < 0 else 
+                            self.features[abs(l)], clause))) + ')')
+
         cnf_formula = and_connective.join(cnf_list)
         self.destination_model.from_textual_cnf(cnf_formula, list(self.variables.keys()))
 
