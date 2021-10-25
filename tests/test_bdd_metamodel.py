@@ -18,8 +18,8 @@ def main():
     bdd_model = FmToBDD(feature_model).transform()
 
     # Save the BDD as a .png
-    bdd_writer = BDDWriter(bdd_model.root.var + '.png', bdd_model)
-    bdd_writer.set_format(BDDDumpFormat.PNG)
+    bdd_writer = BDDWriter(bdd_model.root.var + '.svg', bdd_model)
+    bdd_writer.set_format(BDDDumpFormat.SVG)
     bdd_writer.set_roots([bdd_model.root])
     bdd_writer.transform()
 

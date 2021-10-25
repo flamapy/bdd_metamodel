@@ -30,7 +30,7 @@ class BDDSampling(Sampling):
 
     def execute(self, model: BDDModel) -> 'BDDSampling':
         self.bdd_model = model
-        self.result = get_sample(self.bdd_model, self.size, self.with_replacement, 
+        self.result = sample(self.bdd_model, self.size, self.with_replacement, 
                                  self.partial_configuration)
         return self
 
@@ -39,10 +39,10 @@ class BDDSampling(Sampling):
 
     def sample(self, size: int, with_replacement: bool = False, 
                partial_configuration: Configuration = None) -> list[Configuration]:
-        return get_sample(self.bdd_model, size, with_replacement, partial_configuration)
+        return sample(self.bdd_model, size, with_replacement, partial_configuration)
 
 
-def get_sample(bdd_model: BDDModel, size: int, with_replacement: bool = False, 
+def sample(bdd_model: BDDModel, size: int, with_replacement: bool = False, 
                partial_configuration: Configuration = None) -> list[Configuration]:
     nof_configs = BDDProductsNumber(partial_configuration).execute(bdd_model).get_result()
     if size < 0 or (size > nof_configs and not with_replacement):
@@ -50,19 +50,19 @@ def get_sample(bdd_model: BDDModel, size: int, with_replacement: bool = False,
 
     configurations = []
     for _ in range(size):
-        config = get_random_configuration(bdd_model, partial_configuration)
+        config = random_configuration(bdd_model, partial_configuration)
         configurations.append(config)
 
     if not with_replacement:
         set_configurations = set(configurations)
         while len(set_configurations) < size:
-            config = get_random_configuration(bdd_model, partial_configuration)
+            config = random_configuration(bdd_model, partial_configuration)
             set_configurations.add(config)
 
     return list(set_configurations)
 
 
-def get_random_configuration(bdd_model: BDDModel, p_config: Configuration = None) -> Configuration:
+def random_configuration(bdd_model: BDDModel, p_config: Configuration = None) -> Configuration:
     # Initialize the configurations and values for BDD nodes with already known features
     values = {} if p_config is None else dict(p_config.elements.items())
 

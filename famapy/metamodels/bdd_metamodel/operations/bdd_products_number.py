@@ -18,17 +18,17 @@ class BDDProductsNumber(ProductsNumber):
 
     def execute(self, model: BDDModel) -> 'BDDProductsNumber':
         self.bdd_model = model
-        self.result = get_products_number(self.bdd_model, self.partial_configuration)
+        self.result = products_number(self.bdd_model, self.partial_configuration)
         return self
 
     def get_result(self) -> int:
         return self.result
 
     def get_products_number(self) -> int:
-        return get_products_number(self.bdd_model, self.partial_configuration)
+        return products_number(self.bdd_model, self.partial_configuration)
 
 
-def get_products_number(bdd_model: BDDModel, partial_configuration: Configuration = None) -> int:
+def products_number(bdd_model: BDDModel, partial_configuration: Configuration = None) -> int:
     if partial_configuration is None:
         u_func = bdd_model.root
         n_vars = len(bdd_model.variables)

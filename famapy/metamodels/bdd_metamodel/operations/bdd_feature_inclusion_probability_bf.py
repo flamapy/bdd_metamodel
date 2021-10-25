@@ -23,17 +23,17 @@ class BDDFeatureInclusionProbabilityBF(FeatureInclusionProbability):
 
     def execute(self, model: BDDModel) -> 'BDDFeatureInclusionProbabilityBF':
         self.bdd_model = model
-        self.result = get_feature_inclusion_probability(self.bdd_model, self.partial_configuration)
+        self.result = feature_inclusion_probability(self.bdd_model, self.partial_configuration)
         return self
 
     def get_result(self) -> dict[str, float]:
         return self.result
 
     def feature_inclusion_probability(self) -> dict[str, float]:
-        return get_feature_inclusion_probability(self.bdd_model, self.partial_configuration)
+        return feature_inclusion_probability(self.bdd_model, self.partial_configuration)
 
 
-def get_feature_inclusion_probability(bdd_model: BDDModel, 
+def feature_inclusion_probability(bdd_model: BDDModel, 
                                       config: Configuration = None) -> dict[str, float]:
     products = BDDProducts(config).execute(bdd_model).get_result()
     n_products = len(products)
