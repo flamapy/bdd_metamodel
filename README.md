@@ -1,4 +1,15 @@
 # BDD plugin for FaMaPy
+- [BDD plugin for FaMaPy](#bdd-plugin-for-famapy)
+  - [Description](#description)
+  - [Requirements and Installation](#requirements-and-installation)
+  - [Functionality and usage](#functionality-and-usage)
+    - [Load a feature model and create the BDD](#load-a-feature-model-and-create-the-bdd)
+    - [Save the BDD in a file](#save-the-bdd-in-a-file)
+    - [Analysis operations](#analysis-operations)
+  - [Contributing to the BDD plugin](#contributing-to-the-bdd-plugin)
+
+
+## Description
 This plugin supports Binary Decision Diagrams (BDDs) representations for feature models.
 
 The plugin is based on [FaMaPy](https://github.com/diverso-lab/core) and thus, it follows the same architecture:
@@ -7,16 +18,18 @@ The plugin is based on [FaMaPy](https://github.com/diverso-lab/core) and thus, i
   <img width="750" src="doc/bdd_plugin.png">
 </p>
 
-## Description
 The BDD plugin relies on the [dd](https://github.com/tulip-control/dd) library to manipulate BDDs.
 The complete documentation of such library is available [here](https://github.com/tulip-control/dd/blob/main/doc.md).
 
 The following is an example of feature model and its BDD using complemented arcs.
+
 <p align="center">
   <img width="750" src="doc/fm_example.png">
-  <img width="750" src="doc/bdd_example.svg">
 </p>
 
+<p align="center">
+  <img width="750" src="doc/bdd_example.svg">
+</p>
 
 ## Requirements and Installation
 - Python 3.9+
