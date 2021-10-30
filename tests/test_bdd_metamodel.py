@@ -3,16 +3,16 @@ from famapy.metamodels.fm_metamodel.transformations.featureide_reader import Fea
 from famapy.metamodels.bdd_metamodel.transformations.fm_to_bdd import FmToBDD
 from famapy.metamodels.bdd_metamodel.transformations.bdd_writer import BDDDumpFormat, BDDWriter
 from famapy.metamodels.bdd_metamodel.operations import (
-    BDDProducts, 
-    BDDProductsNumber, 
-    BDDProductDistributionBF, 
-    BDDFeatureInclusionProbabilityBF, 
+    BDDProducts,
+    BDDProductsNumber,
+    BDDProductDistributionBF,
+    BDDFeatureInclusionProbabilityBF,
     BDDSampling)
 
 
 def main():
     # Load the feature model from FeatureIDE
-    feature_model = FeatureIDEReader('input_fms/featureide_models/pizzas.xml').transform() 
+    feature_model = FeatureIDEReader('input_fms/featureide_models/pizzas.xml').transform()
 
     # Create the BDD from the FM
     bdd_model = FmToBDD(feature_model).transform()
@@ -32,7 +32,7 @@ def main():
     for i, prod in enumerate(products):
         print(f'Product {i}: {[feat for feat in prod.elements if prod.elements[feat]]}')
 
-    assert len(products) == nof_products 
+    assert len(products) == nof_products
 
     # BDD product distribution
     dist = BDDProductDistributionBF().execute(bdd_model).get_result()
