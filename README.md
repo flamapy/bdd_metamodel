@@ -1,7 +1,6 @@
 Sample update
 
-This is anothe readme update
-
+This is a fix to the readme
 
 # BDD plugin for FaMaPy
 - [BDD plugin for FaMaPy](#bdd-plugin-for-famapy)
