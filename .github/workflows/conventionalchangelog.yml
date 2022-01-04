@@ -1,0 +1,13 @@
+
+name: Conventional Changelog
+on:
+  release:
+    
+jobs:
+  main:
+    name: Generate conventional changelog
+    runs-on: ubuntu-latest
+    steps:
+      - uses: TriPSs/conventional-changelog-action@v3
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
