@@ -1,4 +1,4 @@
-Readme update
+Readme fix
 
 # BDD plugin for FaMaPy
 - [BDD plugin for FaMaPy](#bdd-plugin-for-famapy)
