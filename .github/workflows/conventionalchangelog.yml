@@ -13,13 +13,7 @@ jobs:
     steps:
       - name: Checkout Git repo
         uses: actions/checkout@master
-
-      - name: yarn install
-        uses: borales/actions-yarn@v2.3.0
-        with:
-          cmd: install
-      - name: Pragmatics install
-        run: sudo yarn add @pragmatics/conventional-changelog-preset -D
+        
       - name: Automated Version Bump
         id: versionBump
         uses: TriPSs/conventional-changelog-action@v3
@@ -28,7 +22,7 @@ jobs:
           tag-prefix: ""
           skip-on-empty: "false"
           skip-version-file: true
-          preset: pragmatics
+          preset: codemirror
       - name: Automated GitHub Release
         uses: actions/create-release@v1
         if: ${{ steps.versionBump.outputs.skipped == 'false' }}
