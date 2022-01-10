@@ -1,4 +1,6 @@
-### [v0.11.2](https://github.com/pabpazjim/bdd_metamodel/compare/v0.11.1...v0.11.2) (2022-01-10)
+## [NaN.0.0](https://github.com/pabpazjim/bdd_metamodel/compare/v0.11.2...NaN.0.0) (2022-01-10)
+
+### [0.11.2](https://github.com/pabpazjim/bdd_metamodel/compare/v0.11.1...v0.11.2) (2022-01-10)
 
 ### [0.11.1](https://github.com/pabpazjim/bdd_metamodel/compare/v0.11.0...v0.11.1) (2022-01-10)
 
@@ -19,6 +21,4 @@
 ### Features
 
 * new version  ([b5a576a](https://github.com/pabpazjim/bdd_metamodel/commit/b5a576a66ffec13f66a486a00c378d66027c12b2))
-
-## [0.10.0](https://github.com/pabpazjim/bdd_metamodel/compare/v0.9.0...v0.10.0) (2022-01-07)
 
