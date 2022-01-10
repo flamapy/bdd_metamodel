@@ -1,13 +1,3 @@
-Readme fix
-
-Readme update
-
-New update
-
-Another update
-
-I am losing my sanity aaaaaadsaadsdsaadsasdasd
-
 
 # BDD plugin for FaMaPy
 - [BDD plugin for FaMaPy](#bdd-plugin-for-famapy)
