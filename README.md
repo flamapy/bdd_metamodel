@@ -1,5 +1,5 @@
 
-Readme updateee
+Readme update
 
 # BDD plugin for FaMaPy
 - [BDD plugin for FaMaPy](#bdd-plugin-for-famapy)
