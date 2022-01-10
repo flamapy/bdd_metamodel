@@ -19,7 +19,7 @@ jobs:
         with:
           cmd: install
       - name: Pragmatics install
-        run: yarn add @pragmatics/conventional-changelog-preset -D
+        run: sudo yarn add @pragmatics/conventional-changelog-preset -D
       - name: Automated Version Bump
         id: versionBump
         uses: TriPSs/conventional-changelog-action@v3
