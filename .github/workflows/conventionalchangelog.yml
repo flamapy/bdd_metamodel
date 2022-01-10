@@ -23,6 +23,7 @@ jobs:
           tag-prefix: ""
           skip-on-empty: "false"
           skip-version-file: true
+          preset: pragmatics
       - name: Automated GitHub Release
         uses: actions/create-release@v1
         if: ${{ steps.versionBump.outputs.skipped == 'false' }}
