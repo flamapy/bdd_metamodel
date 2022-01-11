@@ -1,11 +1,4 @@
 
-Readme update
-
-New readme update
-
-aaaaaaaa
-
-AAAAAAAAAAA
 
 # BDD plugin for FaMaPy
 - [BDD plugin for FaMaPy](#bdd-plugin-for-famapy)
