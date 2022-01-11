@@ -1,3 +1,5 @@
+### [0.1.2](https://github.com/pabpazjim/bdd_metamodel/compare/0.1.1...0.1.2) (2022-01-11)
+
 ### [0.1.1](https://github.com/pabpazjim/bdd_metamodel/compare/0.1.0...0.1.1) (2022-01-10)
 
 ## [0.1.0](https://github.com/pabpazjim/bdd_metamodel/compare/d6c36a56b73a5310b6a16d784d6d07582b58b114...0.1.0) (2022-01-10)
