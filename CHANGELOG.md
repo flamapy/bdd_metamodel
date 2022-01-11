@@ -1,3 +1,10 @@
+## [0.2.0](https://github.com/pabpazjim/bdd_metamodel/compare/0.1.2...0.2.0) (2022-01-11)
+
+
+### Features
+
+* new version ([722d158](https://github.com/pabpazjim/bdd_metamodel/commit/722d158b9786d7ae919ae84542fb43295343615b))
+
 ### [0.1.2](https://github.com/pabpazjim/bdd_metamodel/compare/0.1.1...0.1.2) (2022-01-11)
 
 ### [0.1.1](https://github.com/pabpazjim/bdd_metamodel/compare/0.1.0...0.1.1) (2022-01-10)
