@@ -28,7 +28,7 @@ class FmToBDD(ModelToModel):
         self.clauses: list[list[int]] = []
 
     def add_feature(self, feature: Feature) -> None:
-        if feature.name not in self.variables.keys():
+        if feature.name not in self.variables:
             self.variables[feature.name] = self.counter
             self.features[self.counter] = feature.name
             self.counter += 1
