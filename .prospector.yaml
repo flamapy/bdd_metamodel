@@ -2,7 +2,10 @@ strictness: high
 test-warnings: true
 doc-warnings: false
 
-pep8:
+ignore-paths:
+  - env
+
+pycodestyle:
   options:
     max-line-length: 100
 
