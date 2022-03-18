@@ -64,11 +64,13 @@ def sample(bdd_model: BDDModel, size: int, with_replacement: bool = False) -> li
     for line in line_iterator:
         parsed_line = re.compile(r'\s+').split(line)
         configuration = {}
+        negation = False
         for element in parsed_line:
             if element != "":
                 if element == "not":
-                    configuration[element] = False
+                    negation = True
                 else:
-                    configuration[element] = True
+                    configuration[element] = not negation
+                    negation = False
         configurations.append(Configuration(configuration))
     return configurations
