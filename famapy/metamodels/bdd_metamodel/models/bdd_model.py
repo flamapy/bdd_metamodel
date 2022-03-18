@@ -1,105 +1,92 @@
-from typing import Optional
-
-from dd.autoref import BDD, Function
+import os
+import stat
+import subprocess
+import locale
+from platform import system 
+from pathlib import Path
+from typing import Any
 
 from famapy.core.models import VariabilityModel
-
-from famapy.metamodels.bdd_metamodel.models.utils.txtcnf import TextCNFNotation, CNFLogicConnective
 
 
 class BDDModel(VariabilityModel):
     """A Binary Decision Diagram (BDD) representation of the feature model.
 
-    It relies on the dd library: https://pypi.org/project/dd/
+    It relies on the bdd4va library (https://github.com/rheradio/bdd4va).
     """
 
-    CNF_NOTATION = TextCNFNotation.JAVA_SHORT
-    NOT = CNF_NOTATION.value[CNFLogicConnective.NOT]
-    AND = CNF_NOTATION.value[CNFLogicConnective.AND]
-    OR = CNF_NOTATION.value[CNFLogicConnective.OR]
+    # Binary programs available
+    SPLOT2LOGIC = 'splot2logic'
+    LOGIC2BDD = 'logic2bdd'
+    BDD_SAMPLER = 'BDDSampler'
+    PRODUCT_DISTRIBUTION = 'product_distribution'
+    FEATURE_PROBABILITIES = 'feature_probabilities'
 
     @staticmethod
     def get_extension() -> str:
         return 'bdd'
 
     def __init__(self) -> None:
-        self.bdd = BDD()  # BDD manager
-        self.cnf_formula: Optional[str] = None 
-        self.root = None
-        self.variables: list[str] = []
+        """Initialize the BDD with the dddmp file.
 
-    def from_textual_cnf(self, textual_cnf_formula: str, variables: list[str]) -> None:
-        """Build the BDD from a textual representation of the CNF formula,
-        and the list of variables."""
-        self.cnf_formula = textual_cnf_formula
-        self.variables = variables
-
-        # Declare variables
-        for var in self.variables:
-            self.bdd.declare(var)
-
-        # Build the BDD
-        self.root = self.bdd.add_expr(self.cnf_formula)
-
-        # Reorder variables
-        # variable_order = self.bdd.vars 
-        # var = self.bdd.var_at_level(0)
-        # level = self.root.level
-        # variable_order[self.root.var] = 0
-        # variable_order[var] = level
-        # self.bdd.reorder(variable_order)
-        # self.root = self.bdd.var(self.bdd.var_at_level(0))
-
-    def nof_nodes(self) -> int:
-        """Return number of nodes in the BDD."""
-        return len(self.bdd)
-
-    @staticmethod
-    def level(node: Function) -> int:
-        """Return the level of the node. 
-
-        Non-terminal nodes start at 0. 
-        Terminal nodes have level `s' being the `s' the number of variables.
+        The BDD relies on a dddmp file that stores a feature model's BDD encoding (dddmp is the
+        format that the BDD library CUDD uses; check https://github.com/vscosta/cudd)
         """
-        return node.level
+        self.bdd_file: str
+        self.set_global_constants()
 
-    @staticmethod
-    def index(node: Function) -> int:
-        """Position (index) of the variable that labels the node `n` in the ordering.
+    def set_bdd_file(self, dddmp_file: str) -> None:
+        self.bdd_file = dddmp_file
 
-        Indexes start at 1. 
-        Terminal nodes (n0 and n1) have indexes `s + 1`, being `s' the number of variables.
-        Note that index(n) = level(n) + 1.
+    def get_bdd_file(self) -> str:
+        return self.bdd_file
 
-        Example: node `n4` is labeled `B`, and `B` is in the 2nd position in ordering `[A,B,C]`,
-        thus level(n4) = 2.
+    def __del__(self) -> None:
+        Path(self.bdd_file + '.dddmp').unlink()
+
+    def set_global_constants(self) -> None:
+        """Private auxiliary function that configures the following global constants.
+
+            + SYSTEM, which stores the operating system running bdd4va: Linux or Windows.
+            + BDD4VAR_DIR, which stores the path of the module bdd4va, 
+            which is needed to locate the binaries.
         """
-        return node.level + 1
+        # get SYSTEM
+        self.system = system()
+        # get BDD4VAR_DIR
+        caller_dir = os.getcwd()
+        os.chdir(Path(__file__).parent)
+        if self.system == 'Windows':
+            shell = subprocess.run(['wsl', 'pwd'], stdout=subprocess.PIPE, check=True)
+        else:
+            shell = subprocess.run(['pwd'], stdout=subprocess.PIPE, check=True)
+        self.bdd4var_dir = shell.stdout.decode(str(locale.getdefaultlocale()[1])).strip()
+        os.chdir(caller_dir)
+
+    def run(self, binary: str, *args: Any) -> Any:
+        """Private auxiliary function to run binary files in Linux and Windows."""
+        bin_file = os.path.join(self.bdd4var_dir, 'bin', binary)
+        # Set execution permission
+        file_stats = os.stat(bin_file)
+        os.chmod(bin_file, file_stats.st_mode | stat.S_IEXEC)
+        if self.system == 'Windows':
+            if not args:
+                command = ['wsl', bin_file]
+            else:
+                command = ['wsl', bin_file] + list(args)
+        else:
+            if not args:
+                command = [bin_file]
+            else:
+                command = [bin_file] + list(args)
+        return subprocess.run(command, stdout=subprocess.PIPE, check=True)
 
     @staticmethod
-    def is_terminal_node(node: Function) -> bool:
-        """Check if the node is a terminal node."""
-        return node.var is None    
-
-    @staticmethod
-    def is_terminal_n1(node: Function) -> bool:
-        """Check if the node is the terminal node 1 (n1)."""
-        return node.var is None and node.node == 1
-
-    @staticmethod
-    def is_terminal_n0(node: Function) -> bool:
-        """Check if the node is the terminal node 0 (n0)."""
-        return node.var is None and node.node == -1
-
-    @staticmethod
-    def get_high_node(node: Function) -> Function:
-        """Return the high (right, solid) node."""
-        return node.high
-
-    @staticmethod
-    def get_low_node(node: Function) -> Function:
-        """Return the low (left, dashed) node.
-
-        If the arc is complemented it returns the negation of the left node.
-        """
-        return ~node.low if node.negated and node.low.var is not None else node.low
+    def check_file_existence(filename: str, extension: str) -> str:
+        """Private auxiliary function that verifies if the input file exists."""
+        if not os.path.isfile(filename):
+            filename = filename + '.' + extension
+            if not os.path.isfile(filename):
+                message = 'The file "' + filename + '" doesn\'t exist.'
+                raise Exception(message)
+        return filename
