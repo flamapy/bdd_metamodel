@@ -1,4 +1,6 @@
-from famapy.core.models import Configuration 
+from typing import Optional
+
+from famapy.metamodels.configuration_metamodel.models.configuration import Configuration
 
 from famapy.metamodels.bdd_metamodel.models import BDDModel
 from famapy.metamodels.bdd_metamodel.operations.interfaces import FeatureInclusionProbability
@@ -6,13 +8,13 @@ from famapy.metamodels.bdd_metamodel.operations import BDDProducts
 
 
 class BDDFeatureInclusionProbabilityBF(FeatureInclusionProbability):
-    """The Feature Inclusion Probability (FIP) operation determines the probability 
-    for a variable to be included in a valid solution. 
+    """The Feature Inclusion Probability (FIP) operation determines the probability
+    for a variable to be included in a valid solution.
 
-    This is a brute-force implementation that enumerates all solutions 
+    This is a brute-force implementation that enumerates all solutions
     for calculating the probabilities.
 
-    Ref.: [Heradio et al. 2019. Supporting the Statistical Analysis of Variability Models. SPLC. 
+    Ref.: [Heradio et al. 2019. Supporting the Statistical Analysis of Variability Models. SPLC.
     (https://doi.org/10.1109/ICSE.2019.00091)]
     """
 
@@ -33,8 +35,8 @@ class BDDFeatureInclusionProbabilityBF(FeatureInclusionProbability):
         return feature_inclusion_probability(self.bdd_model, self.partial_configuration)
 
 
-def feature_inclusion_probability(bdd_model: BDDModel, 
-                                  config: Configuration = None) -> dict[str, float]:
+def feature_inclusion_probability(bdd_model: BDDModel,
+                                  config: Optional[Configuration] = None) -> dict[str, float]:
     products = BDDProducts(config).execute(bdd_model).get_result()
     n_products = len(products)
     if n_products == 0:

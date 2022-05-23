@@ -1,6 +1,6 @@
 from typing import Optional
 
-from famapy.core.models import Configuration
+from famapy.metamodels.configuration_metamodel.models.configuration import Configuration
 
 from famapy.metamodels.bdd_metamodel.models import BDDModel
 from famapy.metamodels.bdd_metamodel.operations.interfaces import ProductDistribution
