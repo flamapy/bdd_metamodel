@@ -1,4 +1,4 @@
-from famapy.core.models import Configuration
+from core.famapy.metamodels.configuration_metamodel.models.configuration import Configuration
 from famapy.core.operations import ProductsNumber
 
 from famapy.metamodels.bdd_metamodel.models.bdd_model import BDDModel

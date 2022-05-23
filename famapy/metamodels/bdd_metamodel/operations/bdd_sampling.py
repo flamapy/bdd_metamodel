@@ -1,6 +1,6 @@
 import random 
 
-from famapy.core.models import Configuration
+from core.famapy.metamodels.configuration_metamodel.models.configuration import Configuration
 from famapy.core.operations import Sampling
 
 from famapy.metamodels.bdd_metamodel.models import BDDModel
