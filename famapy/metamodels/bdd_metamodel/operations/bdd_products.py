@@ -1,4 +1,7 @@
+from typing import Optional
+
 from core.famapy.metamodels.configuration_metamodel.models.configuration import Configuration
+
 from famapy.core.operations import Products
 
 from famapy.metamodels.bdd_metamodel.models.bdd_model import BDDModel
@@ -10,7 +13,7 @@ class BDDProducts(Products):
     It also supports the computation of all solutions from a partial configuration.
     """
 
-    def __init__(self, partial_configuration: Configuration = None) -> None:
+    def __init__(self, partial_configuration: Optional[Configuration] = None) -> None:
         self.result: list[Configuration] = []
         self.bdd_model = None
         self.partial_configuration = partial_configuration
@@ -27,7 +30,8 @@ class BDDProducts(Products):
         return products(self.bdd_model, self.partial_configuration)
 
 
-def products(bdd_model: BDDModel, partial_config: Configuration = None) -> list[Configuration]:
+def products(bdd_model: BDDModel, 
+             partial_config: Optional[Configuration] = None) -> list[Configuration]:
     if partial_config is None:
         u_func = bdd_model.root
         care_vars = bdd_model.variables

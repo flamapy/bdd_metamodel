@@ -1,4 +1,5 @@
 import random 
+from typing import Optional
 
 from core.famapy.metamodels.configuration_metamodel.models.configuration import Configuration
 from famapy.core.operations import Sampling
@@ -21,7 +22,7 @@ class BDDSampling(Sampling):
     """
 
     def __init__(self, size: int, with_replacement: bool = False, 
-                 partial_configuration: Configuration = None) -> None:
+                 partial_configuration: Optional[Configuration] = None) -> None:
         self.result: list[Configuration] = []
         self.bdd_model = None
         self.size = size 
@@ -38,12 +39,12 @@ class BDDSampling(Sampling):
         return self.result
 
     def sample(self, size: int, with_replacement: bool = False, 
-               partial_configuration: Configuration = None) -> list[Configuration]:
+               partial_configuration: Optional[Configuration] = None) -> list[Configuration]:
         return sample(self.bdd_model, size, with_replacement, partial_configuration)
 
 
 def sample(bdd_model: BDDModel, size: int, with_replacement: bool = False, 
-           partial_configuration: Configuration = None) -> list[Configuration]:
+           partial_configuration: Optional[Configuration] = None) -> list[Configuration]:
     nof_configs = BDDProductsNumber(partial_configuration).execute(bdd_model).get_result()
     if size < 0 or (size > nof_configs and not with_replacement):
         raise ValueError('Sample larger than population or is negative.')
@@ -62,7 +63,8 @@ def sample(bdd_model: BDDModel, size: int, with_replacement: bool = False,
     return list(set_configurations)
 
 
-def random_configuration(bdd_model: BDDModel, p_config: Configuration = None) -> Configuration:
+def random_configuration(bdd_model: BDDModel, 
+                         p_config: Optional[Configuration] = None) -> Configuration:
     # Initialize the configurations and values for BDD nodes with already known features
     values = {} if p_config is None else dict(p_config.elements.items())
 
