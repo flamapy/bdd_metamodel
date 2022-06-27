@@ -6,7 +6,7 @@ ignore-paths:
   - build
   - env
 
-pep8:
+pycodestyle:
   options:
     max-line-length: 100
 
