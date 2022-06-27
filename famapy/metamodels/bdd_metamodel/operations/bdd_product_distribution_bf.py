@@ -1,4 +1,4 @@
-from typing import Optional 
+from typing import Optional
 
 from famapy.core.models import Configuration
 
@@ -8,12 +8,12 @@ from famapy.metamodels.bdd_metamodel.operations import BDDProducts
 
 
 class BDDProductDistributionBF(ProductDistribution):
-    """The Product Distribution (PD) algorithm determines the number of solutions 
+    """The Product Distribution (PD) algorithm determines the number of solutions
     having a given number of variables.
 
     This is a brute-force implementation that enumerates all solutions for accounting them.
 
-    Ref.: [Heradio et al. 2019. Supporting the Statistical Analysis of Variability Models. SPLC. 
+    Ref.: [Heradio et al. 2019. Supporting the Statistical Analysis of Variability Models. SPLC.
     (https://doi.org/10.1109/ICSE.2019.00091)]
     """
 
@@ -38,15 +38,15 @@ class BDDProductDistributionBF(ProductDistribution):
         serialize(result, filepath)
 
 
-def product_distribution(bdd_model: BDDModel, 
-                         p_config: Optional[Configuration] = None) -> list[int]: 
-    """It accounts for how many solutions have no variables, one variable, 
+def product_distribution(bdd_model: BDDModel,
+                         p_config: Optional[Configuration] = None) -> list[int]:
+    """It accounts for how many solutions have no variables, one variable,
     two variables, ..., all variables.
 
     It enumerates all solutions and filters them.
     """
     products = BDDProducts(p_config).execute(bdd_model).get_result()
-    dist = []
+    dist: list[int] = []
     for i in range(len(bdd_model.variables) + 1):
         dist.append(sum(len(p.elements) == i for p in products))
     return dist
