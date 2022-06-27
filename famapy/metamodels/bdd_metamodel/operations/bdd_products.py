@@ -1,6 +1,6 @@
 from typing import Optional
 
-from core.famapy.metamodels.configuration_metamodel.models.configuration import Configuration
+from famapy.metamodels.configuration_metamodel.models.configuration import Configuration
 
 from famapy.core.operations import Products
 
@@ -30,7 +30,7 @@ class BDDProducts(Products):
         return products(self.bdd_model, self.partial_configuration)
 
 
-def products(bdd_model: BDDModel, 
+def products(bdd_model: BDDModel,
              partial_config: Optional[Configuration] = None) -> list[Configuration]:
     if partial_config is None:
         u_func = bdd_model.root

@@ -1,7 +1,7 @@
-import random 
+import random
 from typing import Optional
 
-from core.famapy.metamodels.configuration_metamodel.models.configuration import Configuration
+from famapy.metamodels.configuration_metamodel.models.configuration import Configuration
 from famapy.core.operations import Sampling
 
 from famapy.metamodels.bdd_metamodel.models import BDDModel
@@ -11,9 +11,9 @@ from famapy.metamodels.bdd_metamodel.operations import BDDProductsNumber
 class BDDSampling(Sampling):
     """Uniform Random Sampling (URS) using a Binary Decision Diagram (BDD).
 
-    This is an adaptation of 
-    [Heradio et al. 2021. 
-    Uniform and Scalable Sampling of Highly Configurable Systems. 
+    This is an adaptation of
+    [Heradio et al. 2021.
+    Uniform and Scalable Sampling of Highly Configurable Systems.
     Empirical Software Engineering]
     which relies on counting-based sampling inspired in the original Knuth algorithm.
 
@@ -21,29 +21,29 @@ class BDDSampling(Sampling):
     as well as samples from a given partial configuration.
     """
 
-    def __init__(self, size: int, with_replacement: bool = False, 
+    def __init__(self, size: int, with_replacement: bool = False,
                  partial_configuration: Optional[Configuration] = None) -> None:
         self.result: list[Configuration] = []
         self.bdd_model = None
-        self.size = size 
-        self.with_replacement = with_replacement 
+        self.size = size
+        self.with_replacement = with_replacement
         self.partial_configuration = partial_configuration
 
     def execute(self, model: BDDModel) -> 'BDDSampling':
         self.bdd_model = model
-        self.result = sample(self.bdd_model, self.size, self.with_replacement, 
+        self.result = sample(self.bdd_model, self.size, self.with_replacement,
                              self.partial_configuration)
         return self
 
     def get_result(self) -> list[Configuration]:
         return self.result
 
-    def sample(self, size: int, with_replacement: bool = False, 
+    def sample(self, size: int, with_replacement: bool = False,
                partial_configuration: Optional[Configuration] = None) -> list[Configuration]:
         return sample(self.bdd_model, size, with_replacement, partial_configuration)
 
 
-def sample(bdd_model: BDDModel, size: int, with_replacement: bool = False, 
+def sample(bdd_model: BDDModel, size: int, with_replacement: bool = False,
            partial_configuration: Optional[Configuration] = None) -> list[Configuration]:
     nof_configs = BDDProductsNumber(partial_configuration).execute(bdd_model).get_result()
     if size < 0 or (size > nof_configs and not with_replacement):
@@ -63,7 +63,7 @@ def sample(bdd_model: BDDModel, size: int, with_replacement: bool = False,
     return list(set_configurations)
 
 
-def random_configuration(bdd_model: BDDModel, 
+def random_configuration(bdd_model: BDDModel,
                          p_config: Optional[Configuration] = None) -> Configuration:
     # Initialize the configurations and values for BDD nodes with already known features
     values = {} if p_config is None else dict(p_config.elements.items())
@@ -82,8 +82,8 @@ def random_configuration(bdd_model: BDDModel,
         nof_configs_var_unselected = bdd_model.bdd.count(v_unsel, nvars=n_vars - 1)
 
         # Randomly select or not the feature
-        selected = random.choices([True, False], 
-                                  [nof_configs_var_selected, nof_configs_var_unselected], 
+        selected = random.choices([True, False],
+                                  [nof_configs_var_selected, nof_configs_var_unselected],
                                   k=1)[0]
 
         # Update configuration and BDD node for the new feature
