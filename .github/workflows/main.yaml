@@ -46,8 +46,12 @@ jobs:
           python-version: 3.9
       - name: Install dependencies
         run: |
+          sudo add-apt-repository universe
+          sudo apt update
+          sudo apt install graphviz -y
           python -m pip install --upgrade pip
           pip install pytest==5.4.3
+          pip install graphviz
           pip install .
       - name: Running test
         run: |
