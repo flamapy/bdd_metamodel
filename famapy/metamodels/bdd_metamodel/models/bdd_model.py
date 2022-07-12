@@ -41,15 +41,6 @@ class BDDModel(VariabilityModel):
         # Build the BDD
         self.root = self.bdd.add_expr(self.cnf_formula)
 
-        # Reorder variables
-        # variable_order = self.bdd.vars 
-        # var = self.bdd.var_at_level(0)
-        # level = self.root.level
-        # variable_order[self.root.var] = 0
-        # variable_order[var] = level
-        # self.bdd.reorder(variable_order)
-        # self.root = self.bdd.var(self.bdd.var_at_level(0))
-
     def nof_nodes(self) -> int:
         """Return number of nodes in the BDD."""
         return len(self.bdd)

@@ -25,6 +25,7 @@ setuptools.setup(
         'famapy~=1.0.0',
         'famapy-fm~=1.0.0',
         'dd>=0.5.6'
+        'graphviz~=0.20',
     ],
     extras_require={
         'dev': [
@@ -36,6 +37,6 @@ setuptools.setup(
         ]
     },
     dependency_links=[
-        'famapy~=1.0.0'
+        'famapy~=1.0.0',
     ]
 )
