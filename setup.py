@@ -7,7 +7,7 @@ with open("README.md", "r") as fh:
 
 setuptools.setup(
     name="famapy-bdd",
-    version="0.7.0",
+    version="0.8.0.dev0",
     author="José Miguel Horcas",
     author_email="jhorcas@us.es",
     description="bdd-plugin for the automated analysis of feature models",
@@ -22,7 +22,7 @@ setuptools.setup(
     ],
     python_requires='>=3.9',
     install_requires=[
-        'famapy>=0.7.0',
+        'famapy>=0.9.0',
         'famapy-fm>=0.7.0',
         'dd>=0.5.6'
     ],
@@ -36,6 +36,6 @@ setuptools.setup(
         ]
     },
     dependency_links=[
-        'famapy>=0.7.0'
+        'famapy>=0.9.0'
     ]
 )

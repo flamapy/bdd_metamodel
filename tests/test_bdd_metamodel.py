@@ -10,9 +10,9 @@ from famapy.metamodels.bdd_metamodel.operations import (
     BDDSampling)
 
 
-def main():
+def test_main():
     # Load the feature model from FeatureIDE
-    feature_model = FeatureIDEReader('input_fms/featureide_models/pizzas.xml').transform()
+    feature_model = FeatureIDEReader('tests/input_fms/featureide_models/pizzas.xml').transform()
 
     # Create the BDD from the FM
     bdd_model = FmToBDD(feature_model).transform()
@@ -51,7 +51,3 @@ def main():
     print('Uniform Random Sampling:')
     for i, prod in enumerate(sample):
         print(f'Product {i}: {[feat for feat in prod.elements if prod.elements[feat]]}')
-
-
-if __name__ == "__main__":
-    main()
