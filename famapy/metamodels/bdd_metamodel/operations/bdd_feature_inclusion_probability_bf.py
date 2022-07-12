@@ -18,7 +18,7 @@ class BDDFeatureInclusionProbabilityBF(FeatureInclusionProbability):
     (https://doi.org/10.1109/ICSE.2019.00091)]
     """
 
-    def __init__(self, partial_configuration: Configuration = None) -> None:
+    def __init__(self, partial_configuration: Optional[Configuration] = None) -> None:
         self.bdd_model = None
         self.result: dict[str, float] = {}
         self.partial_configuration = partial_configuration
