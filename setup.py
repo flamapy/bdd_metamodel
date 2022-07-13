@@ -24,7 +24,8 @@ setuptools.setup(
     install_requires=[
         'famapy>=0.9.0',
         'famapy-fm>=0.7.0',
-        'dd>=0.5.6'
+        'dd>=0.5.6',
+        'graphviz~=0.20'
     ],
     extras_require={
         'dev': [
