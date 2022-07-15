@@ -51,9 +51,11 @@ class BDDWriter(ModelToText):
         if self._output_format == BDDDumpFormat.DDDMP_V3:
             # Convert to dddmp format version 3.0 (adding the '.varnames' field)
             result = dddmp_v2_to_v3(self._path)
-        else:
+        elif self._output_format == BDDDumpFormat.DDDMP_V2:
             with open(self._path, 'r', encoding='utf-8') as file:
                 result = os.linesep.join(file.readlines())
+        else:
+            result = ''
         return result
 
 

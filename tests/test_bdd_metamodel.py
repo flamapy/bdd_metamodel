@@ -5,20 +5,23 @@ from famapy.metamodels.bdd_metamodel.transformations.bdd_writer import BDDDumpFo
 from famapy.metamodels.bdd_metamodel.operations import (
     BDDProducts,
     BDDProductsNumber,
-    BDDProductDistributionBF,
-    BDDFeatureInclusionProbabilityBF,
+    BDDProductDistribution,
+    BDDFeatureInclusionProbability,
     BDDSampling)
+
+
+FM_PATH = 'tests/input_fms/featureide_models/pizzas.xml'
 
 
 def test_main():
     # Load the feature model from FeatureIDE
-    feature_model = FeatureIDEReader('tests/input_fms/featureide_models/pizzas.xml').transform()
+    feature_model = FeatureIDEReader(FM_PATH).transform()
 
     # Create the BDD from the FM
     bdd_model = FmToBDD(feature_model).transform()
 
-    # Save the BDD as a .png
-    bdd_writer = BDDWriter(bdd_model.root.var + '.svg', bdd_model)
+    # # Save the BDD as a .png
+    bdd_writer = BDDWriter(bdd_model.root.var + '.png', bdd_model)
     bdd_writer.set_format(BDDDumpFormat.SVG)
     bdd_writer.set_roots([bdd_model.root])
     bdd_writer.transform()
@@ -35,13 +38,13 @@ def test_main():
     assert len(products) == nof_products
 
     # BDD product distribution
-    dist = BDDProductDistributionBF().execute(bdd_model).get_result()
+    dist = BDDProductDistribution().execute(bdd_model).get_result()
     print(f'Product Distribution: {dist}')
 
     assert sum(dist) == nof_products
 
     # BDD feature inclusion probabilities
-    prob = BDDFeatureInclusionProbabilityBF().execute(bdd_model).get_result()
+    prob = BDDFeatureInclusionProbability().execute(bdd_model).get_result()
     print('Feature Inclusion Probabilities:')
     for feat in prob.keys():
         print(f'{feat}: {prob[feat]}')
@@ -51,3 +54,7 @@ def test_main():
     print('Uniform Random Sampling:')
     for i, prod in enumerate(sample):
         print(f'Product {i}: {[feat for feat in prod.elements if prod.elements[feat]]}')
+
+
+if __name__ == '__main__':
+    test_main()

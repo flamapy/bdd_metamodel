@@ -6,7 +6,7 @@ from famapy.metamodels.bdd_metamodel.operations.interfaces import ProductDistrib
 from famapy.metamodels.bdd_metamodel.operations import BDDProducts
 
 
-class BDDProductDistributionBF(ProductDistribution):
+class BDDProductDistribution(ProductDistribution):
     """The Product Distribution (PD) algorithm determines the number of solutions
     having a given number of variables.
 
@@ -21,7 +21,7 @@ class BDDProductDistributionBF(ProductDistribution):
         self.bdd_model = None
         self.partial_configuration = partial_configuration
 
-    def execute(self, model: BDDModel) -> 'BDDProductDistributionBF':
+    def execute(self, model: BDDModel) -> 'BDDProductDistribution':
         self.bdd_model = model
         self.result = product_distribution(self.bdd_model, self.partial_configuration)
         return self
