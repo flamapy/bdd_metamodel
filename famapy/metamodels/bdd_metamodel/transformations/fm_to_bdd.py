@@ -1,13 +1,13 @@
 import itertools
 
-from famapy.core.models import VariabilityModel
 from famapy.core.transformations import ModelToModel
-from famapy.metamodels.fm_metamodel.models.feature_model import (
+from famapy.metamodels.fm_metamodel.models import (
+    FeatureModel,
     Constraint,
     Feature,
     Relation,
 )
-from famapy.metamodels.bdd_metamodel.models.bdd_model import BDDModel
+from famapy.metamodels.bdd_metamodel.models import BDDModel
 
 
 class FmToBDD(ModelToModel):
@@ -19,7 +19,7 @@ class FmToBDD(ModelToModel):
     def get_destination_extension() -> str:
         return 'bdd'
 
-    def __init__(self, source_model: VariabilityModel) -> None:
+    def __init__(self, source_model: FeatureModel) -> None:
         self.source_model = source_model
         self.counter = 1
         self.destination_model = BDDModel()
@@ -145,7 +145,7 @@ class FmToBDD(ModelToModel):
                     cls.append(var_term)
             self.clauses.append(cls)
 
-    def transform(self) -> VariabilityModel:
+    def transform(self) -> BDDModel:
         for feature in self.source_model.get_features():
             self.add_feature(feature)
 

@@ -1,9 +1,7 @@
 from typing import Optional
 
 from famapy.metamodels.configuration_metamodel.models.configuration import Configuration
-
 from famapy.core.operations import ProductsNumber
-
 from famapy.metamodels.bdd_metamodel.models.bdd_model import BDDModel
 
 
@@ -13,7 +11,7 @@ class BDDProductsNumber(ProductsNumber):
     It also supports counting the solutions from a given partial configuration.
     """
 
-    def __init__(self, partial_configuration: Configuration = None) -> None:
+    def __init__(self, partial_configuration: Optional[Configuration] = None) -> None:
         self.result = 0
         self.bdd_model = None
         self.feature_model = None

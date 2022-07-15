@@ -1,3 +1,4 @@
+import os
 from typing import Optional
 from enum import Enum
 
@@ -45,19 +46,24 @@ class BDDWriter(ModelToText):
     def set_roots(self, roots: list[Function]) -> None:
         self._roots = roots
 
-    def transform(self) -> None:
+    def transform(self) -> str:
         self._source_model.bdd.dump(filename=self._path, roots=self._roots)
         if self._output_format == BDDDumpFormat.DDDMP_V3:
             # Convert to dddmp format version 3.0 (adding the '.varnames' field)
-            dddmp_v2_to_v3(self._path)
+            result = dddmp_v2_to_v3(self._path)
+        elif self._output_format == BDDDumpFormat.DDDMP_V2:
+            with open(self._path, 'r', encoding='utf-8') as file:
+                result = os.linesep.join(file.readlines())
+        else:
+            result = ''
+        return result
 
 
-def dddmp_v2_to_v3(filepath: str) -> None:
+def dddmp_v2_to_v3(filepath: str) -> str:
     """Convert the file with the BDD dump in format dddmp version 2 to version 3.
 
     The difference between versions 2.0 and 3.0 is the addition of the '.varnames' field.
     """
-
     with open(filepath, 'r', encoding='utf-8') as file:
         lines = file.readlines()
         # Change version from 2.0 to 3.0
@@ -70,3 +76,4 @@ def dddmp_v2_to_v3(filepath: str) -> None:
 
     with open(filepath, 'w', encoding='utf-8') as file:
         file.writelines(lines)
+    return os.linesep.join(lines)

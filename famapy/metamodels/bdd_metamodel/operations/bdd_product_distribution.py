@@ -1,13 +1,12 @@
 from typing import Optional
 
 from famapy.metamodels.configuration_metamodel.models.configuration import Configuration
-
 from famapy.metamodels.bdd_metamodel.models import BDDModel
 from famapy.metamodels.bdd_metamodel.operations.interfaces import ProductDistribution
 from famapy.metamodels.bdd_metamodel.operations import BDDProducts
 
 
-class BDDProductDistributionBF(ProductDistribution):
+class BDDProductDistribution(ProductDistribution):
     """The Product Distribution (PD) algorithm determines the number of solutions
     having a given number of variables.
 
@@ -17,12 +16,12 @@ class BDDProductDistributionBF(ProductDistribution):
     (https://doi.org/10.1109/ICSE.2019.00091)]
     """
 
-    def __init__(self, partial_configuration: Configuration = None) -> None:
+    def __init__(self, partial_configuration: Optional[Configuration] = None) -> None:
         self.result: list[int] = []
         self.bdd_model = None
         self.partial_configuration = partial_configuration
 
-    def execute(self, model: BDDModel) -> 'BDDProductDistributionBF':
+    def execute(self, model: BDDModel) -> 'BDDProductDistribution':
         self.bdd_model = model
         self.result = product_distribution(self.bdd_model, self.partial_configuration)
         return self
@@ -33,6 +32,9 @@ class BDDProductDistributionBF(ProductDistribution):
     def product_distribution(self) -> list[int]:
         return product_distribution(self.bdd_model, self.partial_configuration)
 
+    def serialize(self, filepath: str) -> None:
+        result = self.get_result()
+        serialize(result, filepath)
 
 
 def product_distribution(bdd_model: BDDModel,
@@ -47,3 +49,10 @@ def product_distribution(bdd_model: BDDModel,
     for i in range(len(bdd_model.variables) + 1):
         dist.append(sum(len(p.elements) == i for p in products))
     return dist
+
+
+def serialize(prod_dist: list[int], filepath: str) -> None:
+    with open(filepath, mode='w', encoding='utf8') as file:
+        file.write('Features, Products\n')
+        for features, products in enumerate(prod_dist):
+            file.write(f'{features}, {products}\n')
