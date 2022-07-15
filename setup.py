@@ -7,7 +7,7 @@ with open("README.md", "r") as fh:
 
 setuptools.setup(
     name="famapy-bdd",
-    version="0.8.0.dev0",
+    version="1.0.0",
     author="José Miguel Horcas",
     author_email="jhorcas@us.es",
     description="bdd-plugin for the automated analysis of feature models",
