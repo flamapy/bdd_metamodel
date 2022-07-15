@@ -102,14 +102,14 @@ class FmToBDD(ModelToModel):
                         #combinations of val elements
                         for combination in itertools.combinations(relation.children, val):
                             cnf = [-1 *
-                                self.destination_model.variables.get(relation.parent.name)]
+                                self.variables.get(relation.parent.name)]
                             for feat in relation.children:
                                 if feat in combination:
                                     cnf.append( -1 *
-                                            self.destination_model.variables.get(feat.name))
+                                            self.variables.get(feat.name))
                                 else:
                                     cnf.append(
-                                        self.destination_model.variables.get(feat.name))  
+                                        self.variables.get(feat.name))  
                             self.clauses.append(cnf)   
                             
                 #there is a special case when coping with the upper part of the thru table
@@ -118,15 +118,15 @@ class FmToBDD(ModelToModel):
                 for val in range(1,len(relation.children)+1):
                     
                     for combination in itertools.combinations(relation.children, val):
-                        cnf = [self.destination_model.variables.get(
+                        cnf = [self.variables.get(
                                 relation.parent.name)]
                         for feat in relation.children:
                             if feat in combination:
                                 cnf.append(-1*
-                                        self.destination_model.variables.get(feat.name))
+                                        self.variables.get(feat.name))
                             else:
                                 cnf.append(
-                                    self.destination_model.variables.get(feat.name))
+                                    self.variables.get(feat.name))
                         self.clauses.append(cnf)
 
     def add_constraint(self, ctc: Constraint) -> None:
