@@ -1,13 +1,13 @@
 import itertools
 
-from famapy.core.transformations import ModelToModel
-from famapy.metamodels.fm_metamodel.models import (
+from flamapy.core.transformations import ModelToModel
+from flamapy.metamodels.fm_metamodel.models import (
     FeatureModel,
     Constraint,
     Feature,
     Relation,
 )
-from famapy.metamodels.bdd_metamodel.models import BDDModel
+from flamapy.metamodels.bdd_metamodel.models import BDDModel
 
 
 class FmToBDD(ModelToModel):

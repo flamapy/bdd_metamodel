@@ -1,8 +1,8 @@
-from famapy.metamodels.fm_metamodel.transformations.featureide_reader import FeatureIDEReader
+from flamapy.metamodels.fm_metamodel.transformations.featureide_reader import FeatureIDEReader
 
-from famapy.metamodels.bdd_metamodel.transformations.fm_to_bdd import FmToBDD
-from famapy.metamodels.bdd_metamodel.transformations.bdd_writer import BDDDumpFormat, BDDWriter
-from famapy.metamodels.bdd_metamodel.operations import (
+from flamapy.metamodels.bdd_metamodel.transformations.fm_to_bdd import FmToBDD
+from flamapy.metamodels.bdd_metamodel.transformations.bdd_writer import BDDDumpFormat, BDDWriter
+from flamapy.metamodels.bdd_metamodel.operations import (
     BDDProducts,
     BDDProductsNumber,
     BDDProductDistribution,

@@ -1,8 +1,8 @@
 from typing import Optional
 
-from famapy.metamodels.configuration_metamodel.models.configuration import Configuration
-from famapy.core.operations import Products
-from famapy.metamodels.bdd_metamodel.models.bdd_model import BDDModel
+from flamapy.metamodels.configuration_metamodel.models.configuration import Configuration
+from flamapy.core.operations import Products
+from flamapy.metamodels.bdd_metamodel.models.bdd_model import BDDModel
 
 
 class BDDProducts(Products):

@@ -1,10 +1,10 @@
 from typing import Optional
 
-from famapy.metamodels.configuration_metamodel.models.configuration import Configuration
+from flamapy.metamodels.configuration_metamodel.models.configuration import Configuration
 
-from famapy.metamodels.bdd_metamodel.models import BDDModel
-from famapy.metamodels.bdd_metamodel.operations.interfaces import FeatureInclusionProbability
-from famapy.metamodels.bdd_metamodel.operations import BDDProducts
+from flamapy.metamodels.bdd_metamodel.models import BDDModel
+from flamapy.metamodels.bdd_metamodel.operations.interfaces import FeatureInclusionProbability
+from flamapy.metamodels.bdd_metamodel.operations import BDDProducts
 
 
 class BDDFeatureInclusionProbability(FeatureInclusionProbability):

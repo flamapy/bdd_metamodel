@@ -4,7 +4,7 @@ lint:
 	prospector
 
 mypy:
-	mypy famapy
+	mypy flamapy
 
 test:
 	python -m pytest -sv

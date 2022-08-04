@@ -4,9 +4,9 @@ from enum import Enum
 
 from dd.autoref import Function
 
-from famapy.core.transformations import ModelToText
+from flamapy.core.transformations import ModelToText
 
-from famapy.metamodels.bdd_metamodel.models.bdd_model import BDDModel
+from flamapy.metamodels.bdd_metamodel.models.bdd_model import BDDModel
 
 
 class BDDDumpFormat(Enum):

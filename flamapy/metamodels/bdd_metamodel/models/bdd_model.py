@@ -2,9 +2,12 @@ from typing import Optional
 
 from dd.autoref import BDD, Function
 
-from famapy.core.models import VariabilityModel
+from flamapy.core.models import VariabilityModel
 
-from famapy.metamodels.bdd_metamodel.models.utils.txtcnf import TextCNFNotation, CNFLogicConnective
+from flamapy.metamodels.bdd_metamodel.models.utils.txtcnf import (
+    CNFLogicConnective,
+    TextCNFNotation,
+)
 
 
 class BDDModel(VariabilityModel):
@@ -24,7 +27,7 @@ class BDDModel(VariabilityModel):
 
     def __init__(self) -> None:
         self.bdd = BDD()  # BDD manager
-        self.cnf_formula: Optional[str] = None 
+        self.cnf_formula: Optional[str] = None
         self.root = None
         self.variables: list[str] = []
 
@@ -47,9 +50,9 @@ class BDDModel(VariabilityModel):
 
     @staticmethod
     def level(node: Function) -> int:
-        """Return the level of the node. 
+        """Return the level of the node.
 
-        Non-terminal nodes start at 0. 
+        Non-terminal nodes start at 0.
         Terminal nodes have level `s' being the `s' the number of variables.
         """
         return node.level
@@ -58,7 +61,7 @@ class BDDModel(VariabilityModel):
     def index(node: Function) -> int:
         """Position (index) of the variable that labels the node `n` in the ordering.
 
-        Indexes start at 1. 
+        Indexes start at 1.
         Terminal nodes (n0 and n1) have indexes `s + 1`, being `s' the number of variables.
         Note that index(n) = level(n) + 1.
 
@@ -70,7 +73,7 @@ class BDDModel(VariabilityModel):
     @staticmethod
     def is_terminal_node(node: Function) -> bool:
         """Check if the node is a terminal node."""
-        return node.var is None    
+        return node.var is None
 
     @staticmethod
     def is_terminal_n1(node: Function) -> bool:

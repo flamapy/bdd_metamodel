@@ -1,16 +1,16 @@
 from abc import abstractmethod
+from typing import Any
 
-from famapy.core.operations import Operation
+from flamapy.core.operations import Operation
 
 
-class ProductDistribution(Operation):
-    """The Product Distribution (PD) operation determines the number of products 
-    having a given number of features.
+class FeatureInclusionProbability(Operation):
+    """The Feature Inclusion Probability (FIP) operation determines the probability 
+    for a feature to be included in a valid product. 
 
-    It accounts for how many products have no features, one features, 
-    two features, ..., all features.
+    It obtains, for each feature, the proportion of valid products that include it.
 
-    This operation in combination with the Feature Inclusion Probability (FIP) operation
+    This operation in combination with the Product Distribution (PD) operation
     provides a clear picture of the products' homogeneity (i.e., how much does one product 
     differ from the others).
     The product's homogeneity is one the three core metrics that characterize 
@@ -27,5 +27,5 @@ class ProductDistribution(Operation):
         pass
 
     @abstractmethod
-    def product_distribution(self) -> list[int]:
+    def feature_inclusion_probability(self) -> dict[Any, float]:
         pass

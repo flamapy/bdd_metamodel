@@ -1,11 +1,11 @@
 import random
 from typing import Optional
 
-from famapy.metamodels.configuration_metamodel.models.configuration import Configuration
-from famapy.core.operations import Sampling
+from flamapy.metamodels.configuration_metamodel.models.configuration import Configuration
+from flamapy.core.operations import Sampling
 
-from famapy.metamodels.bdd_metamodel.models import BDDModel
-from famapy.metamodels.bdd_metamodel.operations import BDDProductsNumber
+from flamapy.metamodels.bdd_metamodel.models import BDDModel
+from flamapy.metamodels.bdd_metamodel.operations import BDDProductsNumber
 
 
 class BDDSampling(Sampling):
