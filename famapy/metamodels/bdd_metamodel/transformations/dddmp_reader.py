@@ -1,6 +1,6 @@
 import re 
 
-from famapy.core.transformations import TextToModel
+from flamapy.core.transformations import TextToModel
 from famapy.metamodels.bdd_metamodel.models import BDDModel
 
 

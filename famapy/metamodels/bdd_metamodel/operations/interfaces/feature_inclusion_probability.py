@@ -1,7 +1,7 @@
 from abc import abstractmethod
 from typing import Any
 
-from famapy.core.operations import Operation
+from flamapy.core.operations import Operation
 
 
 class FeatureInclusionProbability(Operation):

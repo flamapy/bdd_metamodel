@@ -1,4 +1,4 @@
-from famapy.metamodels.fm_metamodel.transformations import FeatureIDEReader
+from flamapy.metamodels.fm_metamodel.transformations import FeatureIDEReader
 
 from famapy.metamodels.bdd_metamodel.transformations import FmToBDD, DDDMPWriter
 from famapy.metamodels.bdd_metamodel.operations import (
@@ -10,7 +10,7 @@ from famapy.metamodels.bdd_metamodel.operations import (
 
 def main():
     # Load the feature model from FeatureIDE
-    feature_model = FeatureIDEReader('input_fms/featureide_models/jHipster.xml').transform()
+    feature_model = FeatureIDEReader('tests/input_fms/featureide_models/jHipster.xml').transform()
 
     # Create the BDD from the FM
     bdd_model = FmToBDD(feature_model).transform()

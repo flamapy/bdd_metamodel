@@ -1,6 +1,6 @@
 from abc import abstractmethod
 
-from famapy.core.operations import Operation
+from flamapy.core.operations import Operation
 
 
 class ProductDistribution(Operation):

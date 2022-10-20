@@ -6,7 +6,7 @@ from platform import system
 from pathlib import Path
 from typing import Any
 
-from famapy.core.models import VariabilityModel
+from flamapy.core.models import VariabilityModel
 
 
 class BDDModel(VariabilityModel):
@@ -32,7 +32,7 @@ class BDDModel(VariabilityModel):
         The BDD relies on a dddmp file that stores a feature model's BDD encoding (dddmp is the
         format that the BDD library CUDD uses; check https://github.com/vscosta/cudd)
         """
-        self.bdd_file: str
+        self.bdd_file: str = None
         self.set_global_constants()
 
     def set_bdd_file(self, dddmp_file: str) -> None:
@@ -42,7 +42,8 @@ class BDDModel(VariabilityModel):
         return self.bdd_file
 
     def __del__(self) -> None:
-        Path(self.bdd_file + '.dddmp').unlink()
+        if self.bdd_file is not None:
+            Path(self.bdd_file + '.dddmp').unlink()
 
     def set_global_constants(self) -> None:
         """Private auxiliary function that configures the following global constants.
