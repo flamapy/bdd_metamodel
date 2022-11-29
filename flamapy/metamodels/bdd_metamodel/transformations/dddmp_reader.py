@@ -1,7 +1,7 @@
 import re 
 
 from flamapy.core.transformations import TextToModel
-from famapy.metamodels.bdd_metamodel.models import BDDModel
+from flamapy.metamodels.bdd_metamodel.models import BDDModel
 
 
 class DDDMPReader(TextToModel):

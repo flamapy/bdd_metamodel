@@ -4,7 +4,7 @@ from typing import Optional
 
 from flamapy.metamodels.configuration_metamodel.models import Configuration
 from flamapy.core.operations import Sampling
-from famapy.metamodels.bdd_metamodel.models import BDDModel
+from flamapy.metamodels.bdd_metamodel.models import BDDModel
 
 
 class BDDSampling(Sampling):

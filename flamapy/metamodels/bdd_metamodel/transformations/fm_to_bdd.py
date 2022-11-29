@@ -3,8 +3,8 @@ from pathlib import Path
 from flamapy.core.transformations import ModelToModel
 from flamapy.metamodels.fm_metamodel.models import FeatureModel
 from flamapy.metamodels.fm_metamodel.transformations import SPLOTWriter
-from famapy.metamodels.bdd_metamodel.models import BDDModel
-from famapy.metamodels.bdd_metamodel.transformations import SPLOTReader
+from flamapy.metamodels.bdd_metamodel.models import BDDModel
+from flamapy.metamodels.bdd_metamodel.transformations import SPLOTReader
 
 
 class FmToBDD(ModelToModel):

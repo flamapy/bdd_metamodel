@@ -21,6 +21,7 @@ class BDDModel(VariabilityModel):
     BDD_SAMPLER = 'BDDSampler'
     PRODUCT_DISTRIBUTION = 'product_distribution'
     FEATURE_PROBABILITIES = 'feature_probabilities'
+    COUNTER = 'counter'
 
     @staticmethod
     def get_extension() -> str:
@@ -33,7 +34,7 @@ class BDDModel(VariabilityModel):
         format that the BDD library CUDD uses; check https://github.com/vscosta/cudd)
         """
         self.bdd_file: str = None
-        self.set_global_constants()
+        self._set_global_constants()
 
     def set_bdd_file(self, dddmp_file: str) -> None:
         self.bdd_file = dddmp_file
@@ -45,7 +46,7 @@ class BDDModel(VariabilityModel):
         if self.bdd_file is not None:
             Path(self.bdd_file + '.dddmp').unlink()
 
-    def set_global_constants(self) -> None:
+    def _set_global_constants(self) -> None:
         """Private auxiliary function that configures the following global constants.
 
             + SYSTEM, which stores the operating system running bdd4va: Linux or Windows.
@@ -66,7 +67,8 @@ class BDDModel(VariabilityModel):
 
     def run(self, binary: str, *args: Any) -> Any:
         """Private auxiliary function to run binary files in Linux and Windows."""
-        bin_file = os.path.join(self.bdd4var_dir, 'bin', binary)
+        #bin_file = os.path.join(self.bdd4var_dir, 'bin', binary)
+        bin_file = self.bdd4var_dir + '/bin/' + binary
         # Set execution permission
         file_stats = os.stat(bin_file)
         os.chmod(bin_file, file_stats.st_mode | stat.S_IEXEC)
