@@ -101,9 +101,9 @@ class BDDModel(VariabilityModel):
     @staticmethod
     def get_value(node: Function, complemented: bool = False) -> int:
         """Return the value (id) of the node considering complemented arcs."""
+        value = node.node
         if BDDModel.is_terminal_n0(node):
-            return 1 if complemented else 0
+            value = 1 if complemented else 0
         elif BDDModel.is_terminal_n1(node):
-            return 0 if complemented else 1
-        else:
-            return node.node
+            value = 0 if complemented else 1
+        return value
