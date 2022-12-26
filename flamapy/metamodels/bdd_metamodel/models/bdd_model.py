@@ -96,4 +96,14 @@ class BDDModel(VariabilityModel):
 
         If the arc is complemented it returns the negation of the left node.
         """
-        return ~node.low if node.negated and node.low.var is not None else node.low
+        return node.low
+
+    @staticmethod
+    def get_value(node: Function, complemented: bool = False) -> int:
+        """Return the value (id) of the node considering complemented arcs."""
+        if BDDModel.is_terminal_n0(node):
+            return 1 if complemented else 0
+        elif BDDModel.is_terminal_n1(node):
+            return 0 if complemented else 1
+        else:
+            return node.node
