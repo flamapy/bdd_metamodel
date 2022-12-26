@@ -48,6 +48,10 @@ class BDDModel(VariabilityModel):
         """Return number of nodes in the BDD."""
         return len(self.bdd)
 
+    def get_node(self, index: int) -> Function:
+        """Return the node at the given position (index)."""
+        return self.bdd.var(self.bdd.var_at_level(index))
+
     @staticmethod
     def level(node: Function) -> int:
         """Return the level of the node.
