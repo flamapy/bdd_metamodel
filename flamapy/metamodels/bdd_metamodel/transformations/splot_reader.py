@@ -1,3 +1,4 @@
+import os
 import re 
 from pathlib import Path
 
@@ -35,13 +36,14 @@ def build_bdd(model_file: str, bdd_model: BDDModel) -> None:
     match = re.search(re_expression, model_file)
     if match is not None:
         file_name = match.group(1)
+    else:
+        message = 'BDD synthesis failed: the file "' + model_file + 'is not valid.'
+        raise Exception(message) from Exception
 
     # Run binary splot2logic
     print("Preprocessing " + model_file + " to get its BDD...")
-    bdd_model.run("splot2logic", "-use-XOR", model_file)
+    bdd_model.run(BDDModel.SPLOT2LOGIC, model_file)
     # Check that splot2logic was successful
-    bdd_model.check_file_existence(file_name, "var")
-    bdd_model.check_file_existence(file_name, "exp")
     try:
         bdd_model.check_file_existence(file_name, "var")
         bdd_model.check_file_existence(file_name, "exp")
@@ -52,13 +54,7 @@ def build_bdd(model_file: str, bdd_model: BDDModel) -> None:
 
     # Run binary logic2bdd's execution
     print("Synthesizing the BDD (this may take a while)...")
-    bdd_model.run("logic2bdd",
-                  "-line-length", "50",
-                  "-min-nodes", "100000",
-                  "-constraint-reorder", "minspan",
-                  "-base", file_name,
-                  file_name + ".var",
-                  file_name + ".exp")
+    bdd_model.run(BDDModel.LOGIC2BDD, file_name)
     # Check that logic2bdd's execution was successful
     try:
         bdd_model.check_file_existence(file_name, "dddmp")
@@ -67,7 +63,9 @@ def build_bdd(model_file: str, bdd_model: BDDModel) -> None:
         raise Exception(message) from Exception
 
     # Remove auxiliary generated files
-    auxiliary_files = [".data", ".exp", ".reorder", ".tree", ".var"]
+    auxiliary_files = [".dddmp.data", ".exp", ".dddmp.reorder", ".tree", ".var", ".dddmp.applied"]
     for ext in auxiliary_files: 
-        Path(file_name + ext).unlink()
+        filepath = file_name + ext
+        if os.path.exists(filepath):
+            Path(filepath).unlink()
     bdd_model.set_bdd_file(file_name)

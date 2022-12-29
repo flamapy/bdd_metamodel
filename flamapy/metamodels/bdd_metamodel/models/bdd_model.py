@@ -16,12 +16,12 @@ class BDDModel(VariabilityModel):
     """
 
     # Binary programs available
-    SPLOT2LOGIC = 'splot2logic'
-    LOGIC2BDD = 'logic2bdd'
-    BDD_SAMPLER = 'BDDSampler'
-    PRODUCT_DISTRIBUTION = 'product_distribution'
-    FEATURE_PROBABILITIES = 'feature_probabilities'
-    COUNTER = 'counter'
+    SPLOT2LOGIC = 'splot2logic.sh'
+    LOGIC2BDD = 'logic2bdd.sh'
+    BDD_SAMPLER = 'BDDSampler.sh'
+    PRODUCT_DISTRIBUTION = 'product_distribution.sh'
+    FEATURE_PROBABILITIES = 'feature_probabilities.sh'
+    COUNTER = 'counter.sh'
 
     @staticmethod
     def get_extension() -> str:
@@ -68,26 +68,27 @@ class BDDModel(VariabilityModel):
     def run(self, binary: str, *args: Any) -> Any:
         """Private auxiliary function to run binary files in Linux and Windows."""
         #bin_file = os.path.join(self.bdd4var_dir, 'bin', binary)
-        bin_file = self.bdd4var_dir + '/bin/' + binary
+        bin_dir = self.bdd4var_dir + '/bin'
+        bin_file = bin_dir + '/' + binary
         # Set execution permission
         file_stats = os.stat(bin_file)
         os.chmod(bin_file, file_stats.st_mode | stat.S_IEXEC)
         if self.system == 'Windows':
             if not args:
-                command = ['wsl', bin_file]
+                command = ['wsl', bin_file, bin_dir]
             else:
-                command = ['wsl', bin_file] + list(args)
+                command = ['wsl', bin_file, bin_dir] + list(args)
         else:
             if not args:
-                command = [bin_file]
+                command = [bin_file, bin_dir]
             else:
-                command = [bin_file] + list(args)
-        return subprocess.run(command, stdout=subprocess.PIPE, check=True)
+                command = [bin_file, bin_dir] + list(args)
+        return subprocess.run(command, stdout=subprocess.PIPE, stderr=subprocess.DEVNULL)
 
     @staticmethod
-    def check_file_existence(filename: str, extension: str) -> str:
+    def check_file_existence(filename: str, extension: str = None) -> str:
         """Private auxiliary function that verifies if the input file exists."""
-        if not os.path.isfile(filename):
+        if not os.path.isfile(filename) and extension is not None:
             filename = filename + '.' + extension
             if not os.path.isfile(filename):
                 message = 'The file "' + filename + '" doesn\'t exist.'

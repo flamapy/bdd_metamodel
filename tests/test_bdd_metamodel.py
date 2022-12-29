@@ -1,22 +1,27 @@
-from flamapy.metamodels.fm_metamodel.transformations import FeatureIDEReader
+from flamapy.metamodels.fm_metamodel.transformations import UVLReader
 
-from famapy.metamodels.bdd_metamodel.transformations import FmToBDD, DDDMPWriter
-from famapy.metamodels.bdd_metamodel.operations import (
+from flamapy.metamodels.bdd_metamodel.transformations import FmToBDD, DDDMPWriter
+from flamapy.metamodels.bdd_metamodel.operations import (
     BDDProductDistribution,
     BDDFeatureInclusionProbability,
-    BDDSampling
+    BDDSampling,
+    BDDProductsNumber
 )
 
 
 def main():
-    # Load the feature model from FeatureIDE
-    feature_model = FeatureIDEReader('tests/input_fms/featureide_models/jHipster.xml').transform()
+    # Load the feature model from UVLReader
+    feature_model = UVLReader('tests/input_fms/uvl_models/Pizzas.uvl').transform()
 
     # Create the BDD from the FM
     bdd_model = FmToBDD(feature_model).transform()
 
     # Save the BDD as .dddmp file
     DDDMPWriter(feature_model.root.name + '_bdd', bdd_model).transform()
+
+    # Products numbers
+    n_configs = BDDProductsNumber().execute(bdd_model).get_result()
+    print(f'#Configs: {n_configs}')
 
     # BDD product distribution
     dist = BDDProductDistribution().execute(bdd_model).get_result()

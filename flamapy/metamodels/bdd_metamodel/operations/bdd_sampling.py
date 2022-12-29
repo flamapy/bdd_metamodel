@@ -57,7 +57,7 @@ def sample(bdd_model: BDDModel, size: int, with_replacement: bool = False) -> li
     parameters = ["-names"]
     if not with_replacement:
         parameters.append("-norep")
-    sample_process = bdd_model.run(BDDModel.BDD_SAMPLER, "-names", str(size), bdd_file)
+    sample_process = bdd_model.run(BDDModel.BDD_SAMPLER, str(size), bdd_file)
     result = sample_process.stdout.decode(locale.getdefaultlocale()[1])
     line_iterator = iter(result.splitlines())
     configurations = []
