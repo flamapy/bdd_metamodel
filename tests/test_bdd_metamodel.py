@@ -18,7 +18,6 @@ def main():
 
     # Save the BDD as .dddmp file
     DDDMPWriter(feature_model.root.name + '_bdd', bdd_model).transform()
-
     # Products numbers
     n_configs = BDDProductsNumber().execute(bdd_model).get_result()
     print(f'#Configs: {n_configs}')
@@ -41,5 +40,5 @@ def main():
         print(f'Product {i}: {product.get_selected_elements()}')
 
 
-if __name__ == "__main__":
-    main()
+if __name__ == '__main__':
+    test_main()

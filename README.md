@@ -12,14 +12,14 @@
 ## Description
 This plugin supports Binary Decision Diagrams (BDDs) representations for feature models.
 
-The plugin is based on [Flama](https://flamapy.github.io/) and thus, it follows the same architecture.
+The plugin is based on [flamapy](https://github.com/flamapy/core) and thus, it follows the same architecture.
 
 The BDD plugin relies on the [bbd4va](https://github.com/rheradio/bdd4va) library to synthetize and manipulate BDDs.
 
 
 ## Requirements and Installation
 - Python 3.9+
-- This plugin depends on the [Flama core](https://github.com/diverso-lab/core) and on the [Feature Model plugin](https://github.com/diverso-lab/fm_metamodel). 
+- This plugin depends on the [flamapy core](https://github.com/flamapy/core) and on the [Feature Model plugin](https://github.com/flamapy/fm_metamodel).
 
 ```
 pip install flamapy flamapy-fm flamapy-bdd
@@ -41,6 +41,7 @@ from flamapy.metamodels.bdd_metamodel.transformations import FmToBDD
 
 # Load the feature model from UVLReader
 feature_model = UVLReader('input_fms/uvl_models/Pizzas.uvl').transform() 
+
 # Create the BDD from the feature model
 bdd_model = FmToBDD(feature_model).transform()
 ```
@@ -59,7 +60,7 @@ bdd_model = DDDMPReader(path='path/to/my_bdd.dddmp').transform()
 ### Analysis operations
 
 - Products number
-  
+
     Return the number of products (configurations):
     ```python
     from flamapy.metamodels.bdd_metamodel.operations import BDDProductsNumber
@@ -74,7 +75,7 @@ bdd_model = DDDMPReader(path='path/to/my_bdd.dddmp').transform()
     ```
 
 - Sampling
-  
+
     Return a sample of the given size of uniform random products (configurations) with or without replacement:
     ```python
     from flamapy.metamodels.bdd_metamodel.operations import BDDSampling
@@ -91,7 +92,7 @@ bdd_model = DDDMPReader(path='path/to/my_bdd.dddmp').transform()
     ```
 
 - Product Distribution
-  
+
     Return the number of products having a given number of features:
     ```python
     from flamapy.metamodels.bdd_metamodel.operations import BDDProductDistribution
@@ -122,7 +123,6 @@ bdd_model = DDDMPReader(path='path/to/my_bdd.dddmp').transform()
         print(f'{feat}: {prob[feat]}')
     ```
 
-
 ## Contributing to the BDD plugin
 To contribute in the development of this plugin:
 
@@ -136,10 +136,10 @@ To contribute in the development of this plugin:
 Please try to follow the standards code quality to contribute to this plugin before creating a Pull Request:
 
 - To analyze your Python code and output information about errors, potential problems, convention violations and complexity, pass the prospector with:
-    
+
     `make lint`
 
 - To analyze the static type checker for Python and find bugs, pass the Mypy:
-  
+
     `make mypy`
 
