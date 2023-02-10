@@ -41,7 +41,7 @@ def build_bdd(model_file: str, bdd_model: BDDModel) -> None:
         raise Exception(message) from Exception
 
     # Run binary splot2logic
-    print("Preprocessing " + model_file + " to get its BDD...")
+    #print("Preprocessing " + model_file + " to get its BDD...")
     bdd_model.run(BDDModel.SPLOT2LOGIC, model_file)
     # Check that splot2logic was successful
     try:
@@ -53,7 +53,7 @@ def build_bdd(model_file: str, bdd_model: BDDModel) -> None:
         raise Exception(message) from Exception
 
     # Run binary logic2bdd's execution
-    print("Synthesizing the BDD (this may take a while)...")
+    #print("Synthesizing the BDD (this may take a while)...")
     bdd_model.run(BDDModel.LOGIC2BDD, file_name)
     # Check that logic2bdd's execution was successful
     try:

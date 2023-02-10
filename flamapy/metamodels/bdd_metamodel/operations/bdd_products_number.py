@@ -78,7 +78,7 @@ def count(bdd_model: BDDModel, feature_assignment: list[str]=[]) -> int:
         expanded_assignment.append(ft)
 
     # Run counter
-    print("Counting the number of valid configurations (this may take a while)...")
+    #print("Counting the number of valid configurations (this may take a while)...")
     count_process = bdd_model.run(BDDModel.COUNTER, *expanded_assignment, bdd_file)
     result = count_process.stdout.decode(locale.getdefaultlocale()[1])
     return int(result)
