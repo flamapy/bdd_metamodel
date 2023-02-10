@@ -41,7 +41,7 @@ def main():
 
     # Dead features
     dead_features = BDDDeadFeatures().execute(bdd_model).get_result()
-    print(f'Dead features: {core_features}')
+    print(f'Dead features: {dead_features}')
 
     # BDD Sampling
     sample = BDDSampling(size=5, with_replacement=False).execute(bdd_model).get_result()
