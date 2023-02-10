@@ -5,7 +5,9 @@ from flamapy.metamodels.bdd_metamodel.operations import (
     BDDProductDistribution,
     BDDFeatureInclusionProbability,
     BDDSampling,
-    BDDProductsNumber
+    BDDProductsNumber,
+    BDDCoreFeatures,
+    BDDDeadFeatures
 )
 
 
@@ -33,11 +35,20 @@ def main():
     for feat, prob in probabilities.items():
         print(f'{feat}: {prob}')
 
+    # Core features
+    core_features = BDDCoreFeatures().execute(bdd_model).get_result()
+    print(f'Core features: {core_features}')
+
+    # Dead features
+    dead_features = BDDDeadFeatures().execute(bdd_model).get_result()
+    print(f'Dead features: {core_features}')
+
     # BDD Sampling
     sample = BDDSampling(size=5, with_replacement=False).execute(bdd_model).get_result()
     print('Uniform Random Sampling:')
     for i, product in enumerate(sample, 1):
         print(f'Product {i}: {product.get_selected_elements()}')
+
 
 
 if __name__ == '__main__':
