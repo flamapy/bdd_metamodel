@@ -1,58 +1,58 @@
-from typing import Optional
+import re
+import locale
 
-from flamapy.metamodels.configuration_metamodel.models.configuration import Configuration
 from flamapy.metamodels.bdd_metamodel.models import BDDModel
 from flamapy.metamodels.bdd_metamodel.operations.interfaces import ProductDistribution
-from flamapy.metamodels.bdd_metamodel.operations import BDDProducts
 
 
 class BDDProductDistribution(ProductDistribution):
-    """The Product Distribution (PD) algorithm determines the number of solutions
-    having a given number of variables.
+    """Computes the distribution of the number of activated features per product.
 
-    This is a brute-force implementation that enumerates all solutions for accounting them.
+    That is,
+        + How many products have 0 features activated?
+        + How many products have 1 feature activated?
+        + ...
+        + How many products have all features activated?
 
-    Ref.: [Heradio et al. 2019. Supporting the Statistical Analysis of Variability Models. SPLC.
-    (https://doi.org/10.1109/ICSE.2019.00091)]
+    For detailed information, see the paper: 
+    Heradio, R., Fernandez-Amoros, D., Mayr-Dorn, C., Egyed, A.:
+    Supporting the statistical analysis of variability models. 
+    In: 41st International Conference on Software Engineering (ICSE), pp. 843-853. 
+    Montreal, Canada (2019).
+
+    Return a list that stores:
+        + In index 0, the number of products with 0 features activated.
+        + In index 1, the number of products with 1 feature activated.
+        ...
+        + In index n, the number of products with n features activated.
     """
 
-    def __init__(self, partial_configuration: Optional[Configuration] = None) -> None:
+    def __init__(self) -> None:
         self.result: list[int] = []
         self.bdd_model = None
-        self.partial_configuration = partial_configuration
 
     def execute(self, model: BDDModel) -> 'BDDProductDistribution':
         self.bdd_model = model
-        self.result = product_distribution(self.bdd_model, self.partial_configuration)
+        self.result = product_distribution(self.bdd_model)
         return self
 
     def get_result(self) -> list[int]:
         return self.result
 
     def product_distribution(self) -> list[int]:
-        return product_distribution(self.bdd_model, self.partial_configuration)
-
-    def serialize(self, filepath: str) -> None:
-        result = self.get_result()
-        serialize(result, filepath)
+        return product_distribution(self.bdd_model)
 
 
-def product_distribution(bdd_model: BDDModel,
-                         p_config: Optional[Configuration] = None) -> list[int]:
-    """It accounts for how many solutions have no variables, one variable,
-    two variables, ..., all variables.
+def product_distribution(bdd_model: BDDModel) -> list[int]: 
+    # Check bdd_file
+    bdd_file = bdd_model.check_file_existence(bdd_model.get_bdd_file(), 'dddmp')
 
-    It enumerates all solutions and filters them.
-    """
-    products = BDDProducts(p_config).execute(bdd_model).get_result()
-    dist: list[int] = []
-    for i in range(len(bdd_model.variables) + 1):
-        dist.append(sum(len(p.elements) == i for p in products))
-    return dist
-
-
-def serialize(prod_dist: list[int], filepath: str) -> None:
-    with open(filepath, mode='w', encoding='utf8') as file:
-        file.write('Features, Products\n')
-        for features, products in enumerate(prod_dist):
-            file.write(f'{features}, {products}\n')
+    product_distribution_process = bdd_model.run(BDDModel.PRODUCT_DISTRIBUTION, 
+                                                 bdd_file)
+    result = product_distribution_process.stdout.decode(locale.getdefaultlocale()[1])
+    line_iterator = iter(result.splitlines())
+    distribution = []
+    for line in line_iterator:
+        parsed_line = re.compile(r'\s+').split(line.strip())
+        distribution.append(int(parsed_line[1]))
+    return distribution
