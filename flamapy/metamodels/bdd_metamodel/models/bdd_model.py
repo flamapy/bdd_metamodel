@@ -48,6 +48,10 @@ class BDDModel(VariabilityModel):
         """Return number of nodes in the BDD."""
         return len(self.bdd)
 
+    def get_node(self, index: int) -> Function:
+        """Return the node at the given position (index)."""
+        return self.bdd.var(self.bdd.var_at_level(index))
+
     @staticmethod
     def level(node: Function) -> int:
         """Return the level of the node.
@@ -96,4 +100,14 @@ class BDDModel(VariabilityModel):
 
         If the arc is complemented it returns the negation of the left node.
         """
-        return ~node.low if node.negated and node.low.var is not None else node.low
+        return node.low
+
+    @staticmethod
+    def get_value(node: Function, complemented: bool = False) -> int:
+        """Return the value (id) of the node considering complemented arcs."""
+        value = node.node
+        if BDDModel.is_terminal_n0(node):
+            value = 1 if complemented else 0
+        elif BDDModel.is_terminal_n1(node):
+            value = 0 if complemented else 1
+        return value
