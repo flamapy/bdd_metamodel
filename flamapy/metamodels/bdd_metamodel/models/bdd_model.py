@@ -28,7 +28,7 @@ class BDDModel(VariabilityModel):
     def __init__(self) -> None:
         self.bdd = BDD()  # BDD manager
         self.cnf_formula: Optional[str] = None
-        self.root = None
+        self.root: Optional[Function] = None
         self.variables: list[str] = []
 
     def from_textual_cnf(self, textual_cnf_formula: str, variables: list[str]) -> None:
@@ -90,12 +90,12 @@ class BDDModel(VariabilityModel):
         return node.var is None and node.node == -1
 
     @staticmethod
-    def get_high_node(node: Function) -> Function:
+    def get_high_node(node: Function) -> Optional[Function]:
         """Return the high (right, solid) node."""
         return node.high
 
     @staticmethod
-    def get_low_node(node: Function) -> Function:
+    def get_low_node(node: Function) -> Optional[Function]:
         """Return the low (left, dashed) node.
 
         If the arc is complemented it returns the negation of the left node.

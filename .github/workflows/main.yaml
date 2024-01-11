@@ -35,7 +35,7 @@ jobs:
           pip install .
       - name: Running static types with mypy
         run: |
-          mypy flamapy
+          mypy flamapy --no-namespace-packages
   pytest:
     runs-on: ubuntu-latest
     steps:

@@ -13,11 +13,11 @@ from flamapy.metamodels.bdd_metamodel.models import BDDModel
 class FmToBDD(ModelToModel):
     @staticmethod
     def get_source_extension() -> str:
-        return 'fm'
+        return "fm"
 
     @staticmethod
     def get_destination_extension() -> str:
-        return 'bdd'
+        return "bdd"
 
     def __init__(self, source_model: FeatureModel) -> None:
         self.source_model = source_model
@@ -52,9 +52,9 @@ class FmToBDD(ModelToModel):
             self.clauses.append([-1 * var_child, var_parent])
 
         elif relation.is_optional():
-            self.clauses.append([
-                -1 * self._get_variable(relation.children[0].name), var_parent
-            ])
+            self.clauses.append(
+                [-1 * self._get_variable(relation.children[0].name), var_parent]
+            )
 
         elif relation.is_or():  # this is a 1 to n relatinship with multiple childs
             # add the first cnf child1 or child2 or ... or childN or no parent)
@@ -82,9 +82,12 @@ class FmToBDD(ModelToModel):
                 var_child_i = self._get_variable(relation.children[i].name)
                 for j in range(i + 1, len(relation.children)):
                     if i != j:
-                        self.clauses.append([
-                            -1 * var_child_i, -1 * self._get_variable(relation.children[j].name)
-                        ])
+                        self.clauses.append(
+                            [
+                                -1 * var_child_i,
+                                -1 * self._get_variable(relation.children[j].name),
+                            ]
+                        )
                 self.clauses.append([-1 * var_child_i, var_parent])
 
         else:
@@ -93,7 +96,7 @@ class FmToBDD(ModelToModel):
             _max = relation.card_max
             for val in range(len(relation.children) + 1):
                 if val < _min or val > _max:
-                    #combinations of val elements
+                    # combinations of val elements
                     for combination in itertools.combinations(relation.children, val):
                         cnf = [-1 * self._get_variable(relation.parent.name)]
                         for feat in relation.children:
@@ -103,8 +106,8 @@ class FmToBDD(ModelToModel):
                                 cnf.append(self._get_variable(feat.name))
                         self.clauses.append(cnf)
 
-            #there is a special case when coping with the upper part of the thru table
-            #In the case of allowing 0 childs, you cannot exclude the option  in that
+            # there is a special case when coping with the upper part of the thru table
+            # In the case of allowing 0 childs, you cannot exclude the option  in that
             # no feature in this relation is activated
             for val in range(1, len(relation.children) + 1):
                 for combination in itertools.combinations(relation.children, val):
@@ -121,7 +124,7 @@ class FmToBDD(ModelToModel):
         for clause in clauses:
             cls = []
             for term in clause:
-                if term.startswith('-'):
+                if term.startswith("-"):
                     var_term = -1 * self._get_variable(term[1:])
                 else:
                     var_term = self._get_variable(term)
@@ -142,15 +145,28 @@ class FmToBDD(ModelToModel):
 
         # Transform clauses to textual CNF notation required by the BDD
         not_connective = BDDModel.NOT
-        or_connective = ' ' + BDDModel.OR + ' '
-        and_connective = ' ' + BDDModel.AND + ' '
+        or_connective = " " + BDDModel.OR + " "
+        and_connective = " " + BDDModel.AND + " "
         cnf_list = []
         for clause in self.clauses:
-            cnf_list.append('(' + or_connective.join(list(map(lambda l:
-                            not_connective + self.features[abs(l)] if l < 0 else
-                            self.features[abs(l)], clause))) + ')')
+            cnf_list.append(
+                "("
+                + or_connective.join(
+                    list(
+                        map(
+                            lambda elem: not_connective + self.features[abs(elem)]
+                            if elem < 0
+                            else self.features[abs(elem)],
+                            clause,
+                        )
+                    )
+                )
+                + ")"
+            )
 
         cnf_formula = and_connective.join(cnf_list)
-        self.destination_model.from_textual_cnf(cnf_formula, list(self.variables.keys()))
+        self.destination_model.from_textual_cnf(
+            cnf_formula, list(self.variables.keys())
+        )
 
         return self.destination_model
