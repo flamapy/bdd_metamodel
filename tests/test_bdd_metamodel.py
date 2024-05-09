@@ -51,7 +51,9 @@ def main():
     print(f'Dead features: {dead_features}')
 
     # BDD Sampling
-    sample = BDDSampling(size=5, with_replacement=False).execute(bdd_model).get_result()
+    sample_op = BDDSampling()
+    sample_op.set_sample_size(5)
+    sample = sample_op.execute(bdd_model).get_result()
     print('Uniform Random Sampling:')
     for i, product in enumerate(sample, 1):
         print(f'Product {i}: {product.get_selected_elements()}')
