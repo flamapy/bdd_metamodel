@@ -1,6 +1,8 @@
 import re
 import locale 
+from typing import cast
 
+from flamapy.core.models import VariabilityModel
 from flamapy.metamodels.bdd_metamodel.models import BDDModel
 from flamapy.metamodels.bdd_metamodel.operations.interfaces import FeatureInclusionProbability
 
@@ -23,19 +25,18 @@ class BDDFeatureInclusionProbability(FeatureInclusionProbability):
     """
 
     def __init__(self) -> None:
-        self.bdd_model = None
         self.result: dict[str, float] = {}
-
-    def execute(self, model: BDDModel) -> 'BDDFeatureInclusionProbability':
-        self.bdd_model = model
-        self.result = feature_inclusion_probability(self.bdd_model)
-        return self
 
     def get_result(self) -> dict[str, float]:
         return self.result
 
     def feature_inclusion_probability(self) -> dict[str, float]:
-        return feature_inclusion_probability(self.bdd_model)
+        return self.get_result()
+
+    def execute(self, model: VariabilityModel) -> 'BDDFeatureInclusionProbability':
+        bdd_model = cast(BDDModel, model)
+        self.result = feature_inclusion_probability(bdd_model)
+        return self
 
 
 def feature_inclusion_probability(bdd_model: BDDModel) -> dict[str, float]:

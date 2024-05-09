@@ -1,5 +1,7 @@
-from flamapy.core.operations import Valid
+from typing import cast
 
+from flamapy.core.models import VariabilityModel
+from flamapy.core.operations import Valid
 from flamapy.metamodels.bdd_metamodel.models import BDDModel
 from flamapy.metamodels.bdd_metamodel.operations.bdd_products_number import BDDProductsNumber
 
@@ -7,19 +9,18 @@ from flamapy.metamodels.bdd_metamodel.operations.bdd_products_number import BDDP
 class BDDValid(Valid):
 
     def __init__(self) -> None:
-        self.result = None
-        self.bdd_model = None
-
-    def execute(self, model: BDDModel) -> 'BDDValid':
-        self.bdd_model = model
-        self.result = is_valid(self.bdd_model)
-        return self
+        self.result: bool = False
 
     def get_result(self) -> bool:
         return self.result
 
     def is_valid(self) -> bool:
-        return is_valid(self.bdd_model)
+        return self.get_result()
+
+    def execute(self, model: VariabilityModel) -> 'BDDValid':
+        bdd_model = cast(BDDModel, model)
+        self.result = is_valid(bdd_model)
+        return self
 
 
 def is_valid(bdd_model: BDDModel) -> bool:

@@ -7,6 +7,7 @@ from pathlib import Path
 from typing import Any
 
 from flamapy.core.models import VariabilityModel
+from flamapy.core.exceptions import FlamaException
 
 
 class BDDModel(VariabilityModel):
@@ -33,7 +34,7 @@ class BDDModel(VariabilityModel):
         The BDD relies on a dddmp file that stores a feature model's BDD encoding (dddmp is the
         format that the BDD library CUDD uses; check https://github.com/vscosta/cudd)
         """
-        self.bdd_file: str = None
+        self.bdd_file: str = ''
         self._set_global_constants()
 
     def set_bdd_file(self, dddmp_file: str) -> None:
@@ -83,14 +84,17 @@ class BDDModel(VariabilityModel):
                 command = [bin_file, bin_dir]
             else:
                 command = [bin_file, bin_dir] + list(args)
-        return subprocess.run(command, stdout=subprocess.PIPE, stderr=subprocess.DEVNULL)
+        return subprocess.run(command, 
+                              stdout=subprocess.PIPE, 
+                              stderr=subprocess.DEVNULL, 
+                              check=True)
 
     @staticmethod
-    def check_file_existence(filename: str, extension: str = None) -> str:
+    def check_file_existence(filename: str, extension: str = '') -> str:
         """Private auxiliary function that verifies if the input file exists."""
-        if not os.path.isfile(filename) and extension is not None:
+        if not os.path.isfile(filename) and extension:
             filename = filename + '.' + extension
             if not os.path.isfile(filename):
                 message = 'The file "' + filename + '" doesn\'t exist.'
-                raise Exception(message)
+                raise FlamaException(message)
         return filename

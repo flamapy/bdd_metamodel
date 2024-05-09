@@ -16,10 +16,8 @@ features
 				alternative
 					Neapolitan
 					Sicilian
-
 		optional
 			CheesyCrust
-
 constraints
 	CheesyCrust & Sicilian => Big
 	Neapolitan => !Salami & !Ham

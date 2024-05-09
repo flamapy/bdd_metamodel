@@ -7,7 +7,8 @@ from flamapy.metamodels.bdd_metamodel.operations import (
     BDDSampling,
     BDDProductsNumber,
     BDDCoreFeatures,
-    BDDDeadFeatures
+    BDDDeadFeatures,
+    BDDValid
 )
 
 
@@ -19,7 +20,13 @@ def main():
     bdd_model = FmToBDD(feature_model).transform()
 
     # Save the BDD as .dddmp file
-    DDDMPWriter(feature_model.root.name + '_bdd', bdd_model).transform()
+    DDDMPWriter(f'{feature_model.root.name}_bdd.{DDDMPWriter.get_destination_extension()}', 
+                bdd_model).transform()
+    
+    # Valid
+    valid = BDDValid().execute(bdd_model).get_result()
+    print(f'Valid?: {valid}')
+
     # Products numbers
     n_configs = BDDProductsNumber().execute(bdd_model).get_result()
     print(f'#Configs: {n_configs}')

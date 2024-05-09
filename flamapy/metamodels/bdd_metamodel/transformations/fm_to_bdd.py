@@ -17,13 +17,12 @@ class FmToBDD(ModelToModel):
     def get_destination_extension() -> str:
         return 'bdd'
 
-    def __init__(self, source_model: FeatureModel, path: str = None) -> None:
-        self.path = path
+    def __init__(self, source_model: FeatureModel) -> None:
         self.source_model = source_model
 
     def transform(self) -> BDDModel:
-        splot_filepath = self.source_model.root.name if self.path is None else self.path
+        splot_filepath = f'{self.source_model.root.name}.{SPLOTWriter.get_destination_extension()}'
         SPLOTWriter(path=splot_filepath, source_model=self.source_model).transform()
         bdd_model = SPLOTReader(splot_filepath).transform()
-        Path(splot_filepath + '.' + SPLOTWriter.get_destination_extension()).unlink()
+        Path(splot_filepath).unlink()
         return bdd_model

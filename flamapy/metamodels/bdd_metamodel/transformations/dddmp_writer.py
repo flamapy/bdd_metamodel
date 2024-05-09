@@ -1,7 +1,7 @@
 import shutil
 
 from flamapy.core.transformations import ModelToText
-from flamapy.metamodels.fm_metamodel.models import FeatureModel
+from flamapy.metamodels.bdd_metamodel.models import BDDModel
 
 
 class DDDMPWriter(ModelToText):
@@ -10,12 +10,12 @@ class DDDMPWriter(ModelToText):
     def get_destination_extension() -> str:
         return 'dddmp'
 
-    def __init__(self, path: str, source_model: FeatureModel) -> None:
-        self.path = path + '.' + DDDMPWriter.get_destination_extension()
+    def __init__(self, path: str, source_model: BDDModel) -> None:
+        self.path = path
         self.source_model = source_model
 
     def transform(self) -> str:
-        filename = self.source_model.get_bdd_file() + '.' + DDDMPWriter.get_destination_extension()
+        filename = f'{self.source_model.get_bdd_file()}.{DDDMPWriter.get_destination_extension()}'
         shutil.copy(filename, self.path) 
         with open(self.path, 'r', encoding='utf8') as file:
             content = file.read()
