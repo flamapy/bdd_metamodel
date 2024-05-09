@@ -7,7 +7,7 @@ with open("README.md", "r") as fh:
 
 setuptools.setup(
     name="flamapy-bdd",
-    version="1.0.1",
+    version="1.6.0",
     author="Flamapy",
     author_email="flamapy@us.es",
     description="bdd-plugin for the automated analysis of feature models",
