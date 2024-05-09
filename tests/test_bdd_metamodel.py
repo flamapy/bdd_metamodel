@@ -20,7 +20,7 @@ def test_main():
     # Create the BDD from the FM
     bdd_model = FmToBDD(feature_model).transform()
 
-    # # Save the BDD as a .png
+    # Save the BDD as a .png
     bdd_writer = BDDWriter(bdd_model.root.var + '.png', bdd_model)
     bdd_writer.set_format(BDDDumpFormat.SVG)
     bdd_writer.set_roots([bdd_model.root])
@@ -32,7 +32,7 @@ def test_main():
 
     # BDD products operation
     products = BDDProducts().execute(bdd_model).get_result()
-    for i, prod in enumerate(products):
+    for i, prod in enumerate(products, 1):
         print(f'Product {i}: {[feat for feat in prod.elements if prod.elements[feat]]}')
 
     assert len(products) == nof_products
@@ -50,9 +50,11 @@ def test_main():
         print(f'{feat}: {prob[feat]}')
 
     # BDD Sampling
-    sample = BDDSampling(size=5, with_replacement=False).execute(bdd_model).get_result()
+    sample_op = BDDSampling()
+    sample_op.set_sample_size(5)
+    sample = sample_op.execute(bdd_model).get_result()
     print('Uniform Random Sampling:')
-    for i, prod in enumerate(sample):
+    for i, prod in enumerate(sample, 1):
         print(f'Product {i}: {[feat for feat in prod.elements if prod.elements[feat]]}')
 
 
