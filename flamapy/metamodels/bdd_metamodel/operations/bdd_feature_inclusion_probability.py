@@ -1,7 +1,7 @@
-from typing import Optional
+from typing import Any, Optional, cast
 
+from flamapy.core.models import VariabilityModel
 from flamapy.metamodels.configuration_metamodel.models.configuration import Configuration
-
 from flamapy.metamodels.bdd_metamodel.models import BDDModel
 from flamapy.metamodels.bdd_metamodel.operations.interfaces import FeatureInclusionProbability
 from flamapy.metamodels.bdd_metamodel.operations import BDDProducts
@@ -19,24 +19,23 @@ class BDDFeatureInclusionProbability(FeatureInclusionProbability):
     """
 
     def __init__(self, partial_configuration: Optional[Configuration] = None) -> None:
-        self.bdd_model = None
-        self.result: dict[str, float] = {}
+        self.result: dict[Any, float] = {}
         self.partial_configuration = partial_configuration
 
-    def execute(self, model: BDDModel) -> 'BDDFeatureInclusionProbability':
-        self.bdd_model = model
-        self.result = feature_inclusion_probability(self.bdd_model, self.partial_configuration)
+    def execute(self, model: VariabilityModel) -> 'BDDFeatureInclusionProbability':
+        bdd_model = cast(BDDModel, model)
+        self.result = feature_inclusion_probability(bdd_model, self.partial_configuration)
         return self
 
-    def get_result(self) -> dict[str, float]:
+    def get_result(self) -> dict[Any, float]:
         return self.result
 
-    def feature_inclusion_probability(self) -> dict[str, float]:
-        return feature_inclusion_probability(self.bdd_model, self.partial_configuration)
+    def feature_inclusion_probability(self) -> dict[Any, float]:
+        return self.get_result()
 
 
 def feature_inclusion_probability(bdd_model: BDDModel,
-                                  config: Optional[Configuration] = None) -> dict[str, float]:
+                                  config: Optional[Configuration] = None) -> dict[Any, float]:
     products = BDDProducts(config).execute(bdd_model).get_result()
     n_products = len(products)
     if n_products == 0:
