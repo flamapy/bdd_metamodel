@@ -1,21 +1,22 @@
-from flamapy.metamodels.fm_metamodel.transformations.featureide_reader import FeatureIDEReader
+from flamapy.metamodels.fm_metamodel.transformations import UVLReader
 
-from flamapy.metamodels.bdd_metamodel.transformations.fm_to_bdd import FmToBDD
-from flamapy.metamodels.bdd_metamodel.transformations.bdd_writer import BDDDumpFormat, BDDWriter
+from flamapy.metamodels.bdd_metamodel.transformations import FmToBDD, BDDWriter
+from flamapy.metamodels.bdd_metamodel.transformations.bdd_writer import BDDDumpFormat
 from flamapy.metamodels.bdd_metamodel.operations import (
-    BDDProducts,
-    BDDProductsNumber,
     BDDProductDistribution,
     BDDFeatureInclusionProbability,
-    BDDSampling)
+    BDDSampling,
+    BDDConfigurationsNumber,
+    BDDConfigurations,
+    BDDCoreFeatures,
+    BDDDeadFeatures,
+    BDDSatisfiable
+)
 
 
-FM_PATH = 'tests/input_fms/featureide_models/pizzas.xml'
-
-
-def test_main():
-    # Load the feature model from FeatureIDE
-    feature_model = FeatureIDEReader(FM_PATH).transform()
+def main():
+    # Load the feature model from UVLReader
+    feature_model = UVLReader('tests/input_fms/uvl_models/Pizzas.uvl').transform()
 
     # Create the BDD from the FM
     bdd_model = FmToBDD(feature_model).transform()
@@ -25,38 +26,47 @@ def test_main():
     bdd_writer.set_format(BDDDumpFormat.SVG)
     bdd_writer.set_roots([bdd_model.root])
     bdd_writer.transform()
+    
+    # Satisfiable (valid)
+    satisfiable = BDDSatisfiable().execute(bdd_model).get_result()
+    print(f'Satisfiable (valid)?: {satisfiable}')
 
-    # BDD number of products
-    nof_products = BDDProductsNumber().execute(bdd_model).get_result()
-    print(f'#Products: {nof_products}')
+    # Configurations numbers
+    n_configs = BDDConfigurationsNumber().execute(bdd_model).get_result()
+    print(f'#Configs: {n_configs}')
 
-    # BDD products operation
-    products = BDDProducts().execute(bdd_model).get_result()
-    for i, prod in enumerate(products, 1):
-        print(f'Product {i}: {[feat for feat in prod.elements if prod.elements[feat]]}')
-
-    assert len(products) == nof_products
+    # Configurations
+    configs = BDDConfigurations().execute(bdd_model).get_result()
+    for i, config in enumerate(configs, 1):
+        print(f'Config {i}: {config.get_selected_elements()}')
 
     # BDD product distribution
     dist = BDDProductDistribution().execute(bdd_model).get_result()
     print(f'Product Distribution: {dist}')
-
-    assert sum(dist) == nof_products
+    print(f'#Products: {sum(dist)}')
 
     # BDD feature inclusion probabilities
-    prob = BDDFeatureInclusionProbability().execute(bdd_model).get_result()
+    probabilities = BDDFeatureInclusionProbability().execute(bdd_model).get_result()
     print('Feature Inclusion Probabilities:')
-    for feat in prob.keys():
-        print(f'{feat}: {prob[feat]}')
+    for feat, prob in probabilities.items():
+        print(f'{feat}: {prob}')
+
+    # Core features
+    core_features = BDDCoreFeatures().execute(bdd_model).get_result()
+    print(f'Core features: {core_features}')
+
+    # Dead features
+    dead_features = BDDDeadFeatures().execute(bdd_model).get_result()
+    print(f'Dead features: {dead_features}')
 
     # BDD Sampling
     sample_op = BDDSampling()
     sample_op.set_sample_size(5)
     sample = sample_op.execute(bdd_model).get_result()
     print('Uniform Random Sampling:')
-    for i, prod in enumerate(sample, 1):
-        print(f'Product {i}: {[feat for feat in prod.elements if prod.elements[feat]]}')
+    for i, config in enumerate(sample, 1):
+        print(f'Config {i}: {config.get_selected_elements()}')
 
 
 if __name__ == '__main__':
-    test_main()
+    main()

@@ -2,11 +2,11 @@ from typing import Optional, cast
 
 from flamapy.core.models import VariabilityModel
 from flamapy.metamodels.configuration_metamodel.models.configuration import Configuration
-from flamapy.core.operations import ProductsNumber
+from flamapy.core.operations import ConfigurationsNumber
 from flamapy.metamodels.bdd_metamodel.models.bdd_model import BDDModel
 
 
-class BDDProductsNumber(ProductsNumber):
+class BDDConfigurationsNumber(ConfigurationsNumber):
     """It computes the number of solutions of the BDD model.
 
     It also supports counting the solutions from a given partial configuration.
@@ -16,20 +16,20 @@ class BDDProductsNumber(ProductsNumber):
         self.result = 0
         self.partial_configuration = partial_configuration
 
-    def execute(self, model: VariabilityModel) -> 'BDDProductsNumber':
+    def execute(self, model: VariabilityModel) -> 'BDDConfigurationsNumber':
         bdd_model = cast(BDDModel, model)
-        self.result = products_number(bdd_model, self.partial_configuration)
+        self.result = configurations_number(bdd_model, self.partial_configuration)
         return self
 
     def get_result(self) -> int:
         return self.result
 
-    def get_products_number(self) -> int:
+    def get_configurations_number(self) -> int:
         return self.get_result()
 
 
-def products_number(bdd_model: BDDModel,
-                    partial_configuration: Optional[Configuration] = None) -> int:
+def configurations_number(bdd_model: BDDModel,
+                          partial_configuration: Optional[Configuration] = None) -> int:
     if partial_configuration is None:
         u_func = bdd_model.root
         n_vars = len(bdd_model.variables)

@@ -41,7 +41,6 @@ class BDDMetrics(Metrics):
         self.model = cast(BDDModel, model)
 
         #Do some basic calculations to speedup the rest
-        pass
 
         # Get all methods that are marked with the metric_method decorator
         metric_methods = [getattr(self, method_name) for method_name in dir(self)

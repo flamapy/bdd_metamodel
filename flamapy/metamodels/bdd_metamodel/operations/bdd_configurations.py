@@ -2,11 +2,11 @@ from typing import Optional, cast
 
 from flamapy.core.models import VariabilityModel
 from flamapy.metamodels.configuration_metamodel.models.configuration import Configuration
-from flamapy.core.operations import Products
+from flamapy.core.operations import Configurations
 from flamapy.metamodels.bdd_metamodel.models.bdd_model import BDDModel
 
 
-class BDDProducts(Products):
+class BDDConfigurations(Configurations):
     """It computes all the solutions of a BDD model.
 
     It also supports the computation of all solutions from a partial configuration.
@@ -16,20 +16,20 @@ class BDDProducts(Products):
         self.result: list[Configuration] = []
         self.partial_configuration = partial_configuration
 
-    def execute(self, model: VariabilityModel) -> 'BDDProducts':
+    def execute(self, model: VariabilityModel) -> 'BDDConfigurations':
         bdd_model = cast(BDDModel, model)
-        self.result = products(bdd_model, self.partial_configuration)
+        self.result = configurations(bdd_model, self.partial_configuration)
         return self
 
     def get_result(self) -> list[Configuration]:
         return self.result
 
-    def get_products(self) -> list[Configuration]:
+    def get_configurations(self) -> list[Configuration]:
         return self.get_result()
 
 
-def products(bdd_model: BDDModel,
-             partial_config: Optional[Configuration] = None) -> list[Configuration]:
+def configurations(bdd_model: BDDModel,
+                   partial_config: Optional[Configuration] = None) -> list[Configuration]:
     if partial_config is None:
         u_func = bdd_model.root
         care_vars = set(bdd_model.variables)

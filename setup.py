@@ -22,7 +22,7 @@ setuptools.setup(
     ],
     python_requires='>=3.9',
     install_requires=[
-        'flamapy~=1.6.0.dev0',
+        'flamapy~=1.7.0.dev0',
         'flamapy-fm~=1.6.0.dev0',
         'dd>=0.5.6',
         'graphviz~=0.20',
