@@ -1,11 +1,11 @@
 import random
-from typing import Optional
+from typing import Optional, cast
 
-from flamapy.metamodels.configuration_metamodel.models.configuration import Configuration
+from flamapy.core.models import VariabilityModel
+from flamapy.core.exceptions import FlamaException
 from flamapy.core.operations import Sampling
-
+from flamapy.metamodels.configuration_metamodel.models.configuration import Configuration
 from flamapy.metamodels.bdd_metamodel.models import BDDModel
-from flamapy.metamodels.bdd_metamodel.operations import BDDProductsNumber
 
 
 class BDDSampling(Sampling):
@@ -21,43 +21,52 @@ class BDDSampling(Sampling):
     as well as samples from a given partial configuration.
     """
 
-    def __init__(self, size: int, with_replacement: bool = False,
-                 partial_configuration: Optional[Configuration] = None) -> None:
+    def __init__(self) -> None:
         self.result: list[Configuration] = []
-        self.bdd_model = None
-        self.size = size
+        self.sample_size: int = 0
+        self.with_replacement: bool = False
+        self.partial_configuration: Optional[Configuration] = None
+
+    def set_sample_size(self, sample_size: int) -> None:
+        if sample_size < 0:
+            raise FlamaException(f'Sample size {sample_size} cannot be negative.')
+        self.sample_size = sample_size
+
+    def set_with_replacement(self, with_replacement: bool) -> None:
         self.with_replacement = with_replacement
+
+    def set_partial_configuration(self, partial_configuration: Configuration) -> None:
         self.partial_configuration = partial_configuration
 
-    def execute(self, model: BDDModel) -> 'BDDSampling':
-        self.bdd_model = model
-        self.result = sample(self.bdd_model, self.size, self.with_replacement,
-                             self.partial_configuration)
-        return self
+    def get_sample(self) -> list[Configuration]:
+        return self.get_result()
 
     def get_result(self) -> list[Configuration]:
         return self.result
 
-    def sample(self, size: int, with_replacement: bool = False,
-               partial_configuration: Optional[Configuration] = None) -> list[Configuration]:
-        return sample(self.bdd_model, size, with_replacement, partial_configuration)
+    def execute(self, model: VariabilityModel) -> 'BDDSampling':
+        bdd_model = cast(BDDModel, model)
+        self.result = sample(bdd_model, 
+                             self.sample_size, 
+                             self.with_replacement, 
+                             self.partial_configuration)
+        return self
 
 
-def sample(bdd_model: BDDModel, size: int, with_replacement: bool = False,
-           partial_configuration: Optional[Configuration] = None) -> list[Configuration]:
-    nof_configs = BDDProductsNumber(partial_configuration).execute(bdd_model).get_result()
-    if size < 0 or (size > nof_configs and not with_replacement):
-        raise ValueError('Sample larger than population or is negative.')
-
+def sample(model: BDDModel, 
+           sample_size: int, 
+           with_replacement: bool,
+           partial_configuration: Optional[Configuration]
+           ) -> list[Configuration]:
     configurations = []
-    for _ in range(size):
-        config = random_configuration(bdd_model, partial_configuration)
+    for _ in range(sample_size):
+        config = random_configuration(model, partial_configuration)
         configurations.append(config)
 
     if not with_replacement:
         set_configurations = set(configurations)
-        while len(set_configurations) < size:
-            config = random_configuration(bdd_model, partial_configuration)
+        while len(set_configurations) < sample_size:
+            config = random_configuration(model, partial_configuration)
             set_configurations.add(config)
 
     return list(set_configurations)
