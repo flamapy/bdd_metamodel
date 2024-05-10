@@ -1,6 +1,8 @@
 import re
 import locale
+from typing import cast
 
+from flamapy.core.models import VariabilityModel
 from flamapy.metamodels.bdd_metamodel.models import BDDModel
 from flamapy.metamodels.bdd_metamodel.operations.interfaces import ProductDistribution
 
@@ -29,18 +31,17 @@ class BDDProductDistribution(ProductDistribution):
 
     def __init__(self) -> None:
         self.result: list[int] = []
-        self.bdd_model = None
-
-    def execute(self, model: BDDModel) -> 'BDDProductDistribution':
-        self.bdd_model = model
-        self.result = product_distribution(self.bdd_model)
-        return self
 
     def get_result(self) -> list[int]:
         return self.result
 
     def product_distribution(self) -> list[int]:
-        return product_distribution(self.bdd_model)
+        return self.get_result()
+
+    def execute(self, model: VariabilityModel) -> 'BDDProductDistribution':
+        bdd_model = cast(BDDModel, model)
+        self.result = product_distribution(bdd_model)
+        return self
 
 
 def product_distribution(bdd_model: BDDModel) -> list[int]: 

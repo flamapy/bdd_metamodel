@@ -1,6 +1,8 @@
 import re
 import locale 
+from typing import Any, cast
 
+from flamapy.core.models import VariabilityModel
 from flamapy.metamodels.bdd_metamodel.models import BDDModel
 from flamapy.metamodels.bdd_metamodel.operations.interfaces import FeatureInclusionProbability
 
@@ -23,22 +25,21 @@ class BDDFeatureInclusionProbability(FeatureInclusionProbability):
     """
 
     def __init__(self) -> None:
-        self.bdd_model = None
-        self.result: dict[str, float] = {}
+        self.result: dict[Any, float] = {}
 
-    def execute(self, model: BDDModel) -> 'BDDFeatureInclusionProbability':
-        self.bdd_model = model
-        self.result = feature_inclusion_probability(self.bdd_model)
-        return self
-
-    def get_result(self) -> dict[str, float]:
+    def get_result(self) -> dict[Any, float]:
         return self.result
 
-    def feature_inclusion_probability(self) -> dict[str, float]:
-        return feature_inclusion_probability(self.bdd_model)
+    def feature_inclusion_probability(self) -> dict[Any, float]:
+        return self.get_result()
+
+    def execute(self, model: VariabilityModel) -> 'BDDFeatureInclusionProbability':
+        bdd_model = cast(BDDModel, model)
+        self.result = feature_inclusion_probability(bdd_model)
+        return self
 
 
-def feature_inclusion_probability(bdd_model: BDDModel) -> dict[str, float]:
+def feature_inclusion_probability(bdd_model: BDDModel) -> dict[Any, float]:
     # Check bdd_file
     bdd_file = bdd_model.check_file_existence(bdd_model.get_bdd_file(), 'dddmp')
     feature_probabilities_process = bdd_model.run(BDDModel.FEATURE_PROBABILITIES, 

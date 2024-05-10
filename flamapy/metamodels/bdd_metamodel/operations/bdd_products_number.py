@@ -1,9 +1,11 @@
 import re
 import locale
+from typing import Optional, cast
 
-from flamapy.metamodels.configuration_metamodel.models import Configuration
+from flamapy.core.models import VariabilityModel
 from flamapy.core.operations import ProductsNumber
-
+from flamapy.core.exceptions import FlamaException
+from flamapy.metamodels.configuration_metamodel.models import Configuration
 from flamapy.metamodels.bdd_metamodel.models.bdd_model import BDDModel
 
 
@@ -13,25 +15,24 @@ class BDDProductsNumber(ProductsNumber):
     It also supports counting the solutions from a given partial configuration.
     """
 
-    def __init__(self, partial_configuration: Configuration = None) -> None:
-        self.result = 0
-        self.bdd_model = None
-        self.feature_model = None
-        self.partial_configuration = partial_configuration
+    def __init__(self, partial_configuration: Optional[Configuration] = None) -> None:
+        self.result: int = 0
+        self.partial_configuration: Optional[Configuration] = partial_configuration
 
-    def execute(self, model: BDDModel) -> 'BDDProductsNumber':
-        self.bdd_model = model
-        self.result = products_number(self.bdd_model, self.partial_configuration)
+    def execute(self, model: VariabilityModel) -> 'BDDProductsNumber':
+        bdd_model = cast(BDDModel, model)
+        self.result = products_number(bdd_model, self.partial_configuration)
         return self
 
     def get_result(self) -> int:
         return self.result
 
     def get_products_number(self) -> int:
-        return products_number(self.bdd_model, self.partial_configuration)
+        return self.get_result()
 
 
-def products_number(bdd_model: BDDModel, partial_configuration: Configuration = None) -> int:
+def products_number(bdd_model: BDDModel, 
+                    partial_configuration: Optional[Configuration] = None) -> int:
     """
     Computes the number of valid configurations.
         :param feature_assignment: a list with a partial or a complete features' assignment
@@ -41,11 +42,11 @@ def products_number(bdd_model: BDDModel, partial_configuration: Configuration = 
     if partial_configuration is not None:
         result = count(bdd_model, [f.name for f in partial_configuration.get_selected_elements()])
     else:
-        result = count(bdd_model)
+        result = count(bdd_model, [])
     return result
-    
 
-def count(bdd_model: BDDModel, feature_assignment: list[str]=[]) -> int:
+
+def count(bdd_model: BDDModel, feature_assignment: list[str]) -> int:
     """
     Computes the number of valid configurations.
         :param feature_assignment: a list with a partial or a complete features' assignment
@@ -56,26 +57,25 @@ def count(bdd_model: BDDModel, feature_assignment: list[str]=[]) -> int:
     bdd_file = bdd_model.check_file_existence(bdd_model.get_bdd_file(), 'dddmp')
 
     # Get all feature names
-    f = open(bdd_file, "r")
-    bdd_code = f.read()
-    varnames = re.search('varnames\\s+(.*)', bdd_code).group(1).split()
-    f.close()
+    with open(bdd_file, "r", encoding='utf8') as file:
+        bdd_code = file.read()
+        varnames = re.search('varnames\\s+(.*)', bdd_code).group(1).split()
 
     expanded_assignment = []
     for feature in feature_assignment:
-        ft = None
+        feat = None
         if re.match('not\\s+', feature):
-            ft = re.search('not\\s+(.*)', feature).group(1)
-            if varnames.count(ft) == 0:
-                raise Exception(ft + " is not a valid feature of " + bdd_file)
+            feat = re.search('not\\s+(.*)', feature).group(1)
+            if varnames.count(feat) == 0:
+                raise FlamaException(feat + " is not a valid feature of " + bdd_file)
             else:
-                ft += "=false"
+                feat += "=false"
         else:
             if varnames.count(feature) == 0:
-                raise Exception(feature + " is not a valid feature of " + bdd_file)
+                raise FlamaException(feature + " is not a valid feature of " + bdd_file)
             else:
-                ft = feature + "=true"
-        expanded_assignment.append(ft)
+                feat = feature + "=true"
+        expanded_assignment.append(feat)
 
     # Run counter
     #print("Counting the number of valid configurations (this may take a while)...")

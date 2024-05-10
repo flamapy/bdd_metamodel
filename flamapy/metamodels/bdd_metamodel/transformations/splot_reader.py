@@ -2,6 +2,7 @@ import os
 import re 
 from pathlib import Path
 
+from flamapy.core.exceptions import FlamaException
 from flamapy.core.transformations import TextToModel
 from flamapy.metamodels.bdd_metamodel.models import BDDModel
 
@@ -37,8 +38,7 @@ def build_bdd(model_file: str, bdd_model: BDDModel) -> None:
     if match is not None:
         file_name = match.group(1)
     else:
-        message = 'BDD synthesis failed: the file "' + model_file + 'is not valid.'
-        raise Exception(message) from Exception
+        raise FlamaException(f'BDD synthesis failed: the file {model_file} is not valid.')
 
     # Run binary splot2logic
     #print("Preprocessing " + model_file + " to get its BDD...")
@@ -47,10 +47,10 @@ def build_bdd(model_file: str, bdd_model: BDDModel) -> None:
     try:
         bdd_model.check_file_existence(file_name, "var")
         bdd_model.check_file_existence(file_name, "exp")
-    except Exception:
+    except Exception as exc:
         message = 'BDD synthesis failed: the files "' + file_name + '.var" and "' + \
                   file_name + '.exp" couldn\'t be generated.'
-        raise Exception(message) from Exception
+        raise FlamaException(message) from exc
 
     # Run binary logic2bdd's execution
     #print("Synthesizing the BDD (this may take a while)...")
@@ -58,9 +58,9 @@ def build_bdd(model_file: str, bdd_model: BDDModel) -> None:
     # Check that logic2bdd's execution was successful
     try:
         bdd_model.check_file_existence(file_name, "dddmp")
-    except Exception:
+    except Exception as exc:
         message = 'BDD synthesis failed: the file "' + file_name + '.dddmp couldn\'t be generated.'
-        raise Exception(message) from Exception
+        raise FlamaException(message) from exc
 
     # Remove auxiliary generated files
     auxiliary_files = [".dddmp.data", ".exp", ".dddmp.reorder", ".tree", ".var", ".dddmp.applied"]
