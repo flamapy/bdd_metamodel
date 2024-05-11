@@ -5,10 +5,11 @@ from flamapy.metamodels.bdd_metamodel.operations import (
     BDDProductDistribution,
     BDDFeatureInclusionProbability,
     BDDSampling,
-    BDDProductsNumber,
+    BDDConfigurationsNumber,
+    BDDConfigurations,
     BDDCoreFeatures,
     BDDDeadFeatures,
-    BDDValid
+    BDDSatisfiable
 )
 
 
@@ -23,13 +24,18 @@ def main():
     DDDMPWriter(f'{feature_model.root.name}_bdd.{DDDMPWriter.get_destination_extension()}', 
                 bdd_model).transform()
     
-    # Valid
-    valid = BDDValid().execute(bdd_model).get_result()
-    print(f'Valid?: {valid}')
+    # Satisfiable (valid)
+    satisfiable = BDDSatisfiable().execute(bdd_model).get_result()
+    print(f'Satisfiable (valid)?: {satisfiable}')
 
-    # Products numbers
-    n_configs = BDDProductsNumber().execute(bdd_model).get_result()
+    # Configurations numbers
+    n_configs = BDDConfigurationsNumber().execute(bdd_model).get_result()
     print(f'#Configs: {n_configs}')
+
+    # Configurations
+    configs = BDDConfigurations().execute(bdd_model).get_result()
+    for i, config in enumerate(configs, 1):
+        print(f'Config {i}: {config.get_selected_elements()}')
 
     # BDD product distribution
     dist = BDDProductDistribution().execute(bdd_model).get_result()
@@ -55,9 +61,8 @@ def main():
     sample_op.set_sample_size(5)
     sample = sample_op.execute(bdd_model).get_result()
     print('Uniform Random Sampling:')
-    for i, product in enumerate(sample, 1):
-        print(f'Product {i}: {product.get_selected_elements()}')
-
+    for i, config in enumerate(sample, 1):
+        print(f'Config {i}: {config.get_selected_elements()}')
 
 
 if __name__ == '__main__':

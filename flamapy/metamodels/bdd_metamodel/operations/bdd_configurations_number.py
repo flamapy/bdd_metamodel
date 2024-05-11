@@ -3,36 +3,39 @@ import locale
 from typing import Optional, cast
 
 from flamapy.core.models import VariabilityModel
-from flamapy.core.operations import ProductsNumber
+from flamapy.core.operations import ConfigurationsNumber
 from flamapy.core.exceptions import FlamaException
 from flamapy.metamodels.configuration_metamodel.models import Configuration
 from flamapy.metamodels.bdd_metamodel.models.bdd_model import BDDModel
 
 
-class BDDProductsNumber(ProductsNumber):
+class BDDConfigurationsNumber(ConfigurationsNumber):
     """It computes the number of solutions of the BDD model.
 
     It also supports counting the solutions from a given partial configuration.
     """
 
-    def __init__(self, partial_configuration: Optional[Configuration] = None) -> None:
+    def __init__(self) -> None:
         self.result: int = 0
-        self.partial_configuration: Optional[Configuration] = partial_configuration
+        self.partial_configuration: Optional[Configuration] = None
 
-    def execute(self, model: VariabilityModel) -> 'BDDProductsNumber':
+    def set_partial_configuration(self, partial_configuration: Configuration) -> None:
+        self.partial_configuration = partial_configuration
+
+    def execute(self, model: VariabilityModel) -> 'BDDConfigurationsNumber':
         bdd_model = cast(BDDModel, model)
-        self.result = products_number(bdd_model, self.partial_configuration)
+        self.result = configurations_number(bdd_model, self.partial_configuration)
         return self
 
     def get_result(self) -> int:
         return self.result
 
-    def get_products_number(self) -> int:
+    def get_configurations_number(self) -> int:
         return self.get_result()
 
 
-def products_number(bdd_model: BDDModel, 
-                    partial_configuration: Optional[Configuration] = None) -> int:
+def configurations_number(bdd_model: BDDModel, 
+                          partial_configuration: Optional[Configuration] = None) -> int:
     """
     Computes the number of valid configurations.
         :param feature_assignment: a list with a partial or a complete features' assignment
