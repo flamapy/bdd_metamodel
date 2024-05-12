@@ -48,47 +48,49 @@ def product_distribution(bdd_model: BDDModel) -> list[int]:
         + In index n, the number of products with n features activated.
     """
     root = bdd_model.root
-    id_root = BDDModel.get_value(root, root.negated)
+    id_root = bdd_model.get_value(root, root.negated)
     dist: dict[int, list[int]] = {0: [], 1: [1]}
     mark: dict[int, bool] = defaultdict(bool)
-    get_prod_dist(root, dist, mark, root.negated)
-    return dist[id_root]
+    get_prod_dist(bdd_model, root, dist, mark, root.negated)
+    # Complete distribution
+    distribution = dist[id_root] + [0] * (len(bdd_model.variables) + 1 - len(dist[id_root]))
+    return distribution
 
 
-def get_prod_dist(node: Function, 
+def get_prod_dist(bdd_model: BDDModel,
+                  node: Function, 
                   dist: dict[int, list[int]], 
                   mark: dict[int, bool], 
                   complemented: bool) -> None:
-    id_node = BDDModel.get_value(node, complemented)
+    id_node = bdd_model.get_value(node, complemented)
     mark[id_node] = not mark[id_node]
 
-    if not BDDModel.is_terminal_node(node):
+    if not bdd_model.is_terminal_node(node):
 
         # traverse
-        low = BDDModel.get_low_node(node)
-        id_low = BDDModel.get_value(low, complemented)
-
+        low = bdd_model.get_low_node(node)
+        id_low = bdd_model.get_value(low, complemented)
         if mark[id_node] != mark[id_low]:
-            get_prod_dist(low, dist, mark, complemented ^ low.negated)
+            get_prod_dist(bdd_model, low, dist, mark, complemented ^ low.negated)
 
         # compute low_dist to account for the removed nodes through low
-        removed_nodes = BDDModel.index(low) - BDDModel.index(node) - 1
+        removed_nodes = bdd_model.index(low) - bdd_model.index(node) - 1
         low_dist = [0] * (removed_nodes + len(dist[id_low]))
         for i in range(removed_nodes + 1):
             for j in range(len(dist[id_low])):
                 low_dist[i + j] = low_dist[i + j] + dist[id_low][j] * math.comb(removed_nodes, i)
 
         # traverse
-        high = BDDModel.get_high_node(node)
-        id_high = BDDModel.get_value(high, complemented)
+        high = bdd_model.get_high_node(node)
+        id_high = bdd_model.get_value(high, complemented)
 
-        high = BDDModel.get_high_node(node)
-        id_high = BDDModel.get_value(high, complemented)
+        high = bdd_model.get_high_node(node)
+        id_high = bdd_model.get_value(high, complemented)
         if mark[id_node] != mark[id_high]:
-            get_prod_dist(high, dist, mark, complemented ^ high.negated)
+            get_prod_dist(bdd_model, high, dist, mark, complemented ^ high.negated)
 
         # compute high_dist to account for the removed nodes through high
-        removed_nodes = BDDModel.index(high) - BDDModel.index(node) - 1
+        removed_nodes = bdd_model.index(high) - bdd_model.index(node) - 1
         high_dist = [0] * (removed_nodes + len(dist[id_high]))
         for i in range(removed_nodes + 1):
             for j in range(len(dist[id_high])):

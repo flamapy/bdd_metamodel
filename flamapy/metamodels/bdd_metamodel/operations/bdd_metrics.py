@@ -30,9 +30,7 @@ class BDDMetrics(Metrics):
         self.model: Optional[VariabilityModel] = None
         self.result: list[dict[str, Any]] = []
         self.model_type_extension = "bdd"
-        self._features: dict[int, str] = {}
-        self._common_features: list[Any] = []
-        self._dead_features: list[Any] = []
+        self._features: list[Any] = []
 
     def get_result(self) -> list[dict[str, Any]]:
         return self.result
@@ -41,6 +39,7 @@ class BDDMetrics(Metrics):
         self.model = cast(BDDModel, model)
 
         #Do some basic calculations to speedup the rest
+        self._features = self.model.variables
 
         # Get all methods that are marked with the metric_method decorator
         metric_methods = [getattr(self, method_name) for method_name in dir(self)
@@ -53,13 +52,13 @@ class BDDMetrics(Metrics):
         return [method() for method in metric_methods]
 
     @metric_method
-    def valid(self) -> dict[str, Any]:
-        """A feature model is valid if it represents at least one configuration."""
+    def satisfiable(self) -> dict[str, Any]:
+        """A feature model is satisfiable if it represents at least one configuration."""
         if self.model is None:
             raise FlamaException('Model not initialized.')
-        name = "Valid (not void)"
-        _valid = bdd_operations.BDDValid().execute(self.model).get_result()
-        result = self.construct_result(name=name, doc=self.valid.__doc__, result=_valid)
+        name = "satisfiable (valid) (not void)"
+        _satisfiable = bdd_operations.BDDSatisfiable().execute(self.model).get_result()
+        result = self.construct_result(name=name, doc=self.satisfiable.__doc__, result=_satisfiable)
         return result
 
     @metric_method
@@ -94,7 +93,7 @@ class BDDMetrics(Metrics):
         if self.model is None:
             raise FlamaException('Model not initialized.')
         name = "Configurations"
-        _configurations = bdd_operations.BDDProducts().execute(self.model).get_result()
+        _configurations = bdd_operations.BDDConfigurations().execute(self.model).get_result()
         result = self.construct_result(name=name,
                                        doc=self.configurations.__doc__,
                                        result=_configurations,
@@ -107,9 +106,35 @@ class BDDMetrics(Metrics):
         if self.model is None:
             raise FlamaException('Model not initialized.')
         name = "Configurations"
-        _configurations = bdd_operations.BDDProductsNumber().execute(self.model).get_result()
+        _configurations = bdd_operations.BDDConfigurationsNumber().execute(self.model).get_result()
         result = self.construct_result(name=name,
-                                       doc=self.configurations.__doc__,
+                                       doc=self.number_of_configurations.__doc__,
                                        result=_configurations,
+                                       size=None)
+        return result
+
+    @metric_method
+    def product_distribution(self) -> dict[str, Any]:
+        """Product distribution of the feature model."""
+        if self.model is None:
+            raise FlamaException('Model not initialized.')
+        name = "Product distribution"
+        _dist = bdd_operations.BDDProductDistribution().execute(self.model).get_result()
+        result = self.construct_result(name=name,
+                                       doc=self.product_distribution.__doc__,
+                                       result=_dist,
+                                       size=None)
+        return result
+
+    @metric_method
+    def feature_inclusion_probabilities(self) -> dict[str, Any]:
+        """Feature inclusion probabilities of the feature model."""
+        if self.model is None:
+            raise FlamaException('Model not initialized.')
+        name = "Feature inclusion probabilities"
+        _prob = bdd_operations.BDDFeatureInclusionProbability().execute(self.model).get_result()
+        result = self.construct_result(name=name,
+                                       doc=self.feature_inclusion_probabilities.__doc__,
+                                       result=_prob,
                                        size=None)
         return result

@@ -4,7 +4,7 @@ from typing import Optional, cast
 from flamapy.core.models import VariabilityModel
 from flamapy.core.exceptions import FlamaException
 from flamapy.core.operations import Sampling
-from flamapy.metamodels.configuration_metamodel.models.configuration import Configuration
+from flamapy.metamodels.configuration_metamodel.models import Configuration
 from flamapy.metamodels.bdd_metamodel.models import BDDModel
 
 

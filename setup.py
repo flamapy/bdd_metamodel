@@ -24,7 +24,7 @@ setuptools.setup(
     install_requires=[
         'flamapy~=1.7.0.dev0',
         'flamapy-fm~=1.6.0.dev0',
-        'dd>=0.5.6',
+        'dd~=0.5.7',
         'graphviz~=0.20',
     ],
     extras_require={

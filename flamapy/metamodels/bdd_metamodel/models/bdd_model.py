@@ -1,9 +1,11 @@
-from typing import Optional
+from typing import Optional, Any
 
-from dd.autoref import BDD, Function
+try:
+    import dd.cudd as _bdd
+except ImportError:
+    import dd.autoref as _bdd
 
 from flamapy.core.models import VariabilityModel
-
 from flamapy.metamodels.bdd_metamodel.models.utils.txtcnf import (
     CNFLogicConnective,
     TextCNFNotation,
@@ -26,43 +28,41 @@ class BDDModel(VariabilityModel):
         return 'bdd'
 
     def __init__(self) -> None:
-        self.bdd = BDD()  # BDD manager
-        self.cnf_formula: Optional[str] = None
-        self.root: Optional[Function] = None
-        self.variables: list[str] = []
+        self.bdd = _bdd.BDD()  # BDD manager
+        self.root: Optional[_bdd.Function] = None
+        self.variables: dict[str, int] = {}
 
-    def from_textual_cnf(self, textual_cnf_formula: str, variables: list[str]) -> None:
+    @classmethod
+    def from_textual_cnf(cls, cnf_formula: str, variables: list[str]) -> 'BDDModel':
         """Build the BDD from a textual representation of the CNF formula,
         and the list of variables."""
-        self.cnf_formula = textual_cnf_formula
-        self.variables = variables
-
+        bdd_model = cls()
         # Declare variables
-        for var in self.variables:
-            self.bdd.declare(var)
-
+        for var in variables:
+            bdd_model.bdd.declare(var)
         # Build the BDD
-        self.root = self.bdd.add_expr(self.cnf_formula)
+        bdd_model.root = bdd_model.bdd.add_expr(cnf_formula)
+        # Store variables
+        bdd_model.variables = bdd_model.bdd.vars
+        return bdd_model
 
     def nof_nodes(self) -> int:
         """Return number of nodes in the BDD."""
         return len(self.bdd)
 
-    def get_node(self, index: int) -> Function:
-        """Return the node at the given position (index)."""
-        return self.bdd.var(self.bdd.var_at_level(index))
+    def get_node(self, var: Any) -> _bdd.Function:
+        """Return the node of the named var 'var'."""
+        return self.bdd.var(var) 
 
-    @staticmethod
-    def level(node: Function) -> int:
+    def level(self, node: _bdd.Function) -> int:
         """Return the level of the node.
 
         Non-terminal nodes start at 0.
         Terminal nodes have level `s' being the `s' the number of variables.
         """
-        return node.level
+        return node.level if not self.is_terminal_node(node) else len(self.bdd.vars)
 
-    @staticmethod
-    def index(node: Function) -> int:
+    def index(self, node: _bdd.Function) -> int:
         """Position (index) of the variable that labels the node `n` in the ordering.
 
         Indexes start at 1.
@@ -72,42 +72,62 @@ class BDDModel(VariabilityModel):
         Example: node `n4` is labeled `B`, and `B` is in the 2nd position in ordering `[A,B,C]`,
         thus level(n4) = 2.
         """
-        return node.level + 1
+        return self.level(node) + 1
 
-    @staticmethod
-    def is_terminal_node(node: Function) -> bool:
+    def is_terminal_node(self, node: Any) -> bool:
         """Check if the node is a terminal node."""
-        return node.var is None
+        #return node.var is None
+        return self.is_terminal_n0(node) or self.is_terminal_n1(node)
 
-    @staticmethod
-    def is_terminal_n1(node: Function) -> bool:
+    def is_terminal_n1(self, node: Any) -> bool:
         """Check if the node is the terminal node 1 (n1)."""
-        return node.var is None and node.node == 1
+        return node == self.bdd.true
 
-    @staticmethod
-    def is_terminal_n0(node: Function) -> bool:
+    def is_terminal_n0(self, node: Any) -> bool:
         """Check if the node is the terminal node 0 (n0)."""
-        return node.var is None and node.node == -1
+        return node == self.bdd.false
 
-    @staticmethod
-    def get_high_node(node: Function) -> Optional[Function]:
+    def get_high_node(self, node: _bdd.Function) -> Optional[_bdd.Function]:
         """Return the high (right, solid) node."""
         return node.high
 
-    @staticmethod
-    def get_low_node(node: Function) -> Optional[Function]:
+    def get_low_node(self, node: _bdd.Function) -> Optional[_bdd.Function]:
         """Return the low (left, dashed) node.
 
         If the arc is complemented it returns the negation of the left node.
         """
         return node.low
 
-    @staticmethod
-    def get_value(node: Function, complemented: bool = False) -> int:
+    def get_value(self, node: _bdd.Function, complemented: bool = False) -> int:
         """Return the value (id) of the node considering complemented arcs."""
-        value = node.node
-        if BDDModel.is_terminal_n0(node):
+        value = int(node)
+        if self.is_terminal_n0(node):
             value = 1 if complemented else 0
-        elif BDDModel.is_terminal_n1(node):
+        elif self.is_terminal_n1(node):
             value = 0 if complemented else 1
         return value
+
+    def __str__(self) -> str:
+        result = f'Root: {self.root.var} ' \
+                 f'(id: {int(self.root)}) ' \
+                 f'(level: {self.level(self.root)}) ' \
+                 f'(index: {self.index(self.root)})\n'
+        result += f'Vars: ({len(self.bdd.vars)})\n'
+        var_levels = dict(sorted(self.bdd.var_levels.items(), key=lambda item: item[1]))
+        for var in var_levels:
+            node = self.get_node(var)
+            result += f' |-{node.var} ' \
+                      f'(id: {int(node)}) ' \
+                      f'(level: {self.level(node)}) ' \
+                      f'(index: {self.index(node)})\n'
+        node = self.bdd.false
+        result += f'Terminal node (n0): {node.var} ' \
+                  f'(id: {int(node)}) ' \
+                  f'(level: {self.level(node)}) ' \
+                  f'(index: {self.index(node)})\n'
+        node = self.bdd.true
+        result += f'Terminal node (n1): {node.var} ' \
+                  f'(id: {int(node)}) ' \
+                  f'(level: {self.level(node)}) ' \
+                  f'(index: {self.index(node)})\n'
+        return result

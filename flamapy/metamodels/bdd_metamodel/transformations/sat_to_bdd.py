@@ -1,10 +1,12 @@
-from flamapy.core.transformations import ModelToModel
+from typing import Optional
 
+from flamapy.core.transformations import ModelToModel
 from flamapy.metamodels.bdd_metamodel.models import BDDModel
 from flamapy.metamodels.pysat_metamodel.models import PySATModel
 
 
 class SATToBDD(ModelToModel):
+
     @staticmethod
     def get_source_extension() -> str:
         return "pysat"
@@ -15,7 +17,7 @@ class SATToBDD(ModelToModel):
 
     def __init__(self, source_model: PySATModel) -> None:
         self.source_model = source_model
-        self.destination_model = BDDModel()
+        self.destination_model: Optional[BDDModel] = None
 
     def transform(self) -> BDDModel:
         # Transform clauses to textual CNF notation required by the BDD
@@ -39,9 +41,8 @@ class SATToBDD(ModelToModel):
                 )
                 + ")"
             )
-
         cnf_formula = and_connective.join(cnf_list)
-        self.destination_model.from_textual_cnf(cnf_formula, 
-                                                list(self.source_model.variables.keys()))
-
+        bdd_model = BDDModel.from_textual_cnf(cnf_formula, 
+                                              list(self.source_model.variables.keys()))
+        self.destination_model = bdd_model
         return self.destination_model

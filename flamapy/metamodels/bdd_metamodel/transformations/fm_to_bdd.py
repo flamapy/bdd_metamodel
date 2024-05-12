@@ -1,4 +1,5 @@
 import itertools
+from typing import Optional
 
 from flamapy.core.transformations import ModelToModel
 from flamapy.metamodels.fm_metamodel.models import (
@@ -22,7 +23,7 @@ class FmToBDD(ModelToModel):
     def __init__(self, source_model: FeatureModel) -> None:
         self.source_model = source_model
         self.counter = 1
-        self.destination_model = BDDModel()
+        self.destination_model: Optional[BDDModel] = None
         self.variables: dict[str, int] = {}
         self.features: dict[int, str] = {}
         self.clauses: list[list[int]] = []
@@ -163,10 +164,7 @@ class FmToBDD(ModelToModel):
                 )
                 + ")"
             )
-
         cnf_formula = and_connective.join(cnf_list)
-        self.destination_model.from_textual_cnf(
-            cnf_formula, list(self.variables.keys())
-        )
-
+        self.destination_model = BDDModel.from_textual_cnf(cnf_formula, 
+                                                           list(self.variables.keys()))
         return self.destination_model

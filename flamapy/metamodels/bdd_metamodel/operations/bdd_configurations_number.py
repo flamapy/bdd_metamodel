@@ -1,9 +1,9 @@
 from typing import Optional, cast
 
 from flamapy.core.models import VariabilityModel
-from flamapy.metamodels.configuration_metamodel.models.configuration import Configuration
 from flamapy.core.operations import ConfigurationsNumber
-from flamapy.metamodels.bdd_metamodel.models.bdd_model import BDDModel
+from flamapy.metamodels.configuration_metamodel.models import Configuration
+from flamapy.metamodels.bdd_metamodel.models import BDDModel
 
 
 class BDDConfigurationsNumber(ConfigurationsNumber):
@@ -12,8 +12,11 @@ class BDDConfigurationsNumber(ConfigurationsNumber):
     It also supports counting the solutions from a given partial configuration.
     """
 
-    def __init__(self, partial_configuration: Optional[Configuration] = None) -> None:
+    def __init__(self) -> None:
         self.result = 0
+        self.partial_configuration: Optional[Configuration] = None
+
+    def set_partial_configuration(self, partial_configuration: Optional[Configuration]) -> None:
         self.partial_configuration = partial_configuration
 
     def execute(self, model: VariabilityModel) -> 'BDDConfigurationsNumber':
@@ -37,5 +40,4 @@ def configurations_number(bdd_model: BDDModel,
         values = dict(partial_configuration.elements.items())
         u_func = bdd_model.bdd.let(values, bdd_model.root)
         n_vars = len(bdd_model.variables) - len(values)
-
     return bdd_model.bdd.count(u_func, nvars=n_vars)
