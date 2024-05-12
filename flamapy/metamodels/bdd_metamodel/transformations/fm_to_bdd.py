@@ -1,5 +1,5 @@
 import itertools
-from typing import Optional
+from typing import Optional, Any
 
 from flamapy.core.transformations import ModelToModel
 from flamapy.metamodels.fm_metamodel.models import (
@@ -43,94 +43,125 @@ class FmToBDD(ModelToModel):
     def add_root(self, feature: Feature) -> None:
         self.clauses.append([self._get_variable(feature.name)])
 
-    def add_relation(self, relation: Relation) -> None:  # noqa: MC0001
-        # pylint: disable=too-many-nested-blocks
-        var_parent = self._get_variable(relation.parent.name)
-        # TODO: fix too many nested blocks
-        if relation.is_mandatory():
-            var_child = self._get_variable(relation.children[0].name)
-            self.clauses.append([-1 * var_parent, var_child])
-            self.clauses.append([-1 * var_child, var_parent])
+    def _add_mandatory_relation(self, relation: Relation) -> list[list[int]]:
+        value_parent = self._get_variable(relation.parent.name)
+        value_child = self._get_variable(relation.children[0].name)
+        clauses = [[-1 * value_parent, value_child], [-1 * value_child, value_parent]]
+        return clauses
 
-        elif relation.is_optional():
-            self.clauses.append(
-                [-1 * self._get_variable(relation.children[0].name), var_parent]
-            )
+    def _add_optional_relation(self, relation: Relation) -> list[list[int]]:
+        value_parent = self._get_variable(relation.parent.name)
+        value_children = self._get_variable(relation.children[0].name)
+        clauses = [[-1 * value_children, value_parent]]
+        return clauses
 
-        elif relation.is_or():  # this is a 1 to n relatinship with multiple childs
-            # add the first cnf child1 or child2 or ... or childN or no parent)
+    def _add_or_relation(self, relation: Relation) -> list[list[int]]:
+        # this is a 1 to n relatinship with multiple childs
+        # add the first cnf child1 or child2 or ... or childN or no parent)
+        # first elem of the constraint
+        value_parent = self._get_variable(relation.parent.name)
 
-            # first elem of the constraint
-            alt_cnf = [-1 * var_parent]
-            for child in relation.children:
-                alt_cnf.append(self._get_variable(child.name))
-            self.clauses.append(alt_cnf)
+        alt_cnf = [-1 * value_parent]
+        for child in relation.children:
+            alt_cnf.append(self._get_variable(child.name))
+        clauses = [alt_cnf]
 
-            for child in relation.children:
-                self.clauses.append([-1 * self._get_variable(child.name), var_parent])
+        for child in relation.children:
+            clauses.append([
+                -1 * self._get_variable(child.name),
+                value_parent
+            ])
 
-        elif relation.is_alternative():
-            # this is a 1 to 1 relatinship with multiple childs
-            # add the first cnf child1 or child2 or ... or childN or no parent)
+        return clauses
 
-            # first elem of the constraint
-            alt_cnf = [-1 * var_parent]
-            for child in relation.children:
-                alt_cnf.append(self._get_variable(child.name))
-            self.clauses.append(alt_cnf)
+    def _add_alternative_relation(self, relation: Relation) -> list[list[int]]:
+        # this is a 1 to 1 relatinship with multiple childs
+        # add the first cnf child1 or child2 or ... or childN or no parent)
 
-            for i, _ in enumerate(relation.children):
-                var_child_i = self._get_variable(relation.children[i].name)
-                for j in range(i + 1, len(relation.children)):
-                    if i != j:
-                        self.clauses.append(
-                            [
-                                -1 * var_child_i,
-                                -1 * self._get_variable(relation.children[j].name),
-                            ]
-                        )
-                self.clauses.append([-1 * var_child_i, var_parent])
+        value_parent = self._get_variable(relation.parent.name)
+        # first elem of the constraint
+        alt_cnf = [-1 * value_parent]
+        for child in relation.children:
+            alt_cnf.append(self._get_variable(child.name))
+        clauses = [alt_cnf]
 
-        else:
-            # This is a _min to _max relationship
-            _min = relation.card_min
-            _max = relation.card_max
-            for val in range(len(relation.children) + 1):
-                if val < _min or val > _max:
-                    # combinations of val elements
-                    for combination in itertools.combinations(relation.children, val):
-                        cnf = [-1 * self._get_variable(relation.parent.name)]
-                        for feat in relation.children:
-                            if feat in combination:
-                                cnf.append(-1 * self._get_variable(feat.name))
-                            else:
-                                cnf.append(self._get_variable(feat.name))
-                        self.clauses.append(cnf)
+        for i, _ in enumerate(relation.children):
+            for j in range(i + 1, len(relation.children)):
+                if i != j:
+                    clauses.append([
+                        -1 * self._get_variable(relation.children[i].name),
+                        -1 * self._get_variable(relation.children[j].name)
+                    ])
+            clauses.append([
+                -1 * self._get_variable(relation.children[i].name),
+                value_parent
+            ])
+        return clauses
 
-            # there is a special case when coping with the upper part of the thru table
-            # In the case of allowing 0 childs, you cannot exclude the option  in that
-            # no feature in this relation is activated
-            for val in range(1, len(relation.children) + 1):
+    def _add_constraint_relation(self, relation: Relation) -> list[list[int]]:
+        value_parent = self._get_variable(relation.parent.name)
+
+        # This is a _min to _max relationship
+        _min = relation.card_min
+        _max = relation.card_max
+
+        clauses = []
+
+        for val in range(len(relation.children) + 1):
+            if val < _min or val > _max:
+                # combinations of val elements
                 for combination in itertools.combinations(relation.children, val):
-                    cnf = [self._get_variable(relation.parent.name)]
+                    cnf = [-1 * value_parent]
                     for feat in relation.children:
                         if feat in combination:
                             cnf.append(-1 * self._get_variable(feat.name))
                         else:
                             cnf.append(self._get_variable(feat.name))
-                    self.clauses.append(cnf)
+                    clauses.append(cnf)
+
+        # there is a special case when coping with the upper part of the thru table
+        # In the case of allowing 0 childs, you cannot exclude the option  in that
+        # no feature in this relation is activated
+        for val in range(1, len(relation.children) + 1):
+
+            for combination in itertools.combinations(relation.children, val):
+                cnf = [value_parent]
+                for feat in relation.children:
+                    if feat in combination:
+                        cnf.append(-1 * self._get_variable(feat.name))
+                    else:
+                        cnf.append(self._get_variable(feat.name))
+                clauses.append(cnf)
+        return clauses
+    
+    def add_relation(self, relation: Relation) -> None:
+        if relation.is_mandatory():
+            clauses = self._add_mandatory_relation(relation)
+        elif relation.is_optional():
+            clauses = self._add_optional_relation(relation)
+        elif relation.is_or():  
+            clauses = self._add_or_relation(relation)
+        elif relation.is_alternative():  
+            clauses = self._add_alternative_relation(relation)
+        else:
+            clauses = self._add_constraint_relation(relation)
+        self._store_constraint_clauses(clauses)
+
+    def _store_constraint_clauses(self, clauses: list[list[int]]) -> None:
+        for clause in clauses:
+            self.clauses.append(clause)
 
     def add_constraint(self, ctc: Constraint) -> None:
+        def get_term_variable(term: Any) -> int:
+            if term.startswith('-'):
+                return -self._get_variable(term[1:])
+
+            return self._get_variable(term)
+
         clauses = ctc.ast.get_clauses()
         for clause in clauses:
-            cls = []
-            for term in clause:
-                if term.startswith("-"):
-                    var_term = -1 * self._get_variable(term[1:])
-                else:
-                    var_term = self._get_variable(term)
-                cls.append(var_term)
-            self.clauses.append(cls)
+            clause_variables = list(map(get_term_variable, clause))
+            self.clauses.append(clause_variables)
 
     def transform(self) -> BDDModel:
         for feature in self.source_model.get_features():
