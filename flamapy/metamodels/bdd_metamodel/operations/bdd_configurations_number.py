@@ -40,4 +40,4 @@ def configurations_number(bdd_model: BDDModel,
         values = dict(partial_configuration.elements.items())
         u_func = bdd_model.bdd.let(values, bdd_model.root)
         n_vars = len(bdd_model.variables) - len(values)
-    return bdd_model.bdd.count(u_func, nvars=n_vars)
+    return int(bdd_model.bdd.count(u_func, nvars=n_vars))
