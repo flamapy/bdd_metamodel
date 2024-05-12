@@ -1,6 +1,8 @@
-from flamapy.metamodels.fm_metamodel.transformations import UVLReader
+import os
 
-from flamapy.metamodels.bdd_metamodel.transformations import FmToBDD, DDDMPWriter
+from flamapy.metamodels.fm_metamodel.transformations import UVLReader
+from flamapy.metamodels.bdd_metamodel.models import BDDModel
+from flamapy.metamodels.bdd_metamodel.transformations import FmToBDD, DDDMPWriter, DDDMPReader
 from flamapy.metamodels.bdd_metamodel.operations import (
     BDDProductDistribution,
     BDDFeatureInclusionProbability,
@@ -13,29 +15,25 @@ from flamapy.metamodels.bdd_metamodel.operations import (
 )
 
 
-def main():
-    # Load the feature model from UVLReader
-    feature_model = UVLReader('tests/input_fms/uvl_models/Pizzas.uvl').transform()
+FM_PATH = 'tests/models/uvl_models/Pizzas.uvl'
+BDD_MODELS_PATH = 'tests/models/bdd_models/'
 
-    # Create the BDD from the FM
-    bdd_model = FmToBDD(feature_model).transform()
 
-    # Save the BDD as .dddmp file
-    DDDMPWriter(f'{feature_model.root.name}_bdd.{DDDMPWriter.get_destination_extension()}', 
-                bdd_model).transform()
-    
+def analyze_bdd(bdd_model: BDDModel) -> None:
     # Satisfiable (valid)
     satisfiable = BDDSatisfiable().execute(bdd_model).get_result()
     print(f'Satisfiable (valid)?: {satisfiable}')
-
+    
     # Configurations numbers
     n_configs = BDDConfigurationsNumber().execute(bdd_model).get_result()
     print(f'#Configs: {n_configs}')
 
+    assert n_configs > 0 if satisfiable else n_configs == 0
+
     # Configurations
-    configs = BDDConfigurations().execute(bdd_model).get_result()
-    for i, config in enumerate(configs, 1):
-        print(f'Config {i}: {config.get_selected_elements()}')
+    # configs = BDDConfigurations().execute(bdd_model).get_result()
+    # for i, config in enumerate(configs, 1):
+    #     print(f'Config {i}: {config.get_selected_elements()}')
 
     # BDD product distribution
     dist = BDDProductDistribution().execute(bdd_model).get_result()
@@ -65,5 +63,25 @@ def main():
         print(f'Config {i}: {config.get_selected_elements()}')
 
 
+def main():
+    path, filename = os.path.split(FM_PATH)
+    filename = ''.join(filename.split('.')[:-1])
+
+    # Load the feature model from UVLReader
+    feature_model = UVLReader(FM_PATH).transform()
+
+    # Create the BDD from the FM
+    bdd_model = FmToBDD(feature_model).transform()
+
+    analyze_bdd(bdd_model)
+
+    # Save the BDD as .dddmp file
+    DDDMPWriter(f'{filename}.{DDDMPWriter.get_destination_extension()}', bdd_model).transform()
+    
+    # Load a BDD from a .dddmp file
+    bdd_model = DDDMPReader(f'{os.path.join(BDD_MODELS_PATH, filename)}.dddmp').transform()
+    analyze_bdd(bdd_model)
+
+   
 if __name__ == '__main__':
     main()
