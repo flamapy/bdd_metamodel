@@ -5,6 +5,7 @@
   - [Functionality and usage](#functionality-and-usage)
     - [Load a feature model in UVL and create the BDD](#load-a-feature-model-in-uvl-and-create-the-bdd)
     - [Save the BDD in a file](#save-the-bdd-in-a-file)
+    - [Load the BDD from a file](#load-the-bdd-from-a-file)
     - [Analysis operations](#analysis-operations)
   - [Contributing to the BDD plugin](#contributing-to-the-bdd-plugin)
 
@@ -70,6 +71,15 @@ DDDMPv3Writer(f'my_bdd.dddmp', bdd_model).transform()
 ```
 Writers available: DDDMPv3 ('dddmp'), DDDMPv2 ('dddmp'), JSON ('json'), Pickle ('p'), PDF ('pdf'), PNG ('png'), SVG ('svg').
 
+### Load the BDD from a file
+```python
+from flamapy.metamodels.bdd_metamodel.transformations import JSONReader
+# Load the BDD from a .json file
+bdd_model = JSONReader(path='path/to/my_bdd.json').transform()
+```
+Readers available: JSON ('json'), DDDMP ('dddmp'), Pickle ('p').
+
+*NOTE:* DDDMP and Pickle readers are not fully supported yet.
 
 ### Analysis operations
 
