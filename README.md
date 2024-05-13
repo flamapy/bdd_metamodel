@@ -40,7 +40,7 @@ from flamapy.metamodels.fm_metamodel.transformations import UVLReader
 from flamapy.metamodels.bdd_metamodel.transformations import FmToBDD
 
 # Load the feature model from UVLReader
-feature_model = UVLReader('input_fms/uvl_models/Pizzas.uvl').transform() 
+feature_model = UVLReader('models/uvl_models/Pizzas.uvl').transform() 
 
 # Create the BDD from the feature model
 bdd_model = FmToBDD(feature_model).transform()
@@ -50,78 +50,93 @@ bdd_model = FmToBDD(feature_model).transform()
 ### Save and load a BDD to/from a file
 ```python
 from flamapy.metamodels.bdd_metamodel.transformations import DDDMPWriter, DDDMPReader
-# Save the BDD to a .dddmp file (the extension is not required).
-DDDMPWriter(path='path/to/save/my_bdd', source_model=bdd_model).transform()
-# Load a BDD from a .dddmp file (the extension is required).
+# Save the BDD to a .dddmp file
+DDDMPWriter(path='path/to/save/my_bdd.dddmp', source_model=bdd_model).transform()
+# Load a BDD from a .dddmp file
 bdd_model = DDDMPReader(path='path/to/my_bdd.dddmp').transform()
 ```
 
 
 ### Analysis operations
 
-- Products number
+- Satisfiable
 
-    Return the number of products (configurations):
+    Return whether the model is satisfiable (valid):
     ```python
-    from flamapy.metamodels.bdd_metamodel.operations import BDDProductsNumber
-    nof_products = BDDProductsNumber().execute(bdd_model).get_result()
-    print(f'#Products: {nof_products}')
+    from flamapy.metamodels.bdd_metamodel.operations import BDDSatisfiable
+    satisfiable = BDDSatisfiable().execute(bdd_model).get_result()
+    print(f'Satisfiable? (valid?): {satisfiable}')
     ```
-    or alternatively:
+
+- Configurations number
+
+    Return the number of configurations:
     ```python
-    from flamapy.metamodels.bdd_metamodel.operations import products_number
-    nof_products = products_number(bdd_model)
-    print(f'#Products: {nof_products}')
+    from flamapy.metamodels.bdd_metamodel.operations import BDDConfigurationsNumber
+    n_configs = BDDConfigurationsNumber().execute(bdd_model).get_result()
+    print(f'#Configurations: {n_configs}')
+    ```
+
+- Configurations
+
+    Enumerate the configurations of the model:
+    ```python
+    from flamapy.metamodels.bdd_metamodel.operations import BDDConfigurations
+    configurations = BDDConfigurations().execute(bdd_model).get_result()
+    for i, config in enumerate(configurations, 1):
+        print(f'Config {i}: {[feat for feat in config.elements if config.elements[feat]]}')
     ```
 
 - Sampling
 
-    Return a sample of the given size of uniform random products (configurations) with or without replacement:
+    Return a sample of the given size of uniform random configurations with or without replacement:
     ```python
     from flamapy.metamodels.bdd_metamodel.operations import BDDSampling
-    list_sample = BDDSampling(size=5, with_replacement=False).execute(bdd_model).get_result()
-    for i, prod in enumerate(list_sample):
-        print(f'Product {i}: {[feat for feat in prod.elements if prod.elements[feat]]}')
-    ```
-    or alternatively:
-    ```python
-    from flamapy.metamodels.bdd_metamodel.operations import sample
-    list_sample = sample(bdd_model, size=5, with_replacement=False)
-    for i, prod in enumerate(list_sample):
-        print(f'Product {i}: {[feat for feat in prod.elements if prod.elements[feat]]}')
+    sampling_op = BDDSampling()
+    sampling_op.set_sample_size(5)
+    sampling_op.set_with_replacement(False)  # Default False
+    sample = sampling_op.execute(bdd_model).get_result()
+    for i, config in enumerate(sample, 1):
+        print(f'Config {i}: {[feat for feat in config.elements if config.elements[feat]]}')
     ```
 
 - Product Distribution
 
-    Return the number of products having a given number of features:
+    Return the number of products (configurations) having a given number of features:
     ```python
     from flamapy.metamodels.bdd_metamodel.operations import BDDProductDistribution
     dist = BDDProductDistribution().execute(bdd_model).get_result()
     print(f'Product Distribution: {dist}')
     ```
-    or alternatively:
-    ```python
-    from flamapy.metamodels.bdd_metamodel.operations import product_distribution
-    dist = product_distribution(bdd_model)
-    print(f'Product Distribution: {dist}')
-    ```
 
 - Feature Inclusion Probability
 
-    Return the probability for a feature to be included in a valid product:
+    Return the probability for a feature to be included in a valid configuration:
     ```python
     from flamapy.metamodels.bdd_metamodel.operations import BDDFeatureInclusionProbability
     prob = BDDFeatureInclusionProbability().execute(bdd_model).get_result()
     for feat in prob.keys():
         print(f'{feat}: {prob[feat]}')
     ```
-    or alternatively:
+
+- Core features
+
+    Return the core features (those features that are present in all the configurations):
     ```python
-    from flamapy.metamodels.bdd_metamodel.operations import feature_inclusion_probability
-    prob = feature_inclusion_probability(bdd_model)
-    for feat in prob.keys():
-        print(f'{feat}: {prob[feat]}')
+    from flamapy.metamodels.bdd_metamodel.operations import BDDCoreFeatures
+    core_features = BDDCoreFeatures().execute(bdd_model).get_result()
+    print(f'Core features: {core_features}')
     ```
+
+- Dead features
+
+    Return the dead features (those features that are not present in any configuration):
+    ```python
+    from flamapy.metamodels.bdd_metamodel.operations import BDDDeadFeatures
+    dead_features = BDDDeadFeatures().execute(bdd_model).get_result()
+    print(f'Dead features: {dead_features}')
+    ```
+
 
 ## Contributing to the BDD plugin
 To contribute in the development of this plugin:
@@ -131,7 +146,7 @@ To contribute in the development of this plugin:
 3. Create a virtual environment: `python -m venv env`
 4. Activate the virtual environment: `source env/bin/activate`
 5. Install the plugin dependencies: `pip install flamapy flamapy-fm`
-6. Install the BDD plugin from the source code: `pip install -e bdd_metamodel` 
+6. Install the BDD plugin from the source code: `pip install -e bdd_metamodel`
 
 Please try to follow the standards code quality to contribute to this plugin before creating a Pull Request:
 
@@ -142,4 +157,3 @@ Please try to follow the standards code quality to contribute to this plugin bef
 - To analyze the static type checker for Python and find bugs, pass the Mypy:
 
     `make mypy`
-
