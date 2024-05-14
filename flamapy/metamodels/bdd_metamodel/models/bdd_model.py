@@ -33,7 +33,7 @@ class BDDModel(VariabilityModel):
         self.variables: dict[str, int] = {}
 
     @classmethod
-    def from_textual_cnf(cls, cnf_formula: str, variables: list[str]) -> 'BDDModel':
+    def from_cnf_formula(cls, cnf_formula: str, variables: list[str]) -> 'BDDModel':
         """Build the BDD from a textual representation of the CNF formula,
         and the list of variables."""
         bdd_model = cls()
@@ -42,6 +42,20 @@ class BDDModel(VariabilityModel):
             bdd_model.bdd.declare(var)
         # Build the BDD
         bdd_model.root = bdd_model.bdd.add_expr(cnf_formula)
+        # Store variables
+        bdd_model.variables = bdd_model.bdd.vars
+        return bdd_model
+
+    @classmethod
+    def from_propositional_formula(cls, formula: str, variables: list[str]) -> 'BDDModel':
+        """Build the BDD from a textual representation of the CNF formula,
+        and the list of variables."""
+        bdd_model = cls()
+        # Declare variables
+        for var in variables:
+            bdd_model.bdd.declare(var)
+        # Build the BDD
+        bdd_model.root = bdd_model.bdd.add_expr(formula)
         # Store variables
         bdd_model.variables = bdd_model.bdd.vars
         return bdd_model

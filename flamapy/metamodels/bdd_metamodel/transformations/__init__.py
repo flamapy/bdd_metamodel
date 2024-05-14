@@ -1,4 +1,4 @@
-from .fm_to_bdd import FmToBDD
+from .fm_to_bdd_pl import FmToBDD
 from .json_writer import JSONWriter
 from .json_reader import JSONReader
 from .pickle_writer import PickleWriter
