@@ -19,5 +19,5 @@ class DDDMPReader(TextToModel):
         match = re.search(re_expression, self._path)
         if match is not None:
             file_name = match.group(1)
-        bdd_model.set_bdd_file(file_name)
+        bdd_model.bdd_file = file_name
         return bdd_model

@@ -1,4 +1,5 @@
 from pathlib import Path
+import tempfile
 
 from flamapy.core.transformations import ModelToModel
 from flamapy.metamodels.fm_metamodel.models import FeatureModel
@@ -21,8 +22,10 @@ class FmToBDD(ModelToModel):
         self.source_model = source_model
 
     def transform(self) -> BDDModel:
-        splot_filepath = f'{self.source_model.root.name}.{SPLOTWriter.get_destination_extension()}'
-        SPLOTWriter(path=splot_filepath, source_model=self.source_model).transform()
-        bdd_model = SPLOTReader(splot_filepath).transform()
-        Path(splot_filepath).unlink()
+        with tempfile.NamedTemporaryFile(mode='w', 
+                                         encoding='utf8', 
+                                         suffix='.'+SPLOTWriter.get_destination_extension()
+                                        ) as file:
+            SPLOTWriter(path=file.name, source_model=self.source_model).transform()
+            bdd_model = SPLOTReader(file.name).transform()
         return bdd_model

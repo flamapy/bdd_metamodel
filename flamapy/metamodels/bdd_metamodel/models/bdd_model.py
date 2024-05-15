@@ -34,18 +34,22 @@ class BDDModel(VariabilityModel):
         The BDD relies on a dddmp file that stores a feature model's BDD encoding (dddmp is the
         format that the BDD library CUDD uses; check https://github.com/vscosta/cudd)
         """
-        self.bdd_file: str = ''
+        self._bdd_file: str = ''
+        self._temporal_bdd_file: bool = True
         self._set_global_constants()
 
-    def set_bdd_file(self, dddmp_file: str) -> None:
-        self.bdd_file = dddmp_file
+    @property
+    def bdd_file(self) -> str:
+        return self._bdd_file
 
-    def get_bdd_file(self) -> str:
-        return self.bdd_file
+    @bdd_file.setter
+    def bdd_file(self, dddmp_file: str) -> None:
+        self._bdd_file = dddmp_file
+        self._temporal_bdd_file = False
 
     def __del__(self) -> None:
-        if self.bdd_file is not None:
-            Path(self.bdd_file + '.dddmp').unlink()
+        if self._bdd_file is not None and self._temporal_bdd_file:
+            Path(self._bdd_file + '.dddmp').unlink()
 
     def _set_global_constants(self) -> None:
         """Private auxiliary function that configures the following global constants.

@@ -41,7 +41,7 @@ class BDDFeatureInclusionProbability(FeatureInclusionProbability):
 
 def feature_inclusion_probability(bdd_model: BDDModel) -> dict[Any, float]:
     # Check bdd_file
-    bdd_file = bdd_model.check_file_existence(bdd_model.get_bdd_file(), 'dddmp')
+    bdd_file = bdd_model.check_file_existence(bdd_model.bdd_file, 'dddmp')
     feature_probabilities_process = bdd_model.run(BDDModel.FEATURE_PROBABILITIES, 
                                                   bdd_file)
     result = feature_probabilities_process.stdout.decode(locale.getdefaultlocale()[1])

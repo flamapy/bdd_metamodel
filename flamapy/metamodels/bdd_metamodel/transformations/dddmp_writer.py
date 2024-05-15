@@ -15,7 +15,7 @@ class DDDMPWriter(ModelToText):
         self.source_model = source_model
 
     def transform(self) -> str:
-        filename = f'{self.source_model.get_bdd_file()}.{DDDMPWriter.get_destination_extension()}'
+        filename = f'{self.source_model.bdd_file}.{DDDMPWriter.get_destination_extension()}'
         shutil.copy(filename, self.path) 
         with open(self.path, 'r', encoding='utf8') as file:
             content = file.read()

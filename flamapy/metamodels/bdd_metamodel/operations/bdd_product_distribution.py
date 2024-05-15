@@ -46,7 +46,7 @@ class BDDProductDistribution(ProductDistribution):
 
 def product_distribution(bdd_model: BDDModel) -> list[int]: 
     # Check bdd_file
-    bdd_file = bdd_model.check_file_existence(bdd_model.get_bdd_file(), 'dddmp')
+    bdd_file = bdd_model.check_file_existence(bdd_model.bdd_file, 'dddmp')
 
     product_distribution_process = bdd_model.run(BDDModel.PRODUCT_DISTRIBUTION, 
                                                  bdd_file)

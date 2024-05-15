@@ -57,7 +57,7 @@ def count(bdd_model: BDDModel, feature_assignment: list[str]) -> int:
         :return: The number of valid configurations
     """
     # Check bdd_file
-    bdd_file = bdd_model.check_file_existence(bdd_model.get_bdd_file(), 'dddmp')
+    bdd_file = bdd_model.check_file_existence(bdd_model.bdd_file, 'dddmp')
 
     # Get all feature names
     with open(bdd_file, "r", encoding='utf8') as file:

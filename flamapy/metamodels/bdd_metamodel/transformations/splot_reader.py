@@ -68,4 +68,4 @@ def build_bdd(model_file: str, bdd_model: BDDModel) -> None:
         filepath = file_name + ext
         if os.path.exists(filepath):
             Path(filepath).unlink()
-    bdd_model.set_bdd_file(file_name)
+    bdd_model.bdd_file = file_name

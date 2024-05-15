@@ -65,7 +65,7 @@ def sample(bdd_model: BDDModel,
            partial_configuration: Optional[Configuration]  # pylint: disable=unused-argument
            ) -> list[Configuration]:
     # BDDSampler requires the bdd_file with the '.dddmp' extension.
-    bdd_file = bdd_model.check_file_existence(bdd_model.get_bdd_file(), 'dddmp')
+    bdd_file = bdd_model.check_file_existence(bdd_model.bdd_file, 'dddmp')
 
     # Run binary BDDSampler
     parameters = ["-names"]
