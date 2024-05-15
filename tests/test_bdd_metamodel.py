@@ -13,14 +13,13 @@ except ImportError:
     import dd.autoref as _bdd
 
 The same user code can run with both the Python and C backends.
-The interfaces are almost identical, some differences may have, and thus, 
-they are controlled with exceptions 
-(e.g., Using the PickleWriter is only supported with dd.autoref,
-using the DDDMPv2Writer or DDDMPv3Writer is only supported with dd.cudd).
+The interfaces are almost identical, some differences may have.
+For more information, check: https://github.com/tulip-control/dd
 """
 
 import os
 
+from flamapy.core.exceptions import FlamaException
 from flamapy.metamodels.fm_metamodel.transformations import UVLReader
 from flamapy.metamodels.bdd_metamodel.models import BDDModel
 from flamapy.metamodels.bdd_metamodel.transformations import (
@@ -28,8 +27,7 @@ from flamapy.metamodels.bdd_metamodel.transformations import (
     JSONWriter,
     PNGWriter,
     PickleWriter,
-    DDDMPv2Writer,
-    DDDMPv3Writer,
+    DDDMPWriter,
     PDFWriter,
     SVGWriter,
     JSONReader,
@@ -64,9 +62,9 @@ def analyze_bdd(bdd_model: BDDModel) -> None:
     assert n_configs > 0 if satisfiable else n_configs == 0
 
     # Configurations
-    configs = BDDConfigurations().execute(bdd_model).get_result()
-    for i, config in enumerate(configs, 1):
-        print(f'Config {i}: {config.get_selected_elements()}')
+    # configs = BDDConfigurations().execute(bdd_model).get_result()
+    # for i, config in enumerate(configs, 1):
+    #     print(f'Config {i}: {config.get_selected_elements()}')
 
     # BDD product distribution
     dist = BDDProductDistribution().execute(bdd_model).get_result()
@@ -88,9 +86,9 @@ def analyze_bdd(bdd_model: BDDModel) -> None:
     print(f'Dead features: {dead_features}')
 
     # BDD Sampling
-    sample_op = BDDSampling()
-    sample_op.set_sample_size(5)
-    sample = sample_op.execute(bdd_model).get_result()
+    sampling_op = BDDSampling()
+    sampling_op.set_sample_size(5)
+    sample = sampling_op.execute(bdd_model).get_result()
     print('Uniform Random Sampling:')
     for i, config in enumerate(sample, 1):
         print(f'Config {i}: {config.get_selected_elements()}')
@@ -105,7 +103,10 @@ def main():
 
     # Create the BDD from the FM
     bdd_model = FmToBDD(feature_model).transform()
-    print(f'BDD model:\n{bdd_model}')
+    print(bdd_model)
+
+    # Apply different analysis operations
+    analyze_bdd(bdd_model)
 
     # Save the BDD to different image formats
     PNGWriter(f'{filename}.{PNGWriter.get_destination_extension()}', bdd_model).transform()
@@ -114,41 +115,36 @@ def main():
     # Serialize the BDD to different formats
     JSONWriter(f'{filename}.{JSONWriter.get_destination_extension()}', bdd_model).transform()
     try:
-        DDDMPv2Writer(f'{filename}.{DDDMPv2Writer.get_destination_extension()}2', bdd_model).transform()
-    except:
-        print(f'Warning: DDDMPv2 serialization is not supported.')
-    try:
-        DDDMPv3Writer(f'{filename}.{DDDMPv3Writer.get_destination_extension()}', bdd_model).transform()
-    except:
-        print(f'Warning: DDDMPv3 serialization is not supported.')
+        DDDMPWriter(f'{filename}.{DDDMPWriter.get_destination_extension()}', bdd_model).transform()
+    except FlamaException as e:
+        print(e)
     try:
         PickleWriter(f'{filename}.p', bdd_model).transform()
-    except:
-        print(f'Warning: Pickle serialization is not supported.')
+    except FlamaException as e:
+        print(e)
     
-    # Apply different analysis operations
-    analyze_bdd(bdd_model)
-
     # Load the BDD model from a .json file
     reader = JSONReader(f'{os.path.join(BDD_MODELS_PATH, filename)}.json')
-    reader.set_preserve_original_ordering(True)
+    #reader.set_preserve_original_ordering(True)
     bdd_model = reader.transform()
-    print(f'BDD model:\n{bdd_model}')
+    print(f'BDD from JSON:\n{bdd_model}')
     analyze_bdd(bdd_model)
 
-    # TODO: The following reader are not fully supported.
     # Load the BDD model from a .dddmp file
-    # reader = DDDMPReader(f'{os.path.join(BDD_MODELS_PATH, filename)}.dddmp')
-    # bdd_model = reader.transform()
-    # print(f'BDD model:\n{bdd_model}')
-    # analyze_bdd(bdd_model)
+    bdd_model = DDDMPReader(f'{os.path.join(BDD_MODELS_PATH, filename)}.dddmp').transform()
+    print(f'BDD from DDDMP:\n{bdd_model}')
+    analyze_bdd(bdd_model)
 
     # Load the BDD model from a .p file
-    # reader = PickleReader(f'{os.path.join(BDD_MODELS_PATH, filename)}.p')
-    # bdd_model = reader.transform()
-    # print(f'BDD model:\n{bdd_model}')
-    # analyze_bdd(bdd_model)
+    try:
+        bdd_model = PickleReader(f'{os.path.join(BDD_MODELS_PATH, filename)}.p').transform()
+        print(f'BDD from Pickle:\n{bdd_model}')
+        analyze_bdd(bdd_model)
+    except FlamaException as e:
+        print(e)
 
 
 if __name__ == '__main__':
+    import sys
+    sys.setrecursionlimit(100000)
     main()

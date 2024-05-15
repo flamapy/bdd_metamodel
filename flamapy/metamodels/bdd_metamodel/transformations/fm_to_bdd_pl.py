@@ -1,4 +1,5 @@
 import re
+import itertools
 from typing import Optional
 
 from flamapy.core.models.ast import ASTOperation
@@ -23,7 +24,7 @@ class FmToBDD(ModelToModel):
 
     def transform(self) -> BDDModel:
         formula, variables = traverse_feature_tree(self.source_model)
-        self.destination_model = BDDModel.from_propositional_formula(formula, variables)
+        self.destination_model = BDDModel.from_logic_formula(formula, variables)
         return self.destination_model
 
 

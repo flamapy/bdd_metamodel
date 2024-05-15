@@ -32,5 +32,4 @@ class JSONReader(TextToModel):
                 bdd_model.bdd.reorder(level_of_var)
         else:
             _bdd.reorder(bdd_model.bdd)
-        bdd_model.variables = list(bdd_model.bdd.vars)
         return bdd_model

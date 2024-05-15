@@ -1,3 +1,4 @@
+from flamapy.core.exceptions import FlamaException
 from flamapy.metamodels.bdd_metamodel.transformations._bdd_writer import BDDWriter
 
 
@@ -8,10 +9,15 @@ class PickleWriter(BDDWriter):
         return 'p'
 
     def transform(self) -> str:
-        if self._roots is None:
+        if not self._roots:
             try:
                 self.source_model.bdd.dump(filename=self.path)
             except Exception:
-                self._roots = [self.source_model.root]
-        self.source_model.bdd.dump(filename=self.path, roots=self._roots)
+                roots = [self.source_model.root]
+        else:
+            roots = [self.source_model.root]
+            try:
+                self.source_model.bdd.dump(filename=self.path, roots=roots)
+            except Exception:
+                raise FlamaException(f'PickleWriter is not supported.')
         return ''

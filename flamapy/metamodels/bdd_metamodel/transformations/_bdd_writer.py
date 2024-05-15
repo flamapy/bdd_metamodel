@@ -7,21 +7,23 @@ from flamapy.metamodels.bdd_metamodel.models import BDDModel
 class BDDWriter(ModelToText):
 
     def __init__(self, path: str, source_model: BDDModel) -> None:
-        self.path = path
-        self.source_model = source_model
-        self._roots = None
+        self.path: str = path
+        self.source_model: BDDModel = source_model
+        self._roots: bool = True
 
-    def set_roots(self, roots: Any) -> None:
+    def set_roots(self, roots: bool) -> None:
         self._roots = roots
 
     def transform(self) -> str:
-        if self._roots is None:
+        if not self._roots:
             try:
                 self.source_model.bdd.dump(filename=self.path, 
                                            filetype=self.get_destination_extension())
             except Exception:
-                self._roots = [self.source_model.root]
-        self.source_model.bdd.dump(filename=self.path, 
-                                   roots=self._roots, 
-                                   filetype=self.get_destination_extension())
+                roots = [self.source_model.root]
+        else:
+            roots = [self.source_model.root]
+            self.source_model.bdd.dump(filename=self.path,
+                                       roots=roots,
+                                       filetype=self.get_destination_extension())
         return ''

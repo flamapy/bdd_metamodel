@@ -1,11 +1,11 @@
 import os
 import tempfile
 
+from flamapy.core.exceptions import FlamaException
 from flamapy.metamodels.bdd_metamodel.transformations._bdd_writer import BDDWriter
 
 
-class DDDMPv3Writer(BDDWriter):
-    """The difference between versions 2.0 and 3.0 is the addition of the '.varnames' field."""
+class DDDMPWriter(BDDWriter):
 
     @staticmethod
     def get_destination_extension() -> str:
@@ -13,14 +13,20 @@ class DDDMPv3Writer(BDDWriter):
 
     def transform(self) -> str:
         if self.path is None:
-            self.path = tempfile.NamedTemporaryFile(mode='w', encoding='utf8') 
-        result = super().transform()
+            self.path = tempfile.NamedTemporaryFile(mode='w', encoding='utf8').name
+        try:
+            result = super().transform()
+        except:
+            raise FlamaException(f'DDDMPWriter is not supported.')
         result = dddmp_v2_to_v3(self.path)
         return result
 
 
 def dddmp_v2_to_v3(filepath: str) -> str:
-    """Convert the file with the BDD dump in format dddmp version 2 to version 3."""
+    """Convert the file with the BDD dump in format dddmp version 2 to version 3.
+    
+    The difference between versions 2.0 and 3.0 is the addition of the '.varnames' field.
+    """
     with open(filepath, 'r', encoding='utf8') as file:
         lines = file.readlines()
         # Change version from 2.0 to 3.0

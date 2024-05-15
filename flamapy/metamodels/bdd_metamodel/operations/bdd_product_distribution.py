@@ -48,10 +48,10 @@ def product_distribution(bdd_model: BDDModel) -> list[int]:
         + In index n, the number of products with n features activated.
     """
     root = bdd_model.root
-    id_root = bdd_model.get_value(root, root.negated)
+    id_root = bdd_model.get_value(root, bdd_model.negated(root))
     dist: dict[int, list[int]] = {0: [], 1: [1]}
     mark: dict[int, bool] = defaultdict(bool)
-    get_prod_dist(bdd_model, root, dist, mark, root.negated)
+    get_prod_dist(bdd_model, root, dist, mark, bdd_model.negated(root))
     # Complete distribution
     distribution = dist[id_root] + [0] * (len(bdd_model.variables) + 1 - len(dist[id_root]))
     return distribution
@@ -71,7 +71,7 @@ def get_prod_dist(bdd_model: BDDModel,
         low = bdd_model.get_low_node(node)
         id_low = bdd_model.get_value(low, complemented)
         if mark[id_node] != mark[id_low]:
-            get_prod_dist(bdd_model, low, dist, mark, complemented ^ low.negated)
+            get_prod_dist(bdd_model, low, dist, mark, complemented ^ bdd_model.negated(low))
 
         # compute low_dist to account for the removed nodes through low
         removed_nodes = bdd_model.index(low) - bdd_model.index(node) - 1
@@ -87,7 +87,7 @@ def get_prod_dist(bdd_model: BDDModel,
         high = bdd_model.get_high_node(node)
         id_high = bdd_model.get_value(high, complemented)
         if mark[id_node] != mark[id_high]:
-            get_prod_dist(bdd_model, high, dist, mark, complemented ^ high.negated)
+            get_prod_dist(bdd_model, high, dist, mark, complemented ^ bdd_model.negated(high))
 
         # compute high_dist to account for the removed nodes through high
         removed_nodes = bdd_model.index(high) - bdd_model.index(node) - 1

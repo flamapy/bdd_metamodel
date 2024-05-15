@@ -3,8 +3,7 @@ from .json_writer import JSONWriter
 from .json_reader import JSONReader
 from .pickle_writer import PickleWriter
 from .pickle_reader import PickleReader
-from .dddmpv2_writer import DDDMPv2Writer
-from .dddmpv3_writer import DDDMPv3Writer
+from .dddmp_writer import DDDMPWriter
 from .dddmp_reader import DDDMPReader
 from .png_writer import PNGWriter
 from .svg_writer import SVGWriter
@@ -16,8 +15,7 @@ __all__ = ['FmToBDD',
            'JSONReader',
            'PickleWriter',
            'PickleReader',
-           'DDDMPv2Writer',
-           'DDDMPv3Writer',
+           'DDDMPWriter',
            'DDDMPReader',
            'PNGWriter',
            'SVGWriter',

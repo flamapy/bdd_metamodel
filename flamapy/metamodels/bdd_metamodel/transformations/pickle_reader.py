@@ -1,4 +1,5 @@
 from flamapy.core.transformations import TextToModel
+from flamapy.core.exceptions import FlamaException
 from flamapy.metamodels.bdd_metamodel.models import BDDModel
 
 
@@ -14,6 +15,8 @@ class PickleReader(TextToModel):
 
     def transform(self) -> BDDModel:
         bdd_model = BDDModel()
-        bdd_model.root = bdd_model.bdd.load(self.path)[0]
-        bdd_model.variables = list(bdd_model.bdd.vars)
+        try:
+            bdd_model.root = bdd_model.bdd.load(self.path)[0]
+        except:
+            raise FlamaException(f'PickleReader is not supported.')
         return bdd_model
