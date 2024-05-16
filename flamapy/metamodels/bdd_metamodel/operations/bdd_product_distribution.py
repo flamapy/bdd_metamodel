@@ -12,15 +12,15 @@ from flamapy.metamodels.bdd_metamodel.operations.interfaces import ProductDistri
 class BDDProductDistribution(ProductDistribution):
 
     def __init__(self) -> None:
-        self.result: list[int] = []
+        self._result: list[int] = []
 
     def execute(self, model: VariabilityModel) -> 'BDDProductDistribution':
         bdd_model = cast(BDDModel, model)
-        self.result = product_distribution(bdd_model)
+        self._result = product_distribution(bdd_model)
         return self
 
     def get_result(self) -> list[int]:
-        return self.result
+        return self._result
 
     def product_distribution(self) -> list[int]:
         return self.get_result()

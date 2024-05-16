@@ -13,19 +13,19 @@ class BDDConfigurationsNumber(ConfigurationsNumber):
     """
 
     def __init__(self) -> None:
-        self.result = 0
-        self.partial_configuration: Optional[Configuration] = None
+        self._result: int = 0
+        self._partial_configuration: Optional[Configuration] = None
 
     def set_partial_configuration(self, partial_configuration: Optional[Configuration]) -> None:
-        self.partial_configuration = partial_configuration
+        self._partial_configuration = partial_configuration
 
     def execute(self, model: VariabilityModel) -> 'BDDConfigurationsNumber':
         bdd_model = cast(BDDModel, model)
-        self.result = configurations_number(bdd_model, self.partial_configuration)
+        self._result = configurations_number(bdd_model, self._partial_configuration)
         return self
 
     def get_result(self) -> int:
-        return self.result
+        return self._result
 
     def get_configurations_number(self) -> int:
         return self.get_result()

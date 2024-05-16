@@ -15,17 +15,17 @@ class BDDSatisfiable(Satisfiable):
     """
 
     def __init__(self) -> None:
-        self.result: bool = False
+        self._result: bool = False
 
     def get_result(self) -> bool:
-        return self.result
+        return self._result
 
     def is_satisfiable(self) -> bool:
         return self.get_result()
 
     def execute(self, model: VariabilityModel) -> 'BDDSatisfiable':
         bdd_model = cast(BDDModel, model)
-        self.result = is_satisfiable(bdd_model)
+        self._result = is_satisfiable(bdd_model)
         return self
 
 

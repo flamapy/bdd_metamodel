@@ -13,19 +13,19 @@ class BDDConfigurations(Configurations):
     """
 
     def __init__(self) -> None:
-        self.result: list[Configuration] = []
-        self.partial_configuration: Optional[Configuration] = None
+        self._result: list[Configuration] = []
+        self._partial_configuration: Optional[Configuration] = None
 
     def set_partial_configuration(self, partial_configuration: Configuration) -> None:
-        self.partial_configuration = partial_configuration
+        self._partial_configuration = partial_configuration
 
     def execute(self, model: VariabilityModel) -> 'BDDConfigurations':
         bdd_model = cast(BDDModel, model)
-        self.result = configurations(bdd_model, self.partial_configuration)
+        self._result = configurations(bdd_model, self._partial_configuration)
         return self
 
     def get_result(self) -> list[Configuration]:
-        return self.result
+        return self._result
 
     def get_configurations(self) -> list[Configuration]:
         return self.get_result()

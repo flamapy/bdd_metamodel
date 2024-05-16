@@ -42,7 +42,8 @@ from flamapy.metamodels.bdd_metamodel.operations import (
     BDDConfigurations,
     BDDCoreFeatures,
     BDDDeadFeatures,
-    BDDSatisfiable
+    BDDSatisfiable,
+    BDDPureOptionalFeatures
 )
 
 
@@ -84,6 +85,10 @@ def analyze_bdd(bdd_model: BDDModel) -> None:
     # Dead features
     dead_features = BDDDeadFeatures().execute(bdd_model).get_result()
     print(f'Dead features: {dead_features}')
+
+    # Dead features
+    pure_optional_features = BDDPureOptionalFeatures().execute(bdd_model).get_result()
+    print(f'Pure optional features: {pure_optional_features}')
 
     # BDD Sampling
     sampling_op = BDDSampling()

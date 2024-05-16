@@ -14,22 +14,25 @@ class BDDFeatureInclusionProbability(FeatureInclusionProbability):
     """The Feature Inclusion Probability (FIP) operation determines the probability
     for a variable to be included in a valid solution.
 
-    Ref.: [Heradio et al. 2019. Supporting the Statistical Analysis of Variability Models. SPLC.
+    Ref.: [Heradio et al. 2019. Supporting the Statistical Analysis of Variability Models.
     (https://doi.org/10.1109/ICSE.2019.00091)]
     """
 
-    def __init__(self, partial_configuration: Optional[Configuration] = None) -> None:
-        self.result: dict[Any, float] = {}
-        self.partial_configuration = partial_configuration
+    def __init__(self) -> None:
+        self._result: dict[Any, float] = {}
+        self._partial_configuration: Optional[Configuration] = None
+
+    def set_partial_configuration(self, partial_configuration: Optional[Configuration]) -> None:
+        self._partial_configuration = partial_configuration
 
     def execute(self, model: VariabilityModel) -> 'BDDFeatureInclusionProbability':
         bdd_model = cast(BDDModel, model)
-        self.result = feature_inclusion_probability(bdd_model, self.partial_configuration)
+        self._result = feature_inclusion_probability(bdd_model, self._partial_configuration)
         #self.result = variable_probabilities_single_traverse(bdd_model)
         return self
 
     def get_result(self) -> dict[Any, float]:
-        return self.result
+        return self._result
 
     def feature_inclusion_probability(self) -> dict[Any, float]:
         return self.get_result()

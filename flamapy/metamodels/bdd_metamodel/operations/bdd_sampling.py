@@ -22,34 +22,34 @@ class BDDSampling(Sampling):
     """
 
     def __init__(self) -> None:
-        self.result: list[Configuration] = []
-        self.sample_size: int = 0
-        self.with_replacement: bool = False
-        self.partial_configuration: Optional[Configuration] = None
+        self._result: list[Configuration] = []
+        self._sample_size: int = 0
+        self._with_replacement: bool = False
+        self._partial_configuration: Optional[Configuration] = None
 
     def set_sample_size(self, sample_size: int) -> None:
         if sample_size < 0:
             raise FlamaException(f'Sample size {sample_size} cannot be negative.')
-        self.sample_size = sample_size
+        self._sample_size = sample_size
 
     def set_with_replacement(self, with_replacement: bool) -> None:
-        self.with_replacement = with_replacement
+        self._with_replacement = with_replacement
 
     def set_partial_configuration(self, partial_configuration: Configuration) -> None:
-        self.partial_configuration = partial_configuration
+        self._partial_configuration = partial_configuration
 
+    def get_result(self) -> list[Configuration]:
+        return self._result
+    
     def get_sample(self) -> list[Configuration]:
         return self.get_result()
 
-    def get_result(self) -> list[Configuration]:
-        return self.result
-
     def execute(self, model: VariabilityModel) -> 'BDDSampling':
         bdd_model = cast(BDDModel, model)
-        self.result = sample(bdd_model, 
-                             self.sample_size, 
-                             self.with_replacement, 
-                             self.partial_configuration)
+        self._result = sample(bdd_model, 
+                              self._sample_size, 
+                              self._with_replacement, 
+                              self._partial_configuration)
         return self
 
 
