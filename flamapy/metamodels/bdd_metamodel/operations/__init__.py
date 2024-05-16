@@ -6,6 +6,7 @@ from .bdd_core_features import BDDCoreFeatures
 from .bdd_dead_features import BDDDeadFeatures
 from .bdd_satisfiable import BDDSatisfiable
 from .bdd_configurations import BDDConfigurations
+from .bdd_pure_optional_features import BDDPureOptionalFeatures
 
 
 __all__ = ['BDDSampling',
@@ -15,4 +16,5 @@ __all__ = ['BDDSampling',
            'BDDCoreFeatures',
            'BDDDeadFeatures',
            'BDDSatisfiable',
-           'BDDConfigurations']
+           'BDDConfigurations',
+           'BDDPureOptionalFeatures']
