@@ -19,7 +19,7 @@ class BDDModel(VariabilityModel):
     It relies on the dd library: https://pypi.org/project/dd/
     """
 
-    class CNFLogicConnective(Enum):
+    class LogicConnective(Enum):
         NOT = '!'
         OR = '|'
         AND = '&'
@@ -32,9 +32,9 @@ class BDDModel(VariabilityModel):
         return 'bdd'
 
     def __init__(self) -> None:
-        self._bdd: _bdd.BDD | _dd_bdd.BDD = _bdd.BDD()  # BDD manager
+        self._bdd: _bdd.BDD = _bdd.BDD()  # BDD manager
         self._root: Optional[_bdd.Function | int] = None
-        self._variables: list[Any] = None
+        self._variables: list[Any] = []
         self._levels_variables: dict[int, Any] = {}
 
     @property
@@ -44,7 +44,7 @@ class BDDModel(VariabilityModel):
     @bdd.setter
     def bdd(self, new_bdd: _bdd.BDD | _dd_bdd.BDD) -> None:
         self._bdd = new_bdd
-        self._variables = self._bdd.vars.keys()
+        self._variables = list(self._bdd.vars)
         self._root = next(iter(self._bdd.roots), None)
         self._levels_variables = {l: v for v, l in self._bdd.var_levels.items()}
 
@@ -102,7 +102,7 @@ class BDDModel(VariabilityModel):
         else:
             return node.var
         
-    def level(self, node: _bdd.Function | int) -> int:
+    def level(self, node: _bdd.Function | int) -> Optional[int]:
         """Return the level of the node.
 
         Non-terminal nodes start at 0.
@@ -116,10 +116,10 @@ class BDDModel(VariabilityModel):
         return len(self._bdd)
 
     def get_node(self, var: Any) -> _bdd.Function | int:
-        """Return the node of the variable"""
-        return self._bdd.var(var) 
+        """Return the node of the variable."""
+        return self._bdd.var(var)
 
-    def index(self, node: _bdd.Function | int) -> int:
+    def index(self, node: _bdd.Function | int) -> Optional[int]:
         """Position (index) of the variable that labels the node `n` in the ordering.
 
         Indexes start at 1.
@@ -131,7 +131,8 @@ class BDDModel(VariabilityModel):
         """
         if self.is_terminal_node(node):
             return len(self.variables) + 1
-        return self.level(node) + 1
+        level = self.level(node)
+        return level + 1 if level is not None else None
 
     def negated(self, node: _bdd.Function | int) -> bool:
         """Return whether the node is negated."""
@@ -168,6 +169,10 @@ class BDDModel(VariabilityModel):
         _, low, _ = self._bdd.succ(node)
         return low
 
+    # def get_node_id(self, node: _bdd.Function | int, complemented: bool = False) -> str:
+    #     """Return the value (id) of the node as a string."""
+    #     return str(self.get_value(node, complemented))
+
     def get_value(self, node: _bdd.Function | int, complemented: bool = False) -> int:
         """Return the value (id) of the node considering complemented arcs."""
         value = int(node)
@@ -177,30 +182,21 @@ class BDDModel(VariabilityModel):
             value = 0 if complemented else 1
         return value
 
+    def pretty_node_str(self, node: _bdd.Function | int) -> str:
+        return f'{self.var(node)} ' \
+               f'(id: {self.get_value(node)}) ' \
+               f'(level: {self.level(node)}) ' \
+               f'(index: {self.index(node)}) ' \
+                 
     def __str__(self) -> str:
         result = f'Binary Decision Diagram (BDD):\n'
         result += f'Instance class: {type(self._bdd)}\n'
         result += f'#Nodes: {self.nof_nodes()}\n'
-        result += f'Root: {self.var(self.root)} ' \
-                  f'(id: {self.get_value(self.root)}) ' \
-                  f'(level: {self.level(self.root)}) ' \
-                  f'(index: {self.index(self.root)})\n'
-        result += f'Vars: ({len(self.variables)})\n'
+        result += f'Root: {self.pretty_node_str(self.root)}\n'
         levels_vars = dict(sorted(self._levels_variables.items(), key=lambda item: item[0]))
         for level, var in levels_vars.items():
             node = self.get_node(var)
-            result += f' |-{self.var(node)} ' \
-                      f'(id: {self.get_value(node)}) ' \
-                      f'(level: {level}) ' \
-                      f'(index: {self.index(node)})\n'
-        node = self.get_terminal_node_n0()
-        result += f'Terminal node (n0): {self.var(node)} ' \
-                  f'(id: {self.get_value(node)}) ' \
-                  f'(level: {self.level(node)}) ' \
-                  f'(index: {self.index(node)})\n'
-        node = self.get_terminal_node_n1()
-        result += f'Terminal node (n1): {self.var(node)} ' \
-                  f'(id: {self.get_value(node)}) ' \
-                  f'(level: {self.level(node)}) ' \
-                  f'(index: {self.index(node)})\n'
+            result += f' |-{self.pretty_node_str(node)}\n'
+        result += f'Terminal node (n0): {self.pretty_node_str(self.get_terminal_node_n0())}\n'
+        result += f'Terminal node (n1): {self.pretty_node_str(self.get_terminal_node_n1())}\n'
         return result

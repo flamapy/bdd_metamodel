@@ -4,7 +4,7 @@ from typing import Optional
 
 from flamapy.core.models.ast import ASTOperation
 from flamapy.core.transformations import ModelToModel
-from flamapy.metamodels.fm_metamodel.models import FeatureModel, Relation
+from flamapy.metamodels.fm_metamodel.models import FeatureModel, Relation, Constraint
 from flamapy.metamodels.bdd_metamodel.models import BDDModel
 
 
@@ -39,38 +39,28 @@ def traverse_feature_tree(feature_model: FeatureModel) -> tuple[str, list[str]]:
     for feature in feature_model.get_features():
         variables.append(feature.name)
         for relation in feature.get_relations():
-            if relation.is_mandatory():
-                formula.append(get_mandatory_formula(relation))
-            elif relation.is_optional():
-                formula.append(get_optional_formula(relation))
-            elif relation.is_or():
-                formula.append(get_or_formula(relation))
-            elif relation.is_alternative():
-                formula.append(get_alternative_formula(relation))
-            elif relation.is_mutex():
-                formula.append(get_mutex_formula(relation))
-            elif relation.is_cardinal():
-                formula.append(get_cardinality_formula(relation))
+            formula.append(get_relation_formula(relation))
     for constraint in feature_model.get_constraints():
-        ctc = str(
-            re.sub(rf"\b{ASTOperation.EXCLUDES.value}\b", 
-                   "=> !",
-                   re.sub(rf"\b{ASTOperation.REQUIRES.value}\b", 
-                          "=>",
-                          re.sub(rf"\b{ASTOperation.EQUIVALENCE.value}\b", 
-                                 "<=>",
-                                 re.sub(rf"\b{ASTOperation.IMPLIES.value}\b", 
-                                        "=>",
-                                        re.sub(rf"\b{ASTOperation.OR.value}\b", 
-                                               "|",
-                                               re.sub(rf"\b{ASTOperation.AND.value}\b", 
-                                                      "&",
-                                                      re.sub(rf"\b{ASTOperation.NOT.value}\b", 
-                                                             "!",
-                                                             constraint.ast.pretty_str()))))))))
-        formula.append(ctc)
+        formula.append(get_constraint_formula(constraint))
     propositional_formula = ' & '.join(f'({f})' for f in formula)
     return (propositional_formula, variables)
+
+
+def get_relation_formula(relation: Relation) -> str:
+    result = ''
+    if relation.is_mandatory():
+        result = get_mandatory_formula(relation)
+    elif relation.is_optional():
+        result = get_optional_formula(relation)
+    elif relation.is_or():
+        result = get_or_formula(relation)
+    elif relation.is_alternative():
+        result = get_alternative_formula(relation)
+    elif relation.is_mutex():
+        result = get_mutex_formula(relation)
+    elif relation.is_cardinal():
+        result = get_cardinality_formula(relation)
+    return result
 
 
 def get_mandatory_formula(relation: Relation) -> str:
@@ -103,12 +93,12 @@ def get_mutex_formula(relation: Relation) -> str:
                        f'({" & ".join("!" + f.name for f in children_negatives)} '
                        f'& {relation.parent.name})')
     formula_str = " & ".join(f'({f})' for f in formula)
-    return f'({relation.parent.name} <=> !({" | ".join(child.name for child in relation.children)})) ' \
-           f'| ({formula_str})'
+    return f'({relation.parent.name} <=> ' \
+           f'!({" | ".join(child.name for child in relation.children)})) | ({formula_str})'
 
 
 def get_cardinality_formula(relation: Relation) -> str:
-    children = [child.name for child in relation.children]
+    children = {child.name for child in relation.children}
     or_ctc = []
     for k in range(relation.card_min, relation.card_max + 1):
         combi_k = list(itertools.combinations(children, k))
@@ -123,3 +113,24 @@ def get_cardinality_formula(relation: Relation) -> str:
             or_ctc.append(and_ctc) 
     formula_or_ctc = f'{" | ".join(or_ctc)}'
     return f'{relation.parent.name} <=> {formula_or_ctc}'
+
+
+def get_constraint_formula(ctc: Constraint) -> str:
+    return str(
+        re.sub(rf"\b{ASTOperation.EXCLUDES.value}\b",
+               f'{BDDModel.LogicConnective.IMPLIES.value} {BDDModel.LogicConnective.NOT.value}',
+               re.sub(rf"\b{ASTOperation.REQUIRES.value}\b",
+                      BDDModel.LogicConnective.IMPLIES.value,
+                      re.sub(rf"\b{ASTOperation.EQUIVALENCE.value}\b", 
+                             BDDModel.LogicConnective.EQUIVALENCE.value,
+                             re.sub(rf"\b{ASTOperation.IMPLIES.value}\b",
+                                    BDDModel.LogicConnective.IMPLIES.value,
+                                    re.sub(rf"\b{ASTOperation.OR.value}\b",
+                                           BDDModel.LogicConnective.OR.value,
+                                           re.sub(rf"\b{ASTOperation.AND.value}\b",
+                                                  BDDModel.LogicConnective.AND.value,
+                                                  re.sub(rf"\b{ASTOperation.NOT.value}\b",
+                                                         BDDModel.LogicConnective.NOT.value,
+                                                         re.sub(rf"\b{ASTOperation.XOR.value}\b",
+                                                                BDDModel.LogicConnective.XOR.value,
+                                                                ctc.ast.pretty_str())))))))))

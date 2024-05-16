@@ -27,4 +27,3 @@ class FmToBDD(ModelToModel):
         except BaseException:
             bdd_model = FmToBddCNF(self.source_model).transform()
         return bdd_model
-

@@ -17,6 +17,6 @@ class PickleReader(TextToModel):
         bdd_model = BDDModel()
         try:
             bdd_model.root = bdd_model.bdd.load(self.path)[0]
-        except:
-            raise FlamaException(f'PickleReader is not supported.')
+        except Exception as exc:
+            raise FlamaException('PickleReader is not supported.') from exc
         return bdd_model

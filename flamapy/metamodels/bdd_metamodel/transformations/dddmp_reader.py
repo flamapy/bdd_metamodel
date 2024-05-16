@@ -19,7 +19,7 @@ class DDDMPReader(TextToModel):
         bdd_model = BDDModel()
         try:
             bdd_model.bdd = dddmp.load(self.path)
-        except:
+        except Exception:
             path = dddmp_v3_to_v2(self.path)
             bdd_model.bdd = dddmp.load(path)
         return bdd_model
@@ -28,7 +28,7 @@ class DDDMPReader(TextToModel):
 def dddmp_v3_to_v2(filepath: str) -> str:
     """Convert the file with the BDD dump in format dddmp version 3 to version 2 
     (for compatibility).
-    
+
     The difference between versions 2.0 and 3.0 is the addition of the '.varnames' field.
     """
     with open(filepath, 'r', encoding='utf8') as file:

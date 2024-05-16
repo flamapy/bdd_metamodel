@@ -18,5 +18,5 @@ __all__ = ['BDDConfigurationsNumber',
            'BDDSatisfiable',
            'BDDCoreFeatures',
            'BDDDeadFeatures',
-           'BDDPureOptionalFeatures'
+           'BDDPureOptionalFeatures',
            'BDDMetrics']

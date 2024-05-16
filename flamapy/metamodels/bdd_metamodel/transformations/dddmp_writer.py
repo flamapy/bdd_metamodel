@@ -13,14 +13,23 @@ class DDDMPWriter(BDDWriter):
 
     def transform(self) -> str:
         if self.path is None:
-            self.path = tempfile.NamedTemporaryFile(mode='w', encoding='utf8').name
-        try:
-            result = super().transform()
-        except:
-            raise FlamaException(f'DDDMPWriter is not supported.')
-        result = dddmp_v2_to_v3(self.path)
+            with tempfile.NamedTemporaryFile(mode='w', encoding='utf8') as file:
+                self.path = file.name
+                result = write_to_file(self)
+                self.path = None
+        else:
+            result = write_to_file(self)
         return result
 
+
+def write_to_file(writer: DDDMPWriter) -> str:
+    try:
+        super(type(writer), writer).transform()
+        result = dddmp_v2_to_v3(writer.path)
+    except Exception as exc:
+        raise FlamaException(f'DDDMPWriter is not supported.') from exc
+    return result
+    
 
 def dddmp_v2_to_v3(filepath: str) -> str:
     """Convert the file with the BDD dump in format dddmp version 2 to version 3.

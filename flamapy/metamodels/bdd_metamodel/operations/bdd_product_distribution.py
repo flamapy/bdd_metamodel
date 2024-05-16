@@ -83,9 +83,6 @@ def get_prod_dist(bdd_model: BDDModel,
         # traverse
         high = bdd_model.get_high_node(node)
         id_high = bdd_model.get_value(high, complemented)
-
-        high = bdd_model.get_high_node(node)
-        id_high = bdd_model.get_value(high, complemented)
         if mark[id_node] != mark[id_high]:
             get_prod_dist(bdd_model, high, dist, mark, complemented ^ bdd_model.negated(high))
 
@@ -105,10 +102,8 @@ def combine_distributions(id_node: int,
                           high_dist: list[int]) -> None:
     # combine low and high distributions
     if len(low_dist) > len(high_dist):
-        #dist_length = len(dist[id_low])
         dist_length = len(low_dist)
     else:
-        #dist_length = len(dist[id_high]) + 1
         dist_length = len(high_dist) + 1
 
     node_dist = [0] * dist_length

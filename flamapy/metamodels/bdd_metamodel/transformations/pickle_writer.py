@@ -18,6 +18,6 @@ class PickleWriter(BDDWriter):
             roots = [self.source_model.root]
             try:
                 self.source_model.bdd.dump(filename=self.path, roots=roots)
-            except Exception:
-                raise FlamaException(f'PickleWriter is not supported.')
+            except Exception as exc:
+                raise FlamaException('PickleWriter is not supported.') from exc
         return ''

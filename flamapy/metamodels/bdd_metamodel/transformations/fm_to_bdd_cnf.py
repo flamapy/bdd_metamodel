@@ -134,7 +134,7 @@ class FmToBDD(ModelToModel):
                         cnf.append(self._get_variable(feat.name))
                 clauses.append(cnf)
         return clauses
-    
+
     def add_relation(self, relation: Relation) -> None:
         if relation.is_mandatory():
             clauses = self._add_mandatory_relation(relation)

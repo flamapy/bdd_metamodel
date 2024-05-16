@@ -1,4 +1,4 @@
-from typing import Any
+from typing import Any, Optional
 
 from flamapy.core.transformations import ModelToText
 from flamapy.metamodels.bdd_metamodel.models import BDDModel
@@ -7,10 +7,22 @@ from flamapy.metamodels.bdd_metamodel.models import BDDModel
 class BDDWriter(ModelToText):
 
     def __init__(self, path: str, source_model: BDDModel) -> None:
-        self.path: str = path
-        self.source_model: BDDModel = source_model
+        self._path: Optional[str] = path
+        self._source_model: BDDModel = source_model
         self._roots: bool = True
+    
+    @property
+    def path(self) -> Optional[str]:
+        return self._path
+    
+    @path.setter
+    def path(self, new_path: Optional[str]) -> None:
+        self._path = new_path
 
+    @property
+    def source_model(self) -> BDDModel:
+        return self._source_model
+    
     def set_roots(self, roots: bool) -> None:
         self._roots = roots
 
