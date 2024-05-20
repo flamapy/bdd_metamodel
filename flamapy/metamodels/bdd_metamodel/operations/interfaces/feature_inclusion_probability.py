@@ -18,7 +18,7 @@ class FeatureInclusionProbability(Operation):
     The other two core metrics are the number of features the SPL manages, 
     and the number of valid product that can be derived.
 
-    Ref.: [Heradio et al. 2019. Supporting the Statistical Analysis of Variability Models. SPLC. 
+    Ref.: [Heradio et al. 2019. Supporting the Statistical Analysis of Variability Models. 
     (https://doi.org/10.1109/ICSE.2019.00091)]
     """
 

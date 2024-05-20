@@ -1,8 +1,7 @@
 import math
 from collections import defaultdict
-from typing import cast
-
-from dd.autoref import Function
+from typing import cast, Any
+import statistics
 
 from flamapy.core.models import VariabilityModel
 from flamapy.metamodels.bdd_metamodel.models import BDDModel
@@ -24,6 +23,29 @@ class BDDProductDistribution(ProductDistribution):
 
     def product_distribution(self) -> list[int]:
         return self.get_result()
+    
+    def descriptive_statistics(self) -> dict[str, Any]:
+        if not self._result:
+            return {}
+        else:
+            return descriptive_statistics(self._result)
+
+
+def descriptive_statistics(prod_dist: list[int]) -> dict[str, Any]:
+    values = [i for i in range(len(prod_dist)) for _ in range(prod_dist[i])]
+    min_dist = min(values)
+    max_dist = max(values)
+    median = statistics.median(values)
+    result = {'Mean': statistics.mean(values),
+              'Standard deviation': statistics.stdev(values),
+              'Median': median,
+              'Median absolute deviation': statistics.median([abs(n - median) for n in values]),
+              'Mode': statistics.mode(values),
+              'Min': min_dist,
+              'Max': max_dist,
+              'Range': max_dist - min_dist}
+    return result
+
 
 
 def product_distribution(bdd_model: BDDModel) -> list[int]:
@@ -58,7 +80,7 @@ def product_distribution(bdd_model: BDDModel) -> list[int]:
 
 
 def get_prod_dist(bdd_model: BDDModel,
-                  node: Function, 
+                  node: Any, 
                   dist: dict[int, list[int]], 
                   mark: dict[int, bool], 
                   complemented: bool) -> None:
