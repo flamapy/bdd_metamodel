@@ -1,5 +1,4 @@
 from abc import abstractmethod
-from typing import Any
 
 from flamapy.core.operations import Operation
 
@@ -29,8 +28,4 @@ class ProductDistribution(Operation):
 
     @abstractmethod
     def product_distribution(self) -> list[int]:
-        pass
-
-    @abstractmethod
-    def descriptive_statistics(self) -> dict[str, Any]:
         pass

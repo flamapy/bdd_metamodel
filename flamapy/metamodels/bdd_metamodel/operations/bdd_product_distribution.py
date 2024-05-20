@@ -1,7 +1,6 @@
 import re
 import locale
-import statistics
-from typing import cast, Any
+from typing import cast
 
 from flamapy.core.models import VariabilityModel
 from flamapy.metamodels.bdd_metamodel.models import BDDModel
@@ -43,28 +42,6 @@ class BDDProductDistribution(ProductDistribution):
         bdd_model = cast(BDDModel, model)
         self.result = product_distribution(bdd_model)
         return self
-
-    def descriptive_statistics(self) -> dict[str, Any]:
-        if not self.result:
-            return {}
-        else:
-            return descriptive_statistics(self.result)
-
-
-def descriptive_statistics(prod_dist: list[int]) -> dict[str, Any]:
-    values = [i for i in range(len(prod_dist)) for _ in range(prod_dist[i])]
-    min_dist = min(values)
-    max_dist = max(values)
-    median = statistics.median(values)
-    result = {'Mean': statistics.mean(values),
-              'Standard deviation': statistics.stdev(values),
-              'Median': median,
-              'Median absolute deviation': statistics.median([abs(n - median) for n in values]),
-              'Mode': statistics.mode(values),
-              'Min': min_dist,
-              'Max': max_dist,
-              'Range': max_dist - min_dist}
-    return result
 
 
 def product_distribution(bdd_model: BDDModel) -> list[int]: 
