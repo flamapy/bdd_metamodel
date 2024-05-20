@@ -70,11 +70,8 @@ def analyze_bdd(bdd_model: BDDModel) -> None:
     # BDD product distribution
     dist_op = BDDProductDistribution().execute(bdd_model)
     dist = dist_op.get_result()
-    ds_dist = dist_op.descriptive_statistics()
     print(f'Product Distribution: {dist}')
     print(f'#Products: {sum(dist)}')
-    for ds, v in ds_dist.items():
-        print(f'{ds}: {v}')
 
     # BDD feature inclusion probabilities
     probabilities = BDDFeatureInclusionProbability().execute(bdd_model).get_result()
