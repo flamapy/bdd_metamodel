@@ -75,8 +75,12 @@ class BDDModel(VariabilityModel):
         bdd_model._bdd.declare(*variables)
         # Build the BDD
         bdd_model._root = bdd_model._bdd.add_expr(formula)
+
         # Reorder for optimization
-        bdd_model._bdd.reorder()
+        # Warning! Reordering may make the root starting to level > 0, and thus,
+        # operations won't work correctly.
+        # bdd_model._bdd.reorder()  
+
         # Levels and variables (dict for optimization)
         bdd_model._levels_variables = {l: v for v, l in bdd_model._bdd.var_levels.items()}
         return bdd_model
@@ -168,10 +172,6 @@ class BDDModel(VariabilityModel):
         """Return the low (left, dashed) node."""
         _, low, _ = self._bdd.succ(node)
         return low
-
-    # def get_node_id(self, node: _bdd.Function | int, complemented: bool = False) -> str:
-    #     """Return the value (id) of the node as a string."""
-    #     return str(self.get_value(node, complemented))
 
     def get_value(self, node: _bdd.Function | int, complemented: bool = False) -> int:
         """Return the value (id) of the node considering complemented arcs."""

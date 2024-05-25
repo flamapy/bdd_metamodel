@@ -82,7 +82,7 @@ def get_prod_dist(bdd_model: BDDModel,
         high = bdd_model.get_high_node(node)
         id_high = bdd_model.get_value(high, complemented)
         if mark[id_node] != mark[id_high]:
-            get_prod_dist(bdd_model, high, dist, mark, complemented ^ bdd_model.negated(high))
+            get_prod_dist(bdd_model, high, dist, mark, complemented)
 
         # compute high_dist to account for the removed nodes through high
         removed_nodes = bdd_model.index(high) - bdd_model.index(node) - 1
