@@ -40,7 +40,7 @@ class BDDSampling(Sampling):
 
     def get_result(self) -> list[Configuration]:
         return self._result
-    
+
     def get_sample(self) -> list[Configuration]:
         return self.get_result()
 

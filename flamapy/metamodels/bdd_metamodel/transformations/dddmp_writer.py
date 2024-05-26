@@ -27,13 +27,13 @@ def write_to_file(writer: DDDMPWriter) -> str:
         super(type(writer), writer).transform()
         result = dddmp_v2_to_v3(writer.path)
     except Exception as exc:
-        raise FlamaException(f'DDDMPWriter is not supported.') from exc
+        raise FlamaException('DDDMPWriter is not supported.') from exc
     return result
-    
+
 
 def dddmp_v2_to_v3(filepath: str) -> str:
     """Convert the file with the BDD dump in format dddmp version 2 to version 3.
-    
+
     The difference between versions 2.0 and 3.0 is the addition of the '.varnames' field.
     """
     with open(filepath, 'r', encoding='utf8') as file:

@@ -40,7 +40,7 @@ class BDDModel(VariabilityModel):
     @property
     def bdd(self) -> _bdd.BDD | _dd_bdd.BDD:
         return self._bdd
-    
+
     @bdd.setter
     def bdd(self, new_bdd: _bdd.BDD | _dd_bdd.BDD) -> None:
         self._bdd = new_bdd
@@ -51,7 +51,7 @@ class BDDModel(VariabilityModel):
     @property
     def root(self) -> _bdd.Function | int:
         return self._root
-    
+
     @root.setter
     def root(self, new_root: _bdd.Function | int) -> None:
         self._root = new_root
@@ -61,11 +61,11 @@ class BDDModel(VariabilityModel):
     @property
     def variables(self) -> list[Any]:
         return self._variables
-    
+
     @classmethod
     def from_logic_formula(cls, formula: str, variables: list[Any]) -> 'BDDModel':
         """Build the BDD from a logic formula, and the list of variables.
-        
+
         The logic formula can be a CNF formula or a propositional logic formula.
         """
         bdd_model = cls()
@@ -88,14 +88,14 @@ class BDDModel(VariabilityModel):
     def level_of_var(self, var: Any) -> Optional[int]:
         """Return the level of a given variable."""
         return self._bdd.var_levels.get(var, None)
-    
+
     def var_at_level(self, level: int) -> Optional[Any]:
         """Return the variable at the given level."""
         return self._levels_variables.get(level, None)
 
     def var(self, node: _bdd.Function | int) -> Optional[Any]:
         """Return the variable of the node.
-        
+
         It returns None if the node is a terminal node.
         """
         if self.is_terminal_node(node):
@@ -103,9 +103,8 @@ class BDDModel(VariabilityModel):
         if isinstance(node, int):
             level, _, _ = self._bdd.succ(node)
             return self.var_at_level(level)
-        else:
-            return node.var
-        
+        return node.var
+
     def level(self, node: _bdd.Function | int) -> Optional[int]:
         """Return the level of the node.
 
@@ -142,15 +141,14 @@ class BDDModel(VariabilityModel):
         """Return whether the node is negated."""
         if isinstance(node, int):
             return node < 0
-        else:
-            return node.negated
-        
+        return node.negated
+
     def get_terminal_node_n0(self) -> _bdd.Function | int:
         return self._bdd.false
-    
+
     def get_terminal_node_n1(self) -> _bdd.Function | int:
         return self._bdd.true
-    
+
     def is_terminal_node(self, node: _bdd.Function | int) -> bool:
         """Check if the node is a terminal node."""
         return self.is_terminal_n0(node) or self.is_terminal_n1(node)
@@ -186,10 +184,10 @@ class BDDModel(VariabilityModel):
         return f'{self.var(node)} ' \
                f'(id: {self.get_value(node)}) ' \
                f'(level: {self.level(node)}) ' \
-               f'(index: {self.index(node)}) ' \
-                 
+               f'(index: {self.index(node)}) '
+
     def __str__(self) -> str:
-        result = f'Binary Decision Diagram (BDD):\n'
+        result = 'Binary Decision Diagram (BDD):\n'
         result += f'Instance class: {type(self._bdd)}\n'
         result += f'#Nodes: {self.nof_nodes()}\n'
         result += f'Root: {self.pretty_node_str(self.root)}\n'

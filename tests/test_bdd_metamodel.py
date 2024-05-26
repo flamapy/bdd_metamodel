@@ -20,6 +20,7 @@ For more information, check: https://github.com/tulip-control/dd
 import os
 
 from flamapy.core.exceptions import FlamaException
+from flamapy.metamodels.configuration_metamodel.models import Configuration
 from flamapy.metamodels.fm_metamodel.transformations import UVLReader
 from flamapy.metamodels.bdd_metamodel.models import BDDModel
 from flamapy.metamodels.bdd_metamodel.transformations import (
@@ -42,12 +43,17 @@ from flamapy.metamodels.bdd_metamodel.operations import (
     BDDConfigurations,
     BDDCoreFeatures,
     BDDDeadFeatures,
+    BDDVariantFeatures,
     BDDSatisfiable,
-    BDDPureOptionalFeatures
+    BDDPureOptionalFeatures,
+    BDDUniqueFeatures,
+    BDDVariability,
+    BDDCommonalityFactor,
+    BDDHomogeneity
 )
 
 
-FM_PATH = 'tests/models/uvl_models/Pizzas.uvl'
+FM_PATH = 'tests/models/uvl_models/MobilePhone.uvl'
 BDD_MODELS_PATH = 'tests/models/bdd_models/'
 
 
@@ -55,7 +61,7 @@ def analyze_bdd(bdd_model: BDDModel) -> None:
     # Satisfiable (valid)
     satisfiable = BDDSatisfiable().execute(bdd_model).get_result()
     print(f'Satisfiable (valid)?: {satisfiable}')
-    
+
     # Configurations numbers
     n_configs = BDDConfigurationsNumber().execute(bdd_model).get_result()
     print(f'#Configs: {n_configs}')
@@ -87,9 +93,35 @@ def analyze_bdd(bdd_model: BDDModel) -> None:
     dead_features = BDDDeadFeatures().execute(bdd_model).get_result()
     print(f'Dead features: {dead_features}')
 
-    # Dead features
+    # Variant features
+    variant_features = BDDVariantFeatures().execute(bdd_model).get_result()
+    print(f'Variant features: {variant_features}')
+
+    # Pure optional features
     pure_optional_features = BDDPureOptionalFeatures().execute(bdd_model).get_result()
     print(f'Pure optional features: {pure_optional_features}')
+
+    # Unique features
+    unique_features = BDDUniqueFeatures().execute(bdd_model).get_result()
+    print(f'Unique features: {unique_features}')
+
+    # Variability
+    variability_op = BDDVariability().execute(bdd_model)
+    total_variability = variability_op.total_variability()
+    partial_variability = variability_op.partial_variability()
+    print(f'Total variability: {total_variability}')
+    print(f'Partial variability: {partial_variability}')
+
+    # Commonality factor
+    config = Configuration(elements={'MP3': True, 'GPS': False})
+    cf_op = BDDCommonalityFactor()
+    cf_op.set_configuration(config)
+    commonality_factor = cf_op.execute(bdd_model).get_result()
+    print(f'Commonality factor: {commonality_factor}')
+
+    # Homogeneity
+    homogeneity = BDDHomogeneity().execute(bdd_model).get_result()
+    print(f'Homogeneity: {homogeneity}')
 
     # BDD Sampling
     sampling_op = BDDSampling()
@@ -128,7 +160,7 @@ def main():
         PickleWriter(f'{filename}.p', bdd_model).transform()
     except FlamaException as e:
         print(e)
-    
+
     # Load the BDD model from a .json file
     reader = JSONReader(f'{os.path.join(BDD_MODELS_PATH, filename)}.json')
     #reader.set_preserve_original_ordering(True)
