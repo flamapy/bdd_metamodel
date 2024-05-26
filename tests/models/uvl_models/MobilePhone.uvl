@@ -1,0 +1,20 @@
+namespace MobilePhone
+
+features
+	MobilePhone
+		mandatory
+			Calls
+			Screen
+				alternative
+					Basic
+					Color
+					HighResolution
+		optional
+			GPS
+			Media
+				or
+					Camera
+					MP3
+constraints
+	GPS => ! Basic
+	Camera => HighResolution

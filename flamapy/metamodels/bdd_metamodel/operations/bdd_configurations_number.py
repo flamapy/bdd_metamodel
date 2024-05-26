@@ -43,7 +43,8 @@ def configurations_number(bdd_model: BDDModel,
         :return: The number of valid configurations
     """
     if partial_configuration is not None:
-        result = count(bdd_model, [f.name for f in partial_configuration.get_selected_elements()])
+        result = count(bdd_model, [str(f) if selected else f'not {f}' for f, selected in 
+                                   partial_configuration.elements.items()])
     else:
         result = count(bdd_model, [])
     return result
@@ -58,7 +59,6 @@ def count(bdd_model: BDDModel, feature_assignment: list[str]) -> int:
     """
     # Check bdd_file
     bdd_file = bdd_model.check_file_existence(bdd_model.bdd_file, 'dddmp')
-
     # Get all feature names
     with open(bdd_file, "r", encoding='utf8') as file:
         bdd_code = file.read()

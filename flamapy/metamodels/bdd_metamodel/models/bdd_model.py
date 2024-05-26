@@ -36,7 +36,16 @@ class BDDModel(VariabilityModel):
         """
         self._bdd_file: str = ''
         self._temporal_bdd_file: bool = True
+        self._variables: list[Any] = []
         self._set_global_constants()
+
+    @property
+    def variables(self) -> list[Any]:
+        return self._variables
+
+    @variables.setter
+    def variables(self, variables_list: list[Any]) -> None:
+        self._variables = variables_list
 
     @property
     def bdd_file(self) -> str:

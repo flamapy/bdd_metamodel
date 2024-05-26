@@ -20,4 +20,10 @@ class DDDMPReader(TextToModel):
         if match is not None:
             file_name = match.group(1)
         bdd_model.bdd_file = file_name
+        # Read the features
+        with open(self._path, 'r', encoding='utf8') as file:
+            lines = file.readlines()
+            line = next(l.strip() for l in lines if '.varnames' in l)
+            variables = line.split(' ')[1:]
+        bdd_model.variables = variables
         return bdd_model
