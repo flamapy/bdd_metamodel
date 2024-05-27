@@ -41,6 +41,8 @@ def feature_inclusion_probability(bdd_model: BDDModel,
     n_configs_op = BDDConfigurationsNumber()
     n_configs_op.set_partial_configuration(config)
     total_configs = n_configs_op.execute(bdd_model).get_result()
+    if total_configs == 0:
+        return {feature: 0.0 for feature in bdd_model.variables}
 
     prob: dict[Any, float] = defaultdict(float)
     if config is None:
