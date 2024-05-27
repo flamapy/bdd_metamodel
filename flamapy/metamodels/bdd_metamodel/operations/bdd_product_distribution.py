@@ -54,7 +54,7 @@ def product_distribution(bdd_model: BDDModel) -> list[int]:
     mark: dict[int, bool] = defaultdict(bool)
     get_prod_dist(bdd_model, root, dist, mark, bdd_model.negated(root))
     # Complete distribution
-    distribution = dist[id_root] + [0] * (len(bdd_model.variables) + 1 - len(dist[id_root]))
+    distribution = dist[id_root] + [0] * (len(bdd_model.variables_features) + 1 - len(dist[id_root]))
     return distribution
 
 
@@ -94,6 +94,7 @@ def get_prod_dist(bdd_model: BDDModel,
             for j in range(len(dist[id_high])):
                 high_dist[i + j] = high_dist[i + j] + dist[id_high][j] * (
                     math.comb(removed_nodes, i))
+        # combine low and high distributions
         combine_distributions(id_node, dist, low_dist, high_dist)
 
 
@@ -101,7 +102,6 @@ def combine_distributions(id_node: int,
                           dist: dict[int, list[int]], 
                           low_dist: list[int], 
                           high_dist: list[int]) -> None:
-    # combine low and high distributions
     if len(low_dist) > len(high_dist):
         dist_length = len(low_dist)
     else:

@@ -35,9 +35,10 @@ def configurations_number(bdd_model: BDDModel,
                           partial_configuration: Optional[Configuration] = None) -> int:
     if partial_configuration is None:
         u_func = bdd_model.root
-        n_vars = len(bdd_model.variables)
+        n_vars = len(bdd_model.variables_features)
     else:
-        values = dict(partial_configuration.elements.items())
+        values = {bdd_model.features_variables[f]: selected 
+                  for f, selected in partial_configuration.elements.items()}
         u_func = bdd_model.bdd.let(values, bdd_model.root)
-        n_vars = len(bdd_model.variables) - len(values)
+        n_vars = len(bdd_model.variables_features) - len(values)
     return int(bdd_model.bdd.count(u_func, nvars=n_vars))

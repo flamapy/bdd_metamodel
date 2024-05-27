@@ -40,12 +40,13 @@ def configurations(bdd_model: BDDModel,
     else:
         values = dict(partial_config.elements.items())
         u_func = bdd_model.bdd.let(values, bdd_model.root)
-        care_vars = set(bdd_model.variables) - set(values.keys())
+        care_vars = set(bdd_model.variables_features) - set(values.keys())
         elements = partial_config.elements
 
     configs = []
     for assignment in bdd_model.bdd.pick_iter(u_func, care_vars=care_vars):
-        features = {f: True for f in assignment.keys() if assignment[f]}
+        features = {bdd_model.variables_features[f]: True 
+                    for f in assignment.keys() if assignment[f]}
         features = features | elements
         configs.append(Configuration(features))
     return configs

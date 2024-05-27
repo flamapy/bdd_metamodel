@@ -34,9 +34,26 @@ class BDDModel(VariabilityModel):
     def __init__(self) -> None:
         self._bdd: _bdd.BDD = _bdd.BDD()  # BDD manager
         self._root: Optional[_bdd.Function | int] = None
-        self._variables: list[Any] = []
+        self.features_variables: dict[Any, Any] = {}
+        self.variables_features: dict[Any, Any] = {}
         self._levels_variables: dict[int, Any] = {}
+        self._formula: str = None
+    
+    def build_bdd(self, expression: str) -> None:
+        """Built a BDD from an expression representing a logical formula.
+        
+        It assumes that all variables have been added to 
+        features_variables and variables_features.
+        """
+        self._formula = expression
+        self._bdd.declare(*self.variables_features.keys())
+        self._root = self._bdd.add_expr(expression)
+        self._levels_variables = {l: v for v, l in self._bdd.var_levels.items()}
 
+    @property
+    def formula(self) -> str:
+        return self._formula
+    
     @property
     def bdd(self) -> _bdd.BDD | _dd_bdd.BDD:
         return self._bdd
@@ -44,7 +61,8 @@ class BDDModel(VariabilityModel):
     @bdd.setter
     def bdd(self, new_bdd: _bdd.BDD | _dd_bdd.BDD) -> None:
         self._bdd = new_bdd
-        self._variables = list(self._bdd.vars)
+        self.features_variables = {var: var for var in self._bdd.vars}
+        self.variables_features = dict(self.features_variables)
         self._root = next(iter(self._bdd.roots), None)
         self._levels_variables = {l: v for v, l in self._bdd.var_levels.items()}
 
@@ -55,35 +73,36 @@ class BDDModel(VariabilityModel):
     @root.setter
     def root(self, new_root: _bdd.Function | int) -> None:
         self._root = new_root
-        self._variables = list(self._bdd.vars)
+        self.features_variables = {var: var for var in self._bdd.vars}
+        self.variables_features = dict(self.features_variables)
         self._levels_variables = {l: v for v, l in self._bdd.var_levels.items()}
+    
+    # @classmethod
+    # def from_logic_formula(cls, 
+    #                        formula: str, 
+    #                        variables: list[Any]) -> 'BDDModel':
+    #     """Build the BDD from a logic formula, and the list of variables.
 
-    @property
-    def variables(self) -> list[Any]:
-        return self._variables
+    #     The logic formula can be a CNF formula or a propositional logic formula.
+    #     An optional features_variables and variables_features mapping can be provided 
+    #     to track safe features' and variables' names.
+    #     """
+    #     bdd_model = cls()
+    #     # Store variables
+    #     bdd_model._variables = variables
+    #     # Declare variables
+    #     bdd_model._bdd.declare(*variables)
+    #     # Build the BDD
+    #     bdd_model._root = bdd_model._bdd.add_expr(formula)
 
-    @classmethod
-    def from_logic_formula(cls, formula: str, variables: list[Any]) -> 'BDDModel':
-        """Build the BDD from a logic formula, and the list of variables.
+    #     # Reorder for optimization
+    #     # Warning! Reordering may make the root starting to level > 0, and thus,
+    #     # operations won't work correctly.
+    #     #bdd_model._bdd.reorder()  
 
-        The logic formula can be a CNF formula or a propositional logic formula.
-        """
-        bdd_model = cls()
-        # Store variables
-        bdd_model._variables = variables
-        # Declare variables
-        bdd_model._bdd.declare(*variables)
-        # Build the BDD
-        bdd_model._root = bdd_model._bdd.add_expr(formula)
-
-        # Reorder for optimization
-        # Warning! Reordering may make the root starting to level > 0, and thus,
-        # operations won't work correctly.
-        # bdd_model._bdd.reorder()  
-
-        # Levels and variables (dict for optimization)
-        bdd_model._levels_variables = {l: v for v, l in bdd_model._bdd.var_levels.items()}
-        return bdd_model
+    #     # Levels and variables (dict for optimization)
+    #     bdd_model._levels_variables = {l: v for v, l in bdd_model._bdd.var_levels.items()}
+    #     return bdd_model
 
     def level_of_var(self, var: Any) -> Optional[int]:
         """Return the level of a given variable."""
@@ -133,7 +152,7 @@ class BDDModel(VariabilityModel):
         thus level(n4) = 2.
         """
         if self.is_terminal_node(node):
-            return len(self.variables) + 1
+            return len(self.variables_features) + 1
         level = self.level(node)
         return level + 1 if level is not None else None
 

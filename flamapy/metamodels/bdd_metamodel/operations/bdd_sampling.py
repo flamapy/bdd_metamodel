@@ -75,19 +75,23 @@ def sample(model: BDDModel,
 def random_configuration(bdd_model: BDDModel,
                          p_config: Optional[Configuration] = None) -> Configuration:
     # Initialize the configurations and values for BDD nodes with already known features
-    values = {} if p_config is None else dict(p_config.elements.items())
+    if p_config is None:
+        values = {}
+    else:
+        values = {bdd_model.features_variables[f]: selected 
+                  for f, selected in p_config.elements.items()}
 
     # Set the BDD nodes with the already known features values
     u_func = bdd_model.bdd.let(values, bdd_model.root)
 
-    care_vars = set(bdd_model.variables) - values.keys()
+    care_vars = set(bdd_model.variables_features.keys()) - values.keys()
     n_vars = len(care_vars)
-    for feature in care_vars:
+    for variable in care_vars:
         # Number of configurations with the feature selected
-        v_sel = bdd_model.bdd.let({feature: True}, u_func)
+        v_sel = bdd_model.bdd.let({variable: True}, u_func)
         nof_configs_var_selected = bdd_model.bdd.count(v_sel, nvars=n_vars - 1)
         # Number of configurations with the feature unselected
-        v_unsel = bdd_model.bdd.let({feature: False}, u_func)
+        v_unsel = bdd_model.bdd.let({variable: False}, u_func)
         nof_configs_var_unselected = bdd_model.bdd.count(v_unsel, nvars=n_vars - 1)
 
         # Randomly select or not the feature
@@ -96,8 +100,9 @@ def random_configuration(bdd_model: BDDModel,
                                   k=1)[0]
 
         # Update configuration and BDD node for the new feature
-        values[feature] = selected
-        u_func = bdd_model.bdd.let({feature: selected}, u_func)
+        values[variable] = selected
+        u_func = bdd_model.bdd.let({variable: selected}, u_func)
 
         n_vars -= 1
-    return Configuration(values)
+    return Configuration({bdd_model.variables_features[v]: selected 
+                          for v, selected in values.items()})

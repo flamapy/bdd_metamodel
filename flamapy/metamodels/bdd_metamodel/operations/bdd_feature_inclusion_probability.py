@@ -42,27 +42,28 @@ def feature_inclusion_probability(bdd_model: BDDModel,
     n_configs_op.set_partial_configuration(config)
     total_configs = n_configs_op.execute(bdd_model).get_result()
     if total_configs == 0:
-        return {feature: 0.0 for feature in bdd_model.variables}
+        return {feature: 0.0 for feature in bdd_model.features_variables}
 
     prob: dict[Any, float] = defaultdict(float)
     if config is None:
-        for feature in bdd_model.variables:
-            values = {feature: True}
+        for variable, feature in bdd_model.variables_features.items():
+            values = {variable: True}
             u_func = bdd_model.bdd.let(values, bdd_model.root)
-            n_vars = len(bdd_model.variables) - len(values)
+            n_vars = len(bdd_model.variables_features) - len(values)
             prob[feature] = bdd_model.bdd.count(u_func, nvars=n_vars) / total_configs
     else:
-        values = dict(config.elements.items())
-        for feature in bdd_model.variables:
-            feature_selected = values.get(feature, None)    
-            values = {feature: True}
+        values = {bdd_model.features_variables[f]: selected 
+                  for f, selected in config.elements.items()}
+        for variable, feature in bdd_model.variables_features.items():
+            feature_selected = values.get(variable, None)    
+            values = {variable: True}
             u_func = bdd_model.bdd.let(values, bdd_model.root)
-            n_vars = len(bdd_model.variables) - len(values)
+            n_vars = len(bdd_model.variables_features) - len(values)
             prob[feature] = bdd_model.bdd.count(u_func, nvars=n_vars) / total_configs
             if feature_selected is None:
-                values.pop(feature)
+                values.pop(variable)
             else:
-                values[feature] = feature_selected
+                values[variable] = feature_selected
     return prob
 
 

@@ -31,7 +31,7 @@ class BDDVariability(Variability):
 
 def variability(bdd_model: BDDModel) -> tuple[float, float]:
     n_configs = BDDConfigurationsNumber().execute(bdd_model).get_result()
-    total_variability = n_configs / (2**len(bdd_model.variables) - 1)
+    total_variability = n_configs / (2**len(bdd_model.variables_features) - 1)
     variant_features = BDDVariantFeatures().execute(bdd_model).get_result()
     partial_variability = n_configs / (2**len(variant_features) - 1)
     return (total_variability, partial_variability)
