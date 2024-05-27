@@ -7,7 +7,7 @@ with open("README.md", "r") as fh:
 
 setuptools.setup(
     name="flamapy-bdd",
-    version="1.6.0",
+    version="2.0.0.dev1",
     author="Flamapy",
     author_email="flamapy@us.es",
     description="bdd-plugin for the automated analysis of feature models",
@@ -22,8 +22,8 @@ setuptools.setup(
     ],
     python_requires='>=3.9',
     install_requires=[
-        'flamapy~=1.7.0.dev0',
-        'flamapy-fm~=1.6.0.dev0',
+        'flamapy-fw~=2.0.0.dev1',
+        'flamapy-fm~=2.0.0.dev1',
         'dd>=0.5.7',
         'graphviz>=0.20',
     ],
@@ -37,6 +37,6 @@ setuptools.setup(
         ]
     },
     dependency_links=[
-        'flamapy~=1.6.0.dev0',
+        'flamapy~=2.0.0.dev1',
     ]
 )
