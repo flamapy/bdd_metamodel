@@ -27,9 +27,7 @@ class FmToBDD(ModelToModel):
         self.destination_model = BDDModel()
         for feature in self.source_model.get_features():
             self._add_feature(feature)
-        print(self.destination_model.features_variables)
         formula = self._traverse_feature_tree()
-        print(formula)
         self.destination_model.build_bdd(formula)
         return self.destination_model
 

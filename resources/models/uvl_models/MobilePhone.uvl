@@ -1,14 +1,14 @@
-namespace MobilePhone
+namespace "Mobile Phone"
 
 features
-	MobilePhone
+	"Mobile Phone"
 		mandatory
 			Calls
 			Screen
 				alternative
 					Basic
 					Color
-					HighResolution
+					"High Resolution"
 		optional
 			GPS
 			Media
@@ -17,4 +17,4 @@ features
 					MP3
 constraints
 	GPS => ! Basic
-	Camera => HighResolution
+	Camera => "High Resolution"
