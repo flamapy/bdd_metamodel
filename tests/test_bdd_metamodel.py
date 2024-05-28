@@ -53,8 +53,8 @@ from flamapy.metamodels.bdd_metamodel.operations import (
 )
 
 
-FM_PATH = 'tests/models/uvl_models/MobilePhone.uvl'
-BDD_MODELS_PATH = 'tests/models/bdd_models/'
+FM_PATH = 'resources/models/uvl_models/MobilePhone.uvl'
+BDD_MODELS_PATH = 'resources/models/bdd_models/'
 
 
 def analyze_bdd(bdd_model: BDDModel) -> None:
