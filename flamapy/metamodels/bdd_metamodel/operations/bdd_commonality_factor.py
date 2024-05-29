@@ -31,6 +31,8 @@ class BDDCommonalityFactor(CommonalityFactor):
 def commonality_factor(bdd_model: BDDModel, config: Configuration) -> float:
     configs_number_op = BDDConfigurationsNumber()
     total_configs = configs_number_op.execute(bdd_model).get_result()
+    if total_configs == 0:
+        return 0.0
     configs_number_op.set_partial_configuration(config)
     n_configs = configs_number_op.execute(bdd_model).get_result()
     return n_configs / total_configs
