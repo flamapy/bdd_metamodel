@@ -1,4 +1,5 @@
 import os
+import re
 import stat
 import subprocess
 import locale
@@ -111,3 +112,37 @@ class BDDModel(VariabilityModel):
                 message = 'The file "' + filename + '" doesn\'t exist.'
                 raise FlamaException(message)
         return filename
+
+    @staticmethod
+    def expand_assignment(bdd_file: str, feature_assignment: list[str]) -> list[str]:
+        '''
+        Changes the format of a list of features' assignments.
+        e.g., ['MP3', 'not Basic'] => ['MP3=true', 'Basic=false']
+        First, it checks if the features in feature_assignment are valid features of bdd_file.
+        :param bdd_file: file containing the BDD encoding of the model
+        :param feature_assignment: the list of features' assignments
+        :return: reformatted feature assignment
+        '''
+
+        # Get all feature names
+        f = open(bdd_file, "r")
+        bdd_code = f.read()
+        varnames = re.search('varnames\\s+(.*)', bdd_code).group(1).split()
+        f.close()
+
+        expanded_assignment = []
+        for feature in feature_assignment:
+            ft = None
+            if re.match('not\\s+', feature):
+                ft = re.search('not\\s+(.*)', feature).group(1)
+                if varnames.count(ft) == 0:
+                    raise FlamaException(ft + " is not a valid feature of " + bdd_file)
+                else:
+                    ft += "=false"
+            else:
+                if varnames.count(feature) == 0:
+                    raise FlamaException(feature + " is not a valid feature of " + bdd_file)
+                else:
+                    ft = feature + "=true"
+            expanded_assignment.append(ft)
+        return expanded_assignment
