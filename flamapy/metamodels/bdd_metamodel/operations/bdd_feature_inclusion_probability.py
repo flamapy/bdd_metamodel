@@ -89,7 +89,8 @@ def feature_inclusion_probability(bdd_model: BDDModel,
 #     joint_prob_nodes_phi: dict[tuple[int, Any], float] = defaultdict(float)
 #     cond_prob: dict[tuple[int, Any], float] = defaultdict(float)
 #     mark: dict[int, bool] = defaultdict(bool)
-#     get_joint_pr(bdd_model, root, prob, joint_prob, joint_prob_nodes_n, joint_prob_nodes_phi, cond_prob, mark, bdd_model.negated(root))
+#     get_joint_pr(bdd_model, root, prob, joint_prob, joint_prob_nodes_n, 
+#               joint_prob_nodes_phi, cond_prob, mark, bdd_model.negated(root))
 #     print(f'COND PROBS: {len(cond_prob)}')
 #     for v, p in cond_prob.items():
 #         print(f'Value (id): {v} -> {p}')
@@ -101,8 +102,10 @@ def feature_inclusion_probability(bdd_model: BDDModel,
 #         print(f'Index: {v} -> {p}')
 #     #total_prob = prob[bdd_model.get_value(bdd_model.get_terminal_node_n1())]
 #     #total_prob = prob[bdd_model.get_value(bdd_model.get_terminal_node_n1())]
-#     #total_prob = prob[bdd_model.get_value(bdd_model.get_terminal_node_n1(), bdd_model.negated(root))]
-#     total_prob = prob[bdd_model.get_value(bdd_model.get_terminal_node_n1(), bdd_model.negated(root))]
+#     #total_prob = prob[bdd_model.get_value(bdd_model.get_terminal_node_n1(), 
+#                       bdd_model.negated(root))]
+#     total_prob = prob[bdd_model.get_value(bdd_model.get_terminal_node_n1(), 
+#                       bdd_model.negated(root))]
 #     print(f'Total Prob: {total_prob}')
 #     fip: dict[Any, float] = {}
 #     print(bdd_model.bdd.var_levels)
@@ -132,7 +135,8 @@ def feature_inclusion_probability(bdd_model: BDDModel,
 #         else:
 #             prob[id_low] = prob[id_low] + (prob[id_node] / 2)
 #         if mark[id_node] != mark[id_low]:
-#             get_node_pr(bdd_model, low, prob, mark, complemented ^ bdd_model.negated(low))
+#             get_node_pr(bdd_model, low, prob, mark, 
+#                   complemented ^ bdd_model.negated(low))
 
 #         # explore high
 #         high = bdd_model.get_high_node(node)
@@ -142,7 +146,8 @@ def feature_inclusion_probability(bdd_model: BDDModel,
 #         else:
 #             prob[id_high] = prob[id_high] + (prob[id_node] / 2)
 #         if mark[id_node] != mark[id_high]:
-#             get_node_pr(bdd_model, high, prob, mark, complemented ^ bdd_model.negated(high))
+#             get_node_pr(bdd_model, high, prob, mark,
+#                    complemented ^ bdd_model.negated(high))
 
 
 # def get_joint_pr(bdd_model: BDDModel,
@@ -168,10 +173,15 @@ def feature_inclusion_probability(bdd_model: BDDModel,
 #             cond_prob[(id_node, False)] = 1.0
 #         else:
 #             if mark[id_node] != mark[id_low]:
-#                 get_joint_pr(bdd_model, low, prob, joint_prob, joint_prob_nodes_n, joint_prob_nodes_phi, cond_prob, mark, complemented ^ bdd_model.negated(low))
-#             cond_prob[(id_node, False)] = joint_prob_nodes_phi[(id_low, None)] / (2 * prob[id_low])
-#         joint_prob_nodes_n[(id_node, False)] = cond_prob[(id_node, False)] * prob[id_node]
-        
+#                 get_joint_pr(bdd_model, low, prob, joint_prob, 
+#                       joint_prob_nodes_n, joint_prob_nodes_phi, 
+#                       cond_prob, mark, complemented ^ bdd_model.negated(low))
+#             cond_prob[(id_node, False)] = joint_prob_nodes_phi[
+#                                       (id_low, None)] / 
+#                                        (2 * prob[id_low])
+#         joint_prob_nodes_n[(id_node, False)] = cond_prob[
+#                                       (id_node, False)] * 
+#                                          prob[id_node]
 #         # explore high
 #         high = bdd_model.get_high_node(node)
 #         id_high = bdd_model.get_value(high, complemented)
@@ -181,13 +191,17 @@ def feature_inclusion_probability(bdd_model: BDDModel,
 #             cond_prob[(id_node, True)] = 1.0
 #         else:
 #             if mark[id_node] != mark[id_high]:
-#                 get_joint_pr(bdd_model, high, prob, joint_prob, joint_prob_nodes_n, joint_prob_nodes_phi, cond_prob, mark, complemented ^ bdd_model.negated(high))
-#             cond_prob[(id_node, True)] = joint_prob_nodes_phi[(id_high, None)] / (2 * prob[id_high])
+#                 get_joint_pr(bdd_model, high, prob, joint_prob, joint_prob_nodes_n, 
+# joint_prob_nodes_phi, cond_prob, mark, complemented ^ bdd_model.negated(high))
+#             cond_prob[(id_node, True)] = joint_prob_nodes_phi[(id_high, None)] 
+# / (2 * prob[id_high])
 #         joint_prob_nodes_n[(id_node, True)] = cond_prob[(id_node, True)] * prob[id_node]
 
 #         # Combine both low and high
-#         joint_prob_nodes_phi[(id_node, None)] = joint_prob_nodes_phi[(id_node, True)] + joint_prob_nodes_phi[(id_node, False)]
-#         joint_prob[bdd_model.index(node)] = prob[bdd_model.index(node)] + joint_prob_nodes_n[(id_node, True)]
+#         joint_prob_nodes_phi[(id_node, None)] = joint_prob_nodes_phi[(id_node, True)] + 
+# joint_prob_nodes_phi[(id_node, False)]
+#         joint_prob[bdd_model.index(node)] = prob[bdd_model.index(node)] 
+# + joint_prob_nodes_n[(id_node, True)]
 
 #         # Add joint probabilities of the removed nodes
 #         for xj in range(bdd_model.index(node) + 1, bdd_model.index(high)):

@@ -2,6 +2,7 @@ from typing import Optional
 
 from flamapy.core.transformations import ModelToText
 from flamapy.metamodels.bdd_metamodel.models import BDDModel
+from flamapy.core.exceptions import FlamaException
 
 
 class BDDWriter(ModelToText):
@@ -31,7 +32,7 @@ class BDDWriter(ModelToText):
             try:
                 self.source_model.bdd.dump(filename=self.path, 
                                            filetype=self.get_destination_extension())
-            except Exception:
+            except FlamaException:
                 roots = [self.source_model.root]
         else:
             roots = [self.source_model.root]

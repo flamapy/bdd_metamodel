@@ -40,7 +40,7 @@ from flamapy.metamodels.bdd_metamodel.operations import (
     BDDFeatureInclusionProbability,
     BDDSampling,
     BDDConfigurationsNumber,
-    BDDConfigurations,
+    #BDDConfigurations,
     BDDCoreFeatures,
     BDDDeadFeatures,
     BDDVariantFeatures,
@@ -58,6 +58,7 @@ BDD_MODELS_PATH = 'resources/models/bdd_models/'
 
 
 def analyze_bdd(bdd_model: BDDModel) -> None:
+    # pylint: disable=too-many-locals
     # Satisfiable (valid)
     satisfiable = BDDSatisfiable().execute(bdd_model).get_result()
     print(f'Satisfiable (valid)?: {satisfiable}')
@@ -133,7 +134,7 @@ def analyze_bdd(bdd_model: BDDModel) -> None:
 
 
 def main():
-    path, filename = os.path.split(FM_PATH)
+    _path, filename = os.path.split(FM_PATH)
     filename = ''.join(filename.split('.')[:-1])
 
     # Load the feature model from UVLReader
@@ -154,12 +155,12 @@ def main():
     JSONWriter(f'{filename}.{JSONWriter.get_destination_extension()}', bdd_model).transform()
     try:
         DDDMPWriter(f'{filename}.{DDDMPWriter.get_destination_extension()}', bdd_model).transform()
-    except FlamaException as e:
-        print(e)
+    except FlamaException as exception:
+        print(exception)
     try:
         PickleWriter(f'{filename}.p', bdd_model).transform()
-    except FlamaException as e:
-        print(e)
+    except FlamaException as exception:
+        print(exception)
 
     # Load the BDD model from a .json file
     reader = JSONReader(f'{os.path.join(BDD_MODELS_PATH, filename)}.json')
@@ -178,8 +179,8 @@ def main():
         bdd_model = PickleReader(f'{os.path.join(BDD_MODELS_PATH, filename)}.p').transform()
         print(f'BDD from Pickle:\n{bdd_model}')
         analyze_bdd(bdd_model)
-    except FlamaException as e:
-        print(e)
+    except FlamaException as exception:
+        print(exception)
 
 
 if __name__ == '__main__':

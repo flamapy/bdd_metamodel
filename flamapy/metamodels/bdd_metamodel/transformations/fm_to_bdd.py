@@ -24,6 +24,6 @@ class FmToBDD(ModelToModel):
     def transform(self) -> BDDModel:
         try:
             bdd_model = FmToBddPL(self.source_model).transform()
-        except BaseException:
+        except (IOError, ValueError):
             bdd_model = FmToBddCNF(self.source_model).transform()
         return bdd_model

@@ -1,5 +1,5 @@
 from enum import Enum
-from typing import Optional, Any
+from typing import Optional, Any, Union
 
 # Low-level interface to pure Python implementation (wrapped by dd.autoref.BDD).
 import dd.bdd as _dd_bdd
@@ -33,15 +33,15 @@ class BDDModel(VariabilityModel):
 
     def __init__(self) -> None:
         self._bdd: _bdd.BDD = _bdd.BDD()  # BDD manager
-        self._root: Optional[_bdd.Function | int] = None
+        self._root: Optional[Union[_bdd.Function, int]] = None
         self.features_variables: dict[Any, Any] = {}
         self.variables_features: dict[Any, Any] = {}
         self._levels_variables: dict[int, Any] = {}
-        self._formula: str = None
-    
+        self._formula: Any = None
+
     def build_bdd(self, expression: str) -> None:
         """Built a BDD from an expression representing a logical formula.
-        
+
         It assumes that all variables have been added to 
         features_variables and variables_features.
         """
@@ -53,13 +53,13 @@ class BDDModel(VariabilityModel):
     @property
     def formula(self) -> str:
         return self._formula
-    
+
     @property
-    def bdd(self) -> _bdd.BDD | _dd_bdd.BDD:
+    def bdd(self) -> Union[_bdd.BDD, _dd_bdd.BDD]:
         return self._bdd
 
     @bdd.setter
-    def bdd(self, new_bdd: _bdd.BDD | _dd_bdd.BDD) -> None:
+    def bdd(self, new_bdd: Union[_bdd.BDD, _dd_bdd.BDD]) -> None:
         self._bdd = new_bdd
         self.features_variables = {var: var for var in self._bdd.vars}
         self.variables_features = dict(self.features_variables)
@@ -67,16 +67,16 @@ class BDDModel(VariabilityModel):
         self._levels_variables = {l: v for v, l in self._bdd.var_levels.items()}
 
     @property
-    def root(self) -> _bdd.Function | int:
+    def root(self) -> Union[_bdd.Function, int]:
         return self._root
 
     @root.setter
-    def root(self, new_root: _bdd.Function | int) -> None:
+    def root(self, new_root: Union[_bdd.Function, int]) -> None:
         self._root = new_root
         self.features_variables = {var: var for var in self._bdd.vars}
         self.variables_features = dict(self.features_variables)
         self._levels_variables = {l: v for v, l in self._bdd.var_levels.items()}
-    
+
     # @classmethod
     # def from_logic_formula(cls, 
     #                        formula: str, 
@@ -112,7 +112,7 @@ class BDDModel(VariabilityModel):
         """Return the variable at the given level."""
         return self._levels_variables.get(level, None)
 
-    def var(self, node: _bdd.Function | int) -> Optional[Any]:
+    def var(self, node: Union[_bdd.Function, int]) -> Optional[Any]:
         """Return the variable of the node.
 
         It returns None if the node is a terminal node.
@@ -124,7 +124,7 @@ class BDDModel(VariabilityModel):
             return self.var_at_level(level)
         return node.var
 
-    def level(self, node: _bdd.Function | int) -> Optional[int]:
+    def level(self, node: Union[_bdd.Function, int]) -> Optional[int]:
         """Return the level of the node.
 
         Non-terminal nodes start at 0.
@@ -137,11 +137,11 @@ class BDDModel(VariabilityModel):
         """Return number of nodes in the BDD."""
         return len(self._bdd)
 
-    def get_node(self, var: Any) -> _bdd.Function | int:
+    def get_node(self, var: Any) -> Union[_bdd.Function, int]:
         """Return the node of the variable."""
         return self._bdd.var(var)
 
-    def index(self, node: _bdd.Function | int) -> Optional[int]:
+    def index(self, node: Union[_bdd.Function, int]) -> Optional[int]:
         """Position (index) of the variable that labels the node `n` in the ordering.
 
         Indexes start at 1.
@@ -156,41 +156,45 @@ class BDDModel(VariabilityModel):
         level = self.level(node)
         return level + 1 if level is not None else None
 
-    def negated(self, node: _bdd.Function | int) -> bool:
+    def negated(self, node: Union[_bdd.Function, int]) -> bool:
         """Return whether the node is negated."""
         if isinstance(node, int):
             return node < 0
         return node.negated
 
-    def get_terminal_node_n0(self) -> _bdd.Function | int:
+    def get_terminal_node_n0(self) -> Union[_bdd.Function, int]:
         return self._bdd.false
 
-    def get_terminal_node_n1(self) -> _bdd.Function | int:
+    def get_terminal_node_n1(self) -> Union[_bdd.Function, int]:
         return self._bdd.true
 
-    def is_terminal_node(self, node: _bdd.Function | int) -> bool:
+    def is_terminal_node(self, node: Union[_bdd.Function, int]) -> bool:
         """Check if the node is a terminal node."""
         return self.is_terminal_n0(node) or self.is_terminal_n1(node)
 
-    def is_terminal_n1(self, node: _bdd.Function | int) -> bool:
+    def is_terminal_n1(self, node: Union[_bdd.Function, int]) -> bool:
         """Check if the node is the terminal node 1 (n1)."""
         return node == self.get_terminal_node_n1()
 
-    def is_terminal_n0(self, node: _bdd.Function | int) -> bool:
+    def is_terminal_n0(self, node: Union[_bdd.Function, int]) -> bool:
         """Check if the node is the terminal node 0 (n0)."""
         return node == self.get_terminal_node_n0()
 
-    def get_high_node(self, node: _bdd.Function | int) -> Optional[_bdd.Function | int]:
+    def get_high_node(self, 
+                      node: Union[_bdd.Function, int]
+                      ) -> Optional[Union[_bdd.Function, int]]:
         """Return the high (right, solid) node."""
         _, _, high = self._bdd.succ(node)
         return high
 
-    def get_low_node(self, node: _bdd.Function | int) -> Optional[_bdd.Function | int]:
+    def get_low_node(self, 
+                     node: Union[_bdd.Function, int]
+                     ) -> Optional[Union[_bdd.Function, int]]:
         """Return the low (left, dashed) node."""
         _, low, _ = self._bdd.succ(node)
         return low
 
-    def get_value(self, node: _bdd.Function | int, complemented: bool = False) -> int:
+    def get_value(self, node: Union[_bdd.Function, int], complemented: bool = False) -> int:
         """Return the value (id) of the node considering complemented arcs."""
         value = int(node)
         if self.is_terminal_n0(node):
@@ -199,7 +203,7 @@ class BDDModel(VariabilityModel):
             value = 0 if complemented else 1
         return value
 
-    def pretty_node_str(self, node: _bdd.Function | int) -> str:
+    def pretty_node_str(self, node: Union[_bdd.Function, int]) -> str:
         return f'{self.var(node)} ' \
                f'(id: {self.get_value(node)}) ' \
                f'(level: {self.level(node)}) ' \
@@ -211,7 +215,7 @@ class BDDModel(VariabilityModel):
         result += f'#Nodes: {self.nof_nodes()}\n'
         result += f'Root: {self.pretty_node_str(self.root)}\n'
         levels_vars = dict(sorted(self._levels_variables.items(), key=lambda item: item[0]))
-        for level, var in levels_vars.items():
+        for _level, var in levels_vars.items():
             node = self.get_node(var)
             result += f' |-{self.pretty_node_str(node)}\n'
         result += f'Terminal node (n0): {self.pretty_node_str(self.get_terminal_node_n0())}\n'

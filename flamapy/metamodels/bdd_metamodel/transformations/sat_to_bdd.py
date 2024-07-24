@@ -2,7 +2,13 @@ from typing import Optional
 
 from flamapy.core.transformations import ModelToModel
 from flamapy.metamodels.bdd_metamodel.models import BDDModel
-from flamapy.metamodels.pysat_metamodel.models import PySATModel
+try:
+    from flamapy.metamodels.pysat_metamodel.models import PySATModel
+except ImportError as exc:
+    raise ImportError(
+        "The 'pysat' package is required for this functionality. "
+        "Please install it using 'pip install flamapy-sat'."
+    ) from exc
 
 
 class SATToBDD(ModelToModel):

@@ -32,6 +32,7 @@ class FmToBDD(ModelToModel):
         return self.destination_model
 
     def _add_feature(self, feature: Feature) -> str:
+        assert self.destination_model is not None, "destination_model is None"
         if feature.name not in self.destination_model.features_variables:
             variable = secure_variable_name(feature.name, self._counter)
             self.destination_model.variables_features[variable] = feature.name
@@ -42,7 +43,8 @@ class FmToBDD(ModelToModel):
     def _traverse_feature_tree(self) -> str:
         """Traverse the feature tree from the root and return the propositional formula."""
         if self.source_model is None or self.source_model.root is None:
-            return ('', [])
+            return ''
+        assert self.destination_model is not None, "destination_model is None"
         # The root is always present
         root_feature = self.source_model.root
         formula = [self.destination_model.features_variables[root_feature.name]]  
@@ -53,7 +55,7 @@ class FmToBDD(ModelToModel):
             formula.append(self._get_constraint_formula(constraint))
         propositional_formula = ' & '.join(f'({f})' for f in formula)
         return propositional_formula
-    
+
     def _get_relation_formula(self, relation: Relation) -> str:
         result = ''
         if relation.is_mandatory():
@@ -71,46 +73,56 @@ class FmToBDD(ModelToModel):
         return result
 
     def _get_mandatory_formula(self, relation: Relation) -> str:
+        assert self.destination_model is not None, "destination_model is None"
         parent = self.destination_model.features_variables[relation.parent.name]
         child = self.destination_model.features_variables[relation.children[0].name]
         return f'{parent} <=> {child}'
 
     def _get_optional_formula(self, relation: Relation) -> str:
+        assert self.destination_model is not None, "destination_model is None"
         parent = self.destination_model.features_variables[relation.parent.name]
         child = self.destination_model.features_variables[relation.children[0].name]
         return f'{child} => {parent}'
 
     def _get_or_formula(self, relation: Relation) -> str:
+        assert self.destination_model is not None, "destination_model is None"
         parent = self.destination_model.features_variables[relation.parent.name]
-        return f'{parent} <=> ({" | ".join(self.destination_model.features_variables[child.name] for child in relation.children)})'
+        children = " | ".join(
+            self.destination_model.features_variables[child.name] 
+            for child in relation.children
+        )
+        return f'{parent} <=> ({children})'
 
     def _get_alternative_formula(self, relation: Relation) -> str:
         formula = []
+        assert self.destination_model is not None, "destination_model is None"
         parent = self.destination_model.features_variables[relation.parent.name]
         children = [self.destination_model.features_variables[child.name] 
                     for child in relation.children]
         for child in children:
             children_negatives = set(children) - {child}
             formula.append(f'{child} <=> '
-                        f'({" & ".join("!" + ch for ch in children_negatives)} '
-                        f'& {parent})')
+                           f'({" & ".join("!" + ch for ch in children_negatives)} '
+                           f'& {parent})')
         return " & ".join(f'({f})' for f in formula)
 
     def _get_mutex_formula(self, relation: Relation) -> str:
         formula = []
+        assert self.destination_model is not None, "destination_model is None"
         parent = self.destination_model.features_variables[relation.parent.name]
         children = {self.destination_model.features_variables[child.name] 
                     for child in relation.children}
         for child in children:
             children_negatives = children - {child}
             formula.append(f'{child} <=> '
-                        f'({" & ".join("!" + cn for cn in children_negatives)} '
-                        f'& {parent})')
+                           f'({" & ".join("!" + cn for cn in children_negatives)} '
+                           f'& {parent})')
         formula_str = " & ".join(f'({f})' for f in formula)
         return f'({parent} <=> ' \
             f'!({" | ".join(child for child in children)})) | ({formula_str})'
 
     def _get_cardinality_formula(self, relation: Relation) -> str:
+        assert self.destination_model is not None, "destination_model is None"
         parent = self.destination_model.features_variables[relation.parent.name]
         children = {self.destination_model.features_variables[child.name] 
                     for child in relation.children}
@@ -130,24 +142,28 @@ class FmToBDD(ModelToModel):
         return f'{parent} <=> {formula_or_ctc}'
 
     def _get_constraint_formula(self, ctc: Constraint) -> str:
-        return str(
-            re.sub(rf"\b{ASTOperation.EXCLUDES.value}\b",
-                f'{BDDModel.LogicConnective.IMPLIES.value} {BDDModel.LogicConnective.NOT.value}',
-                re.sub(rf"\b{ASTOperation.REQUIRES.value}\b",
-                        BDDModel.LogicConnective.IMPLIES.value,
-                        re.sub(rf"\b{ASTOperation.EQUIVALENCE.value}\b", 
-                                BDDModel.LogicConnective.EQUIVALENCE.value,
-                                re.sub(rf"\b{ASTOperation.IMPLIES.value}\b",
-                                        BDDModel.LogicConnective.IMPLIES.value,
-                                        re.sub(rf"\b{ASTOperation.OR.value}\b",
-                                            BDDModel.LogicConnective.OR.value,
-                                            re.sub(rf"\b{ASTOperation.AND.value}\b",
-                                                    BDDModel.LogicConnective.AND.value,
-                                                    re.sub(rf"\b{ASTOperation.NOT.value}\b",
-                                                            BDDModel.LogicConnective.NOT.value,
-                                                            re.sub(rf"\b{ASTOperation.XOR.value}\b",
-                                                                    BDDModel.LogicConnective.XOR.value,
-                                                                    secure_constraint(ctc, self.destination_model.features_variables))))))))))
+        assert self.destination_model is not None, "destination_model is None"
+        constraint_str = secure_constraint(ctc, self.destination_model.features_variables)
+        constraint_str = re.sub(rf"\b{ASTOperation.XOR.value}\b", 
+                                BDDModel.LogicConnective.XOR.value, constraint_str)
+        constraint_str = re.sub(rf"\b{ASTOperation.NOT.value}\b", 
+                                BDDModel.LogicConnective.NOT.value, constraint_str)
+        constraint_str = re.sub(rf"\b{ASTOperation.AND.value}\b", 
+                                BDDModel.LogicConnective.AND.value, constraint_str)
+        constraint_str = re.sub(rf"\b{ASTOperation.OR.value}\b", 
+                                BDDModel.LogicConnective.OR.value, constraint_str)
+        constraint_str = re.sub(rf"\b{ASTOperation.IMPLIES.value}\b", 
+                                BDDModel.LogicConnective.IMPLIES.value, constraint_str)
+        constraint_str = re.sub(rf"\b{ASTOperation.EQUIVALENCE.value}\b", 
+                                BDDModel.LogicConnective.EQUIVALENCE.value, constraint_str)
+        constraint_str = re.sub(rf"\b{ASTOperation.REQUIRES.value}\b", 
+                                BDDModel.LogicConnective.IMPLIES.value, constraint_str)
+        constraint_str = re.sub(
+            rf"\b{ASTOperation.EXCLUDES.value}\b",
+            f'{BDDModel.LogicConnective.IMPLIES.value} {BDDModel.LogicConnective.NOT.value}',
+            constraint_str
+        )
+        return constraint_str
 
 
 def secure_variable_name(name: str, counter: int) -> str:
@@ -157,7 +173,7 @@ def secure_variable_name(name: str, counter: int) -> str:
     if allowed_characters[0].isdigit():  # Ensure the first character is not a digit
         allowed_characters = [char for char in allowed_characters if not char.isdigit()]
     return f'n{counter}_{"".join(allowed_characters)}'
-    
+
 
 def secure_constraint(ctc: Constraint, features_variables: dict[str, str]) -> str:
     formula = ctc.ast.pretty_str()
@@ -167,7 +183,7 @@ def secure_constraint(ctc: Constraint, features_variables: dict[str, str]) -> st
     return formula
 
 
-def substitute_quoted_word(text: str, quoted_word: str, replacement_word: str):
+def substitute_quoted_word(text: str, quoted_word: str, replacement_word: str) -> str:
     # Ensure the quoted_word has double quotes around it
     if not (quoted_word.startswith('"') and quoted_word.endswith('"')):
         raise ValueError("The quoted_word parameter must be surrounded by double quotes.")

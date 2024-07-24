@@ -19,7 +19,7 @@ class DDDMPReader(TextToModel):
         bdd_model = BDDModel()
         try:
             bdd_model.bdd = dddmp.load(self.path)
-        except Exception:
+        except (IOError, ValueError):
             path = dddmp_v3_to_v2(self.path)
             bdd_model.bdd = dddmp.load(path)
         return bdd_model
@@ -41,7 +41,7 @@ def dddmp_v3_to_v2(filepath: str) -> str:
         i, line = next((i, l) for i, l in enumerate(lines) if '.varnames' in l)
         lines.pop(i)
 
-    temp_file = tempfile.NamedTemporaryFile(mode='w', encoding='utf8').name
-    with open(temp_file, 'w', encoding='utf8') as file:
-        file.writelines(lines)
-    return temp_file
+    with tempfile.NamedTemporaryFile(mode='w', encoding='utf8', delete=False) as temp_file:
+        temp_file.writelines(lines)
+        temp_file_path = temp_file.name
+        return temp_file_path

@@ -12,11 +12,11 @@ class DDDMPWriter(BDDWriter):
         return 'dddmp'
 
     def transform(self) -> str:
-        if self.path is None:
+        if self.path is None:  # type: ignore[has-type]
             with tempfile.NamedTemporaryFile(mode='w', encoding='utf8') as file:
                 self.path = file.name
                 result = write_to_file(self)
-                self.path = None
+                self.path = None  # type: ignore[assignment]
         else:
             result = write_to_file(self)
         return result

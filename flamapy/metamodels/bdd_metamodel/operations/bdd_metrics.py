@@ -7,7 +7,7 @@ from flamapy.metamodels.bdd_metamodel.models import BDDModel
 from flamapy.metamodels.bdd_metamodel import operations as bdd_operations
 
 
-def metric_method(func: Callable) -> Callable:
+def metric_method(func: Callable[..., Any]) -> Callable[..., Any]:
     """Decorator to mark a method as a metric method.
     It has the value of the measure, it can also have a size and a ratio.
     Example:
@@ -23,8 +23,8 @@ def metric_method(func: Callable) -> Callable:
     return func
 
 
-class BDDMetrics(Metrics):
-
+class BDDMetrics(Metrics): 
+    # pylint: disable=too-many-instance-attributes
     def __init__(self) -> None:
         super().__init__()
         self.model: Optional[VariabilityModel] = None
@@ -46,11 +46,13 @@ class BDDMetrics(Metrics):
         #Do some basic calculations to speedup the rest
         self._features = self.model.variables
         self._configurations_number = bdd_operations.BDDConfigurationsNumber() \
-                                      .execute(self.model).get_result()
+            .execute(self.model) \
+            .get_result()        
         self._prod_dist_op = bdd_operations.BDDProductDistribution()
         self._prod_dist = self._prod_dist_op.execute(self.model).get_result()
         self._fip = bdd_operations.BDDFeatureInclusionProbability() \
-                    .execute(self.model).get_result()
+            .execute(self.model) \
+            .get_result()
         self._variant_features = [feat for feat, prob, in self._fip.items() if 0.0 < prob < 1.0]
         # Get all methods that are marked with the metric_method decorator
         metric_methods = [getattr(self, method_name) for method_name in dir(self)
@@ -94,7 +96,7 @@ class BDDMetrics(Metrics):
                                      result=_dead_features,
                                      size=len(_dead_features),
                                      ratio=self.get_ratio(_dead_features, self._features, 2))
-    
+
     @metric_method
     def pure_optional_features(self) -> dict[str, Any]:
         """Pure optional features are those feature with 0.5 (50%) probability of being selected 
@@ -139,7 +141,7 @@ class BDDMetrics(Metrics):
                                      size=len(_unique_features),
                                      ratio=self.get_ratio(_unique_features, 
                                                           self._features, 2))
-    
+
     @metric_method
     def total_variability(self) -> dict[str, Any]:
         """The total variability of an SPL, considered as a measure of its flexibility, is the 
@@ -165,7 +167,7 @@ class BDDMetrics(Metrics):
         return self.construct_result(name=name,
                                      doc=self.partial_variability.__doc__,
                                      result=_partial_variability)
-    
+
     @metric_method
     def homogeneity(self) -> dict[str, Any]:
         """The homogeneity of an SPL is the commonality mean, i.e., the sum of the commonality 
@@ -177,7 +179,7 @@ class BDDMetrics(Metrics):
         return self.construct_result(name=name,
                                      doc=self.homogeneity.__doc__,
                                      result=_homogeneity)
-    
+
     @metric_method
     def configurations(self) -> dict[str, Any]:
         """Configurations represented by the feature model."""
