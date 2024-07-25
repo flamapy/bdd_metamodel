@@ -96,7 +96,7 @@ def test_bdd_product_distribution(path: str, expected: list):
     assert dist == expected
 
 @pytest.mark.parametrize("path, expected", [
-    ('resources/models/uvl_models/MobilePhone.uvl', defaultdict(float, {'"Mobile Phone"': 1.0, 'Calls': 1.0, 'Screen': 1.0, 'Basic': 0.14285714285714285, 'Color': 0.2857142857142857, '"High Resolution"': 0.5714285714285714, 'GPS': 0.42857142857142855, 'Media': 0.6428571428571429, 'Camera': 0.2857142857142857, 'MP3': 0.5})),  
+    ('resources/models/uvl_models/MobilePhone.uvl', defaultdict(float, {'Mobile Phone': 1.0, 'Calls': 1.0, 'Screen': 1.0, 'Basic': 0.14285714285714285, 'Color': 0.2857142857142857, 'High Resolution': 0.5714285714285714, 'GPS': 0.42857142857142855, 'Media': 0.6428571428571429, 'Camera': 0.2857142857142857, 'MP3': 0.5})),  
     ('resources/models/uvl_models/JHipster.uvl', defaultdict(float, {'JHipster': 1.0, 'Generator': 1.0, 'Server': 0.0517976843388178, 'Application': 0.9482023156611822, 'MicroserviceApplication': 0.03473491773308958, 'UaaServer': 0.017062766605728214, 'MicroserviceGateway': 0.2730042656916514, 'Monolithic': 0.6751980499695308, 'Authentication': 1.0, 'HTTPSession': 0.27056672760511885, 'OAuth2': 0.1340645947592931, 'Uaa': 0.17093235831809872, 'JWT': 0.4244363193174893, 'SocialLogin': 0.2681291895185862, 'Database': 0.9993906154783668, 'SQL': 0.9707495429616088, 'Cassandra': 0.010664229128580133, 'MongoDB': 0.01797684338817794, 'Hibernate2ndLvlCache': 0.6471663619744058, 'HazelCast': 0.3235831809872029, 'EhCache': 0.3235831809872029, 'Development': 0.9707495429616088, 'H2': 0.6471663619744058, 'PostgreSQLDev': 0.10786106032906764, 'MariaDBDev': 0.10786106032906764, 'MySql': 0.10786106032906764, 'DiskBased': 0.3235831809872029, 'InMemory': 0.3235831809872029, 'Production': 0.9707495429616088, 'MySQL': 0.3235831809872029, 'MariaDB': 0.3235831809872029, 'PostgreSQL': 0.3235831809872029, 'ElasticSearch': 0.4853747714808044, 'SpringWebSockets': 0.4741011578305911, 'Libsass': 0.4741011578305911, 'ClusteredSession': 0.4741011578305911, 'BackEnd': 1.0, 'Gradle': 0.5, 'Maven': 0.5, 'InternationalizationSupport': 0.5, 'Docker': 0.5, 'TestingFrameworks': 1.0, 'Protractor': 0.9482023156611822, 'Gatling': 1.0, 'Cucumber': 1.0})), 
 #    ('resources/models/uvl_models/busybox_simple.uvl', []),
     ('resources/models/uvl_models/Pizzas.uvl', defaultdict(float, {'Pizza': 1.0, 'Topping': 1.0, 'Salami': 0.5714285714285714, 'Ham': 0.5714285714285714, 'Mozzarella': 0.5714285714285714, 'Size': 1.0, 'Normal': 0.3333333333333333, 'Big': 0.6666666666666666, 'Dough': 1.0, 'Neapolitan': 0.5, 'Sicilian': 0.5, 'CheesyCrust': 0.3333333333333333})), 
@@ -110,7 +110,7 @@ def test_probabilities(path: str, expected: dict):
     assert str(probabilities) == str(expected)
 
 @pytest.mark.parametrize("path, expected", [
-    ('resources/models/uvl_models/MobilePhone.uvl', ['"Mobile Phone"', 'Calls', 'Screen']),
+    ('resources/models/uvl_models/MobilePhone.uvl', ['Mobile Phone', 'Calls', 'Screen']),
     ('resources/models/uvl_models/JHipster.uvl', ['JHipster', 'Generator', 'Authentication', 'BackEnd', 'TestingFrameworks', 'Gatling', 'Cucumber']), 
 #    ('resources/models/uvl_models/busybox_simple.uvl', []),
     ('resources/models/uvl_models/Pizzas.uvl', ['Pizza', 'Topping', 'Size', 'Dough']), 
@@ -136,7 +136,7 @@ def test_dead_features(path: str, expected: list):
     assert dead_features == expected
 
 @pytest.mark.parametrize("path, expected", [
-    ('resources/models/uvl_models/MobilePhone.uvl', ['Basic', 'Color', '"High Resolution"', 'GPS', 'Media', 'Camera', 'MP3']),
+    ('resources/models/uvl_models/MobilePhone.uvl', ['Basic', 'Color', 'High Resolution', 'GPS', 'Media', 'Camera', 'MP3']),
     ('resources/models/uvl_models/JHipster.uvl', ['Server', 'Application', 'MicroserviceApplication', 'UaaServer', 'MicroserviceGateway', 'Monolithic', 'HTTPSession', 'OAuth2', 'Uaa', 'JWT', 'SocialLogin', 'Database', 'SQL', 'Cassandra', 'MongoDB', 'Hibernate2ndLvlCache', 'HazelCast', 'EhCache', 'Development', 'H2', 'PostgreSQLDev', 'MariaDBDev', 'MySql', 'DiskBased', 'InMemory', 'Production', 'MySQL', 'MariaDB', 'PostgreSQL', 'ElasticSearch', 'SpringWebSockets', 'Libsass', 'ClusteredSession', 'Gradle', 'Maven', 'InternationalizationSupport', 'Docker', 'Protractor']), 
 #    ('resources/models/uvl_models/busybox_simple.uvl', []),
     ('resources/models/uvl_models/Pizzas.uvl', ['Salami', 'Ham', 'Mozzarella', 'Normal', 'Big', 'Neapolitan', 'Sicilian', 'CheesyCrust']), 
