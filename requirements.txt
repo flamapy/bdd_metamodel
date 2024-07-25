@@ -1,4 +1,4 @@
 flamapy-fw==2.0.0.dev6
-flamapy-fm==2.0.0.dev6
+flamapy-fm==2.0.0.dev7
 dd~=0.5.7
 graphviz~=0.20
