@@ -1,4 +1,3 @@
-import re
 import locale
 from typing import Optional, cast
 

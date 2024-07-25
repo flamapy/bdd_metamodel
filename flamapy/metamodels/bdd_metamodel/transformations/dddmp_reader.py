@@ -23,7 +23,7 @@ class DDDMPReader(TextToModel):
         # Read the features
         with open(self._path, 'r', encoding='utf8') as file:
             lines = file.readlines()
-            line = next(l.strip() for l in lines if '.varnames' in l)
-            variables = line.split(' ')[1:]
+            varnames_line = next(line.strip() for line in lines if '.varnames' in line)
+            variables = varnames_line.split(' ')[1:]
         bdd_model.variables = variables
         return bdd_model

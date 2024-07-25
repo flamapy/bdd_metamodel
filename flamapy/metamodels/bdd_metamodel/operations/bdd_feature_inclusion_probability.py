@@ -31,9 +31,13 @@ class BDDFeatureInclusionProbability(FeatureInclusionProbability):
     def __init__(self) -> None:
         self.result: dict[Any, float] = {}
         self.partial_configuration: Optional[Configuration] = None
+        self.precision = 4
 
     def set_partial_configuration(self, partial_configuration: Configuration) -> None:
         self.partial_configuration = partial_configuration
+
+    def set_precision(self, precision: int) -> None:
+        self.precision = precision
 
     def get_result(self) -> dict[Any, float]:
         return self.result
@@ -43,11 +47,13 @@ class BDDFeatureInclusionProbability(FeatureInclusionProbability):
 
     def execute(self, model: VariabilityModel) -> 'BDDFeatureInclusionProbability':
         bdd_model = cast(BDDModel, model)
-        self.result = feature_inclusion_probability(bdd_model, self.partial_configuration)
+        self.result = feature_inclusion_probability(bdd_model, self.precision,
+                                                    self.partial_configuration)
         return self
 
 
 def feature_inclusion_probabilities(bdd_model: BDDModel, 
+                                    precision: int,
                                     partial_configuration: Optional[Configuration] = None) -> int:
     """
     Computes the featue inclusion probabilities.
@@ -56,16 +62,19 @@ def feature_inclusion_probabilities(bdd_model: BDDModel,
         :return: The feature inclusion probabilities.
     """
     if partial_configuration is not None:
-        result = feature_inclusion_probability(bdd_model, [str(f) if selected else f'not {f}' 
-                                                           for f, selected in 
-                                                           partial_configuration.elements.items()])
+        result = feature_inclusion_probability(bdd_model, precision,
+                                               [str(f) if selected else f'not {f}' 
+                                                for f, selected in 
+                                                partial_configuration.elements.items()])
     else:
-        result = feature_inclusion_probability(bdd_model)
+        result = feature_inclusion_probability(bdd_model, precision)
     return result
 
 
 def feature_inclusion_probability(bdd_model: BDDModel,
-                                  feature_assignment: list[str] = None) -> dict[Any, float]:
+                                  precision: int,
+                                  feature_assignment: Optional[list[str]] = None
+                                  ) -> dict[Any, float]:
     # Check bdd_file
     bdd_file = bdd_model.check_file_existence(bdd_model.bdd_file, 'dddmp')
     if feature_assignment is None:
@@ -81,5 +90,7 @@ def feature_inclusion_probability(bdd_model: BDDModel,
     probabilities = {}
     for line in line_iterator:
         parsed_line = re.compile(r'\s+').split(line.strip())
-        probabilities[parsed_line[0]] = float(parsed_line[1])
+        print(f'Feature: {parsed_line[0]}')
+        original_feature_name = bdd_model.features_names.get(parsed_line[0])
+        probabilities[original_feature_name] = round(float(parsed_line[1]), precision)
     return probabilities

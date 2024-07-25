@@ -28,7 +28,7 @@ def homogeneity(bdd_model: BDDModel) -> float:
     commonality_sum = 0.0
     commonality_op = BDDCommonalityFactor()
 
-    for feature in bdd_model.variables:
+    for feature in bdd_model.features_names:
         config = Configuration(elements={feature: True})
         commonality_op.set_configuration(config)
         commonality_sum += commonality_op.execute(bdd_model).get_result()

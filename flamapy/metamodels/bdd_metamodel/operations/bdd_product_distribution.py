@@ -1,6 +1,6 @@
 import re
 import locale
-from typing import Any, cast
+from typing import Any, Optional, cast
 
 from flamapy.core.models import VariabilityModel
 from flamapy.metamodels.bdd_metamodel.models import BDDModel
@@ -40,7 +40,7 @@ class BDDProductDistribution(ProductDistribution):
 
     def descriptive_statistics(self) -> dict[str, Any]:
         return descriptive_statistics(self.result)
-    
+
     def execute(self, model: VariabilityModel) -> 'BDDProductDistribution':
         bdd_model = cast(BDDModel, model)
         self.result = product_distribution(bdd_model)
@@ -62,7 +62,7 @@ def product_distribution(bdd_model: BDDModel) -> list[int]:
     return distribution
 
 
-def descriptive_statistics(prod_dist: list[int]) -> dict[str, Any]:
+def descriptive_statistics(prod_dist: list[int]) -> dict[str, Any]: # noqa: MC0001
     total_elements = sum(prod_dist)
     if total_elements == 0:
         return {
@@ -78,20 +78,19 @@ def descriptive_statistics(prod_dist: list[int]) -> dict[str, Any]:
 
     total_sum = 0
     running_total = 0
-    median1 = None
-    median2 = None
+    median1: Optional[float] = None
+    median2: Optional[float] = None
     median_pos1 = (total_elements + 1) // 2
     median_pos2 = (total_elements + 2) // 2
     min_val = None
     max_val = None
     mode = None
-    mode_count = 0
 
-    sum_squared_diff = 0
-    abs_deviation_total = 0
+    sum_squared_diff = 0.0
+    abs_deviation_total = 0.0
     abs_deviation_running_total = 0
-    mad1 = None
-    mad2 = None
+    mad1: Optional[float] = None
+    mad2: Optional[float] = None
     mad_pos1 = (total_elements + 1) // 2
     mad_pos2 = (total_elements + 2) // 2
 
@@ -104,9 +103,8 @@ def descriptive_statistics(prod_dist: list[int]) -> dict[str, Any]:
             total_sum += i * count
             running_total += count
 
-            if mode is None or count > mode_count:
+            if mode is None:
                 mode = i
-                mode_count = count
 
             if median1 is None and running_total >= median_pos1:
                 median1 = i
@@ -114,7 +112,7 @@ def descriptive_statistics(prod_dist: list[int]) -> dict[str, Any]:
                 median2 = i
 
     mean = total_sum / total_elements
-    median = (median1 + median2) / 2
+    median = (median1 + median2) / 2 if median1 is not None and median2 is not None else 0
 
     running_total = 0
     for i, count in enumerate(prod_dist):

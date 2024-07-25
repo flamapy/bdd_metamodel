@@ -38,6 +38,9 @@ class BDDModel(VariabilityModel):
         self._bdd_file: str = ''
         self._temporal_bdd_file: bool = True
         self._variables: list[Any] = []
+        # Maps to maintain original features' names
+        self.features_names: dict[str, str] = {}  # names without spaces -> original names
+        self.original_features_names: dict[str, str] = {}  # original names -> names without spaces
         self._set_global_constants()
 
     @property
@@ -125,24 +128,21 @@ class BDDModel(VariabilityModel):
         '''
 
         # Get all feature names
-        f = open(bdd_file, "r")
-        bdd_code = f.read()
-        varnames = re.search('varnames\\s+(.*)', bdd_code).group(1).split()
-        f.close()
+        with open(bdd_file, 'r', encoding='utf8') as file:
+            bdd_code = file.read()
+            varnames = re.search('varnames\\s+(.*)', bdd_code).group(1).split()
 
         expanded_assignment = []
         for feature in feature_assignment:
-            ft = None
+            feat = None
             if re.match('not\\s+', feature):
-                ft = re.search('not\\s+(.*)', feature).group(1)
-                if varnames.count(ft) == 0:
-                    raise FlamaException(ft + " is not a valid feature of " + bdd_file)
-                else:
-                    ft += "=false"
+                feat = re.search('not\\s+(.*)', feature).group(1)
+                if varnames.count(feat) == 0:
+                    raise FlamaException(f'{feat} is not a valid feature of {bdd_file}')
+                feat += "=false"
             else:
                 if varnames.count(feature) == 0:
                     raise FlamaException(feature + " is not a valid feature of " + bdd_file)
-                else:
-                    ft = feature + "=true"
-            expanded_assignment.append(ft)
+                feat = feature + "=true"
+            expanded_assignment.append(feat)
         return expanded_assignment

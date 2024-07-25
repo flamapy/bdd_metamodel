@@ -1,7 +1,6 @@
-from typing import Any, Optional, cast
+from typing import Any, cast
 
 from flamapy.core.models import VariabilityModel
-from flamapy.metamodels.configuration_metamodel.models.configuration import Configuration
 from flamapy.metamodels.bdd_metamodel.models import BDDModel
 from flamapy.metamodels.bdd_metamodel.operations.interfaces import PureOptionalFeatures
 from flamapy.metamodels.bdd_metamodel.operations import BDDFeatureInclusionProbability
@@ -11,7 +10,7 @@ class BDDPureOptionalFeatures(PureOptionalFeatures):
 
     def __init__(self) -> None:
         self._result: list[Any] = []
- 
+
     def execute(self, model: VariabilityModel) -> 'BDDPureOptionalFeatures':
         bdd_model = cast(BDDModel, model)
         self._result = pure_optional_features(bdd_model)
