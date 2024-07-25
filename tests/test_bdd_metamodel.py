@@ -15,6 +15,7 @@ from flamapy.metamodels.bdd_metamodel.operations import (
     BDDFeatureInclusionProbability,
     BDDSampling,
     BDDConfigurationsNumber,
+    BDDConfigurations,
     BDDCoreFeatures,
     BDDDeadFeatures,
     BDDVariantFeatures,
@@ -66,6 +67,19 @@ def test_nconfigs(path: str, expected: int):
     bdd_model = _read_model(path)
     n_configs = BDDConfigurationsNumber().execute(bdd_model).get_result()
     assert n_configs == expected
+
+@pytest.mark.parametrize("path, expected", [
+    ('resources/models/uvl_models/MobilePhone.uvl', 14),  
+    ('resources/models/uvl_models/JHipster.uvl', 26256), 
+#    ('resources/models/uvl_models/busybox_simple.uvl', 0),
+    ('resources/models/uvl_models/Pizzas.uvl', 42), 
+    ('resources/models/uvl_models/Pizzas_complex.uvl', 25), 
+    ('resources/models/uvl_models/Trimesh_NFM.uvl', 734720), 
+])
+def test_configs(path: str, expected: int):
+    bdd_model = _read_model(path)
+    n_configs = BDDConfigurations().execute(bdd_model).get_result()
+    assert len(n_configs) == expected
 
 @pytest.mark.parametrize("path, expected", [
     ('resources/models/uvl_models/MobilePhone.uvl', [0, 0, 0, 0, 3, 5, 7, 4, 1, 0, 0]),  
