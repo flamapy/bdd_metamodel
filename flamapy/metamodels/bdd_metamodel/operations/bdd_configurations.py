@@ -35,7 +35,7 @@ def configurations(bdd_model: BDDModel,
                    partial_config: Optional[Configuration] = None) -> list[Configuration]:
     if partial_config is None:
         u_func = bdd_model.root
-        care_vars = set(bdd_model.variables)
+        care_vars = set(bdd_model.variables_features)
         elements = {}
     else:
         values = dict(partial_config.elements.items())
