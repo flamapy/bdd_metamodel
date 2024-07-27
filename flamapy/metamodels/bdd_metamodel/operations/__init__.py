@@ -1,15 +1,32 @@
-from .bdd_products_number import BDDProductsNumber, products_number
-from .bdd_products import BDDProducts, products
-from .bdd_sampling import BDDSampling, sample, random_configuration
-from .bdd_product_distribution import BDDProductDistribution, product_distribution
-from .bdd_feature_inclusion_probability import (
-    BDDFeatureInclusionProbability, 
-    feature_inclusion_probability
-)
+from .bdd_configurations_number import BDDConfigurationsNumber
+from .bdd_configurations import BDDConfigurations
+from .bdd_sampling import BDDSampling
+from .bdd_product_distribution import BDDProductDistribution
+from .bdd_feature_inclusion_probability import BDDFeatureInclusionProbability
+from .bdd_satisfiable import BDDSatisfiable
+from .bdd_core_features import BDDCoreFeatures
+from .bdd_dead_features import BDDDeadFeatures
+from .bdd_variant_features import BDDVariantFeatures
+from .bdd_pure_optional_features import BDDPureOptionalFeatures
+from .bdd_unique_features import BDDUniqueFeatures
+from .bdd_variability import BDDVariability
+from .bdd_commonality_factor import BDDCommonalityFactor
+from .bdd_homogeneity import BDDHomogeneity
+from .bdd_metrics import BDDMetrics
 
 
-__all__ = ['BDDProductsNumber', 'products_number', 
-           'BDDProducts', 'products',
-           'BDDSampling', 'sample', 'random_configuration',
-           'BDDProductDistribution', 'product_distribution',
-           'BDDFeatureInclusionProbability', 'feature_inclusion_probability']
+__all__ = ['BDDConfigurationsNumber', 
+           'BDDConfigurations',
+           'BDDSampling',
+           'BDDProductDistribution',
+           'BDDFeatureInclusionProbability',
+           'BDDSatisfiable',
+           'BDDCoreFeatures',
+           'BDDDeadFeatures',
+           'BDDVariantFeatures',
+           'BDDPureOptionalFeatures',
+           'BDDUniqueFeatures',
+           'BDDVariability',
+           'BDDCommonalityFactor',
+           'BDDHomogeneity',
+           'BDDMetrics']

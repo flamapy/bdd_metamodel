@@ -1,4 +1,4 @@
-from .bdd_model import BDDModel 
+from .bdd_model import BDDModel
 
 
 __all__ = ['BDDModel']

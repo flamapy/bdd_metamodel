@@ -4,10 +4,19 @@ import setuptools
 with open("README.md", "r") as fh:
     long_description = fh.read()
 
+def read_requirements(file):
+    with open(file, "r") as fh:
+        return fh.read().splitlines()
+    
+# Read requirements from the requirements.txt file
+requirements = read_requirements("requirements.txt")
+
+# Read development requirements from the dev-requirements.txt file
+dev_requirements = read_requirements("requirements-dev.txt")
 
 setuptools.setup(
     name="flamapy-bdd",
-    version="1.6.0",
+    version="2.0.0",
     author="Flamapy",
     author_email="flamapy@us.es",
     description="bdd-plugin for the automated analysis of feature models",
@@ -21,22 +30,8 @@ setuptools.setup(
         "Operating System :: OS Independent",
     ],
     python_requires='>=3.9',
-    install_requires=[
-        'flamapy~=1.6.0.dev0',
-        'flamapy-fm~=1.6.0.dev0',
-        'dd>=0.5.6',
-        'graphviz~=0.20',
-    ],
+    install_requires=requirements,
     extras_require={
-        'dev': [
-            'pytest',
-            'pytest-mock',
-            'prospector',
-            'mypy',
-            'coverage',
-        ]
-    },
-    dependency_links=[
-        'flamapy~=1.6.0.dev0',
-    ]
+        'dev':dev_requirements
+    }
 )

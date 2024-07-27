@@ -5,7 +5,8 @@ doc-warnings: false
 ignore-paths:
   - build
   - env
-
+  - tests
+  
 pycodestyle:
   options:
     max-line-length: 100

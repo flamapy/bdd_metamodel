@@ -3,8 +3,9 @@
   - [Description](#description)
   - [Requirements and Installation](#requirements-and-installation)
   - [Functionality and usage](#functionality-and-usage)
-    - [Load a feature model and create the BDD](#load-a-feature-model-and-create-the-bdd)
+    - [Load a feature model in UVL and create the BDD](#load-a-feature-model-in-uvl-and-create-the-bdd)
     - [Save the BDD in a file](#save-the-bdd-in-a-file)
+    - [Load the BDD from a file](#load-the-bdd-from-a-file)
     - [Analysis operations](#analysis-operations)
   - [Contributing to the BDD plugin](#contributing-to-the-bdd-plugin)
 
@@ -48,13 +49,13 @@ The executable script [test_bdd_metamodel.py](https://github.com/flamapy/bdd_met
 The following functionality is provided:
 
 
-### Load a feature model and create the BDD
+### Load a feature model in UVL and create the BDD
 ```python
-from flamapy.metamodels.fm_metamodel.transformations.featureide_reader import FeatureIDEReader
-from flamapy.metamodels.bdd_metamodel.transformations.fm_to_bdd import FmToBDD
+from flamapy.metamodels.fm_metamodel.transformations import UVLReader
+from flamapy.metamodels.bdd_metamodel.transformations import FmToBDD
 
-# Load the feature model from FeatureIDE
-feature_model = FeatureIDEReader('input_fms/featureide_models/pizzas.xml').transform()
+# Load the feature model from UVL
+feature_model = UVLReader('models/uvl_models/pizzas.uvl').transform()
 # Create the BDD from the feature model
 bdd_model = FmToBDD(feature_model).transform()
 ```
@@ -62,114 +63,116 @@ bdd_model = FmToBDD(feature_model).transform()
 
 ### Save the BDD in a file
 ```python
-from flamapy.metamodels.bdd_metamodel.transformations.bdd_writer import BDDWriter, BDDDumpFormat
+from flamapy.metamodels.bdd_metamodel.transformations import PNGWriter, DDDMPv3Writer
 # Save the BDD as an image in PNG
-BDDWriter(path='my_bdd.png',
-          source_model=bdd_model,
-          roots=[bdd_model.root],
-          output_format=BDDDumpFormat.PNG).transform()
+PNGWriter(path='my_bdd.png', bdd_model).transform()
+# Save the BDD in a .dddmp file
+DDDMPv3Writer(f'my_bdd.dddmp', bdd_model).transform()
 ```
-Formats supported: DDDMP_V3 ('dddmp'), DDDMP_V2 ('dddmp2'), PDF ('pdf'), PNG ('png'), SVG ('svg').
+Writers available: DDDMPv3 ('dddmp'), DDDMPv2 ('dddmp'), JSON ('json'), Pickle ('p'), PDF ('pdf'), PNG ('png'), SVG ('svg').
 
+### Load the BDD from a file
+```python
+from flamapy.metamodels.bdd_metamodel.transformations import JSONReader
+# Load the BDD from a .json file
+bdd_model = JSONReader(path='path/to/my_bdd.json').transform()
+```
+Readers available: JSON ('json'), DDDMP ('dddmp'), Pickle ('p').
+
+*NOTE:* DDDMP and Pickle readers are not fully supported yet.
 
 ### Analysis operations
 
-- Products number
+- Satisfiable
 
-    Return the number of products (configurations):
+    Return whether the model is satisfiable (valid):
     ```python
-    from flamapy.metamodels.bdd_metamodel.operations import BDDProductsNumber
-    nof_products = BDDProductsNumber().execute(bdd_model).get_result()
-    print(f'#Products: {nof_products}')
-    ```
-    or alternatively:
-    ```python
-    from flamapy.metamodels.bdd_metamodel.operations import products_number
-    nof_products = products_number(bdd_model)
-    print(f'#Products: {nof_products}')
+    from flamapy.metamodels.bdd_metamodel.operations import BDDSatisfiable
+    satisfiable = BDDSatisfiable().execute(bdd_model).get_result()
+    print(f'Satisfiable? (valid?): {satisfiable}')
     ```
 
-- Products
+- Configurations number
 
-    Return the list of products (configurations):
+    Return the number of configurations:
     ```python
-    from flamapy.metamodels.bdd_metamodel.operations import BDDProducts
-    list_products = BDDProducts().execute(bdd_model).get_result()
-    for i, prod in enumerate(list_products):
-        print(f'Product {i}: {[feat for feat in prod.elements if prod.elements[feat]]}')
+    from flamapy.metamodels.bdd_metamodel.operations import BDDConfigurationsNumber
+    n_configs = BDDConfigurationsNumber().execute(bdd_model).get_result()
+    print(f'#Configurations: {n_configs}')
     ```
-    or alternatively:
+
+- Configurations
+
+    Enumerate the configurations of the model:
     ```python
-    from flamapy.metamodels.bdd_metamodel.operations import products
-    nof_products = products(bdd_model)
-    for i, prod in enumerate(list_products):
-        print(f'Product {i}: {[feat for feat in prod.elements if prod.elements[feat]]}')
+    from flamapy.metamodels.bdd_metamodel.operations import BDDConfigurations
+    configurations = BDDConfigurations().execute(bdd_model).get_result()
+    for i, config in enumerate(configurations, 1):
+        print(f'Config {i}: {[feat for feat in config.elements if config.elements[feat]]}')
     ```
 
 - Sampling
 
-    Return a sample of the given size of uniform random products (configurations) with or without replacement:
+    Return a sample of the given size of uniform random configurations with or without replacement:
     ```python
     from flamapy.metamodels.bdd_metamodel.operations import BDDSampling
-    list_sample = BDDSampling(size=5, with_replacement=False).execute(bdd_model).get_result()
-    for i, prod in enumerate(list_sample):
-        print(f'Product {i}: {[feat for feat in prod.elements if prod.elements[feat]]}')
-    ```
-    or alternatively:
-    ```python
-    from flamapy.metamodels.bdd_metamodel.operations import sample
-    list_sample = sample(bdd_model, size=5, with_replacement=False)
-    for i, prod in enumerate(list_sample):
-        print(f'Product {i}: {[feat for feat in prod.elements if prod.elements[feat]]}')
+    sampling_op = BDDSampling()
+    sampling_op.set_sample_size(5)
+    sampling_op.set_with_replacement(False)  # Default False
+    sample = sampling_op.execute(bdd_model).get_result()
+    for i, config in enumerate(sample, 1):
+        print(f'Config {i}: {[feat for feat in config.elements if config.elements[feat]]}')
     ```
 
 - Product Distribution
 
-    Return the number of products having a given number of features:
+    Return the number of products (configurations) having a given number of features:
     ```python
-    from flamapy.metamodels.bdd_metamodel.operations import BDDProductDistributionBF
-    dist = BDDProductDistributionBF().execute(bdd_model).get_result()
-    print(f'Product Distribution: {dist}')
-    ```
-    or alternatively:
-    ```python
-    from flamapy.metamodels.bdd_metamodel.operations import product_distribution
-    dist = product_distribution(bdd_model)
+    from flamapy.metamodels.bdd_metamodel.operations import BDDProductDistribution
+    dist = BDDProductDistribution().execute(bdd_model).get_result()
     print(f'Product Distribution: {dist}')
     ```
 
 - Feature Inclusion Probability
 
-    Return the probability for a feature to be included in a valid product:
+    Return the probability for a feature to be included in a valid configuration:
     ```python
-    from flamapy.metamodels.bdd_metamodel.operations import BDDFeatureInclusionProbabilityBF
-    prob = BDDFeatureInclusionProbabilityBF().execute(bdd_model).get_result()
-    for feat in prob.keys():
-        print(f'{feat}: {prob[feat]}')
-    ```
-    or alternatively:
-    ```python
-    from flamapy.metamodels.bdd_metamodel.operations import feature_inclusion_probability
-    prob = feature_inclusion_probability(bdd_model)
+    from flamapy.metamodels.bdd_metamodel.operations import BDDFeatureInclusionProbability
+    prob = BDDFeatureInclusionProbability().execute(bdd_model).get_result()
     for feat in prob.keys():
         print(f'{feat}: {prob[feat]}')
     ```
 
-All analysis operations support also a partial configuration as an additional argument, so the operation will return the result taking into account the given partial configuration. For example:
+- Core features
+
+    Return the core features (those features that are present in all the configurations):
+    ```python
+    from flamapy.metamodels.bdd_metamodel.operations import BDDCoreFeatures
+    core_features = BDDCoreFeatures().execute(bdd_model).get_result()
+    print(f'Core features: {core_features}')
+    ```
+
+- Dead features
+
+    Return the dead features (those features that are not present in any configuration):
+    ```python
+    from flamapy.metamodels.bdd_metamodel.operations import BDDDeadFeatures
+    dead_features = BDDDeadFeatures().execute(bdd_model).get_result()
+    print(f'Dead features: {dead_features}')
+    ```
+
+Most analysis operations support also a partial configuration as an additional argument, so the operation will return the result taking into account the given partial configuration. For example:
 
 ```python
 from flamapy.core.models import Configuration
 # Create a partial configuration
 elements = {'Pizza': True, 'Big': True}
 partial_config = Configuration(elements)
-# Calculate the number of products from the partial configuration
-nof_products = BDDProductsNumber(partial_config).execute(bdd_model).get_result()
-print(f'#Products: {nof_products}')
-```
-or alternatively:
-```python
-nof_products = products(bdd_model, partial_config)
-print(f'#Products: {nof_products}')
+# Calculate the number of configuration from the partial configuration
+configs_number_op = BDDConfigurationsNumber()
+configs_number_op.set_partial_configuration(partial_config)
+n_configs = configs_number_op.execute(bdd_model).get_result()
+print(f'#Configurations: {n_configs}')
 ```
 
 
