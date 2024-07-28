@@ -54,7 +54,8 @@ class BDDFeatureInclusionProbability(FeatureInclusionProbability):
 
 def feature_inclusion_probabilities(bdd_model: BDDModel, 
                                     precision: int,
-                                    partial_configuration: Optional[Configuration] = None) -> int:
+                                    partial_configuration: Optional[Configuration] = None
+                                    ) -> dict[Any, float]:
     """
     Computes the featue inclusion probabilities.
         :param feature_assignment: a list with a partial or a complete features' assignment
