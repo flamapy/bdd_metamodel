@@ -40,11 +40,14 @@ class BDDMetrics(Metrics):
     def get_result(self) -> list[dict[str, Any]]:
         return self.result
 
+    def model_type_extension(self) -> str:
+        return 'bdd'
+
     def calculate_metamodel_metrics(self, model: VariabilityModel) -> list[dict[str, Any]]:
         self.model = cast(BDDModel, model)
 
         #Do some basic calculations to speedup the rest
-        self._features = self.model.variables
+        self._features = list(self.model.features_variables.keys())
         self._configurations_number = bdd_operations.BDDConfigurationsNumber() \
             .execute(self.model) \
             .get_result()        
@@ -150,7 +153,7 @@ class BDDMetrics(Metrics):
         if self.model is None:
             raise FlamaException('Model not initialized.')
         name = "Total variability"
-        _total_variability = self.configurations_number / (2**len(self._features) - 1)
+        _total_variability = self._configurations_number / (2**len(self._features) - 1)
         return self.construct_result(name=name,
                                      doc=self.total_variability.__doc__,
                                      result=_total_variability)
@@ -163,7 +166,7 @@ class BDDMetrics(Metrics):
         if self.model is None:
             raise FlamaException('Model not initialized.')
         name = "Partial variability"
-        _partial_variability = self.configurations_number / (2**len(self._variant_features) - 1)
+        _partial_variability = self._configurations_number / (2**len(self._variant_features) - 1)
         return self.construct_result(name=name,
                                      doc=self.partial_variability.__doc__,
                                      result=_partial_variability)
