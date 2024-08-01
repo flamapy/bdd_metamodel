@@ -29,7 +29,7 @@ class BDDMetrics(Metrics):
         super().__init__()
         self.model: Optional[VariabilityModel] = None
         self.result: list[dict[str, Any]] = []
-        self.model_type_extension = "bdd"
+        self._model_type_extension = "bdd"
         self._features: list[Any] = []
         self._configurations_number: int = 0
         self._fip: dict[Any, float] = {}
@@ -37,11 +37,16 @@ class BDDMetrics(Metrics):
         self._prod_dist_op: bdd_operations.BDDProductDistribution = None
         self._variant_features: list[Any] = []
 
+    @property
+    def model_type_extension(self) -> str:
+        return self._model_type_extension
+    
+    @model_type_extension.setter
+    def model_type_extension(self, ext: str) -> None:
+        self._model_type_extension = ext
+    
     def get_result(self) -> list[dict[str, Any]]:
         return self.result
-
-    def model_type_extension(self) -> str:
-        return 'bdd'
 
     def calculate_metamodel_metrics(self, model: VariabilityModel) -> list[dict[str, Any]]:
         self.model = cast(BDDModel, model)
