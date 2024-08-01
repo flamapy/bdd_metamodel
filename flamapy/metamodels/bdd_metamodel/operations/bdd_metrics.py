@@ -190,6 +190,8 @@ class BDDMetrics(Metrics):
             raise FlamaException('Model not initialized.')
         name = "Configurations"
         _configurations = bdd_operations.BDDConfigurations().execute(self.model).get_result()
+        _configurations = [feature for config in _configurations 
+                           for feature in config.get_selected_elements()]
         return self.construct_result(name=name,
                                      doc=self.configurations.__doc__,
                                      result=_configurations,
