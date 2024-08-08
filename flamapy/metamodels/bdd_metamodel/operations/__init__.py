@@ -13,6 +13,7 @@ from .bdd_variability import BDDVariability
 from .bdd_commonality_factor import BDDCommonalityFactor
 from .bdd_homogeneity import BDDHomogeneity
 from .bdd_metrics import BDDMetrics
+from .bdd_satisfiable_configuration import BDDSatisfiableConfiguration
 
 
 __all__ = ['BDDConfigurationsNumber', 
@@ -29,4 +30,5 @@ __all__ = ['BDDConfigurationsNumber',
            'BDDVariability',
            'BDDCommonalityFactor',
            'BDDHomogeneity',
-           'BDDMetrics']
+           'BDDMetrics',
+           'BDDSatisfiableConfiguration']
