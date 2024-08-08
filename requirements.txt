@@ -1,2 +1,2 @@
-flamapy-fw==2.0.0.dev6
-flamapy-fm==2.0.0.dev6
+flamapy-fw==2.0.0
+flamapy-fm==2.0.0

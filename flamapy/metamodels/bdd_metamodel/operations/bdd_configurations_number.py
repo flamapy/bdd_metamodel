@@ -48,7 +48,7 @@ def configurations_number(bdd_model: BDDModel,
     return result
 
 
-def count(bdd_model: BDDModel, feature_assignment: list[str] = None) -> int:
+def count(bdd_model: BDDModel, feature_assignment: Optional[list[str]] = None) -> int:
     """
     Computes the number of valid configurations.
         :param feature_assignment: a list with a partial or a complete features' assignment

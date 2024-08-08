@@ -130,19 +130,25 @@ class BDDModel(VariabilityModel):
         # Get all feature names
         with open(bdd_file, 'r', encoding='utf8') as file:
             bdd_code = file.read()
-            varnames = re.search('varnames\\s+(.*)', bdd_code).group(1).split()
+            varnames_match = re.search(r'varnames\s+(.*)', bdd_code)
+            if not varnames_match:
+                raise FlamaException('No varnames found in the BDD file.')
+            varnames = varnames_match.group(1).split()
 
         expanded_assignment = []
         for feature in feature_assignment:
             feat = None
-            if re.match('not\\s+', feature):
-                feat = re.search('not\\s+(.*)', feature).group(1)
-                if varnames.count(feat) == 0:
-                    raise FlamaException(f'{feat} is not a valid feature of {bdd_file}')
-                feat += "=false"
+            if re.match(r'not\s+', feature):
+                feat_match = re.search(r'not\s+(.*)', feature)
+                if feat_match:
+                    feat = feat_match.group(1)
+                    if varnames.count(feat) == 0:
+                        raise FlamaException(f'{feat} is not a valid feature of {bdd_file}')
+                    feat += "=false"
             else:
                 if varnames.count(feature) == 0:
                     raise FlamaException(feature + " is not a valid feature of " + bdd_file)
                 feat = feature + "=true"
-            expanded_assignment.append(feat)
+            if feat:
+                expanded_assignment.append(feat)
         return expanded_assignment
