@@ -4,11 +4,11 @@ from typing import Optional, Any, Union
 # Low-level interface to pure Python implementation (wrapped by dd.autoref.BDD).
 import dd.bdd as _dd_bdd
 # Import the best available interface:
-try:
-    import dd.cudd as _bdd  # High-level interface to a C implementation.
-except ImportError:
-    import dd.autoref as _bdd  # High-level interface to pure Python implementation.
-
+# try:
+#     import dd.cudd as _bdd  # High-level interface to a C implementation.
+# except ImportError:
+#     import dd.autoref as _bdd  # High-level interface to pure Python implementation.
+import dd.autoref as _bdd
 
 from flamapy.core.models import VariabilityModel
 
@@ -48,6 +48,7 @@ class BDDModel(VariabilityModel):
         self._formula = expression
         self._bdd.declare(*self.variables_features.keys())
         self._root = self._bdd.add_expr(expression)
+        _bdd.reorder(self._bdd)
         self._levels_variables = {l: v for v, l in self._bdd.var_levels.items()}
 
     @property
@@ -174,11 +175,11 @@ class BDDModel(VariabilityModel):
 
     def is_terminal_n1(self, node: Union[_bdd.Function, int]) -> bool:
         """Check if the node is the terminal node 1 (n1)."""
-        return node == self.get_terminal_node_n1()
+        return node == 1 if isinstance(node, int) else node == self.get_terminal_node_n1()
 
     def is_terminal_n0(self, node: Union[_bdd.Function, int]) -> bool:
         """Check if the node is the terminal node 0 (n0)."""
-        return node == self.get_terminal_node_n0()
+        return node == 0 if isinstance(node, int) else node == self.get_terminal_node_n0()
 
     def get_high_node(self, 
                       node: Union[_bdd.Function, int]
