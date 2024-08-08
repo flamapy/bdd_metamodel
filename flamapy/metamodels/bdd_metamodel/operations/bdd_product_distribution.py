@@ -140,8 +140,8 @@ def descriptive_statistics(prod_dist: list[int]) -> dict[str, Any]: # noqa: MC00
     max_val = None
     mode = None
 
-    sum_squared_diff = 0.0
-    abs_deviation_total = 0.0
+    sum_squared_diff = 0
+    abs_deviation_total = 0
     abs_deviation_running_total = 0
     mad1: Optional[float] = None
     mad2: Optional[float] = None
@@ -165,8 +165,8 @@ def descriptive_statistics(prod_dist: list[int]) -> dict[str, Any]: # noqa: MC00
             if median2 is None and running_total >= median_pos2:
                 median2 = i
 
-    mean = total_sum / total_elements
-    median = (median1 + median2) / 2 if median1 is not None and median2 is not None else 0
+    mean = total_sum // total_elements
+    median = (median1 + median2) // 2 if median1 is not None and median2 is not None else 0
 
     running_total = 0
     for i, count in enumerate(prod_dist):
