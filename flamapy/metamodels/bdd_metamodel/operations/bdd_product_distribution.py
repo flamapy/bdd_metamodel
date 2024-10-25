@@ -141,7 +141,7 @@ def descriptive_statistics(prod_dist: list[int]) -> dict[str, Any]: # noqa: MC00
     mode = None
 
     sum_squared_diff = 0
-    abs_deviation_total = 0
+    abs_deviation_total = 0.0
     abs_deviation_running_total = 0
     mad1: Optional[float] = None
     mad2: Optional[float] = None
