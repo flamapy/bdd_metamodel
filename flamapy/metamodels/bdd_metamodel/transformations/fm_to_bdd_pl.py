@@ -51,7 +51,7 @@ class FmToBDD(ModelToModel):
         for feature in self.source_model.get_features():
             for relation in feature.get_relations():
                 formula.append(self._get_relation_formula(relation))
-        for constraint in self.source_model.get_constraints():
+        for constraint in self.source_model.get_logical_constraints():
             formula.append(self._get_constraint_formula(constraint))
         propositional_formula = ' & '.join(f'({f})' for f in formula)
         return propositional_formula
