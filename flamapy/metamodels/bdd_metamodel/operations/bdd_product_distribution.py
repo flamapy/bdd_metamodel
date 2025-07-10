@@ -76,7 +76,10 @@ def get_prod_dist(bdd_model: BDDModel,
             get_prod_dist(bdd_model, low, dist, mark, complemented ^ bdd_model.negated(low))
 
         # compute low_dist to account for the removed nodes through low
-        removed_nodes = bdd_model.index(low) - bdd_model.index(node) - 1
+        low_index = bdd_model.index(low)
+        node_index = bdd_model.index(node)
+        assert low_index is not None and node_index is not None
+        removed_nodes = low_index - node_index - 1
         low_dist = [0] * (removed_nodes + len(dist[id_low]))
         for i in range(removed_nodes + 1):
             for j in range(len(dist[id_low])):
@@ -89,7 +92,10 @@ def get_prod_dist(bdd_model: BDDModel,
             get_prod_dist(bdd_model, high, dist, mark, complemented)
 
         # compute high_dist to account for the removed nodes through high
-        removed_nodes = bdd_model.index(high) - bdd_model.index(node) - 1
+        high_index = bdd_model.index(high)
+        node_index = bdd_model.index(node)
+        assert high_index is not None and node_index is not None
+        removed_nodes = high_index - node_index - 1
         high_dist = [0] * (removed_nodes + len(dist[id_high]))
         for i in range(removed_nodes + 1):
             for j in range(len(dist[id_high])):
@@ -116,7 +122,7 @@ def combine_distributions(id_node: int,
     dist[id_node] = node_dist
 
 
-def descriptive_statistics(prod_dist: list[int]) -> dict[str, Any]: # noqa: MC0001
+def descriptive_statistics(prod_dist: list[int]) -> dict[str, Any]:
     total_elements = sum(prod_dist)
     if total_elements == 0:
         return {

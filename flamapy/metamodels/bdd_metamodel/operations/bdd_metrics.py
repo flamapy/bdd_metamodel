@@ -34,7 +34,7 @@ class BDDMetrics(Metrics):
         self._configurations_number: int = 0
         self._fip: dict[Any, float] = {}
         self._prod_dist: list[int] = []
-        self._prod_dist_op: bdd_operations.BDDProductDistribution = None
+        self._prod_dist_op: bdd_operations.BDDProductDistribution | None = None
         self._variant_features: list[Any] = []
 
     @property
@@ -232,6 +232,7 @@ class BDDMetrics(Metrics):
         Min, Max, and Range, of the product distribution of the variability model."""
         if self.model is None:
             raise FlamaException('Model not initialized.')
+        assert self._prod_dist_op is not None
         name = "Descriptive statistics"
         _desc_stats = self._prod_dist_op.descriptive_statistics()
         return self.construct_result(name=name,

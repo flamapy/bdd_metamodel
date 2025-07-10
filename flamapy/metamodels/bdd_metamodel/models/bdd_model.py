@@ -49,7 +49,7 @@ class BDDModel(VariabilityModel):
         self._bdd.declare(*self.variables_features.keys())
         self._root = self._bdd.add_expr(expression)
         _bdd.reorder(self._bdd)
-        self._levels_variables = {l: v for v, l in self._bdd.var_levels.items()}
+        self._levels_variables = {level: var for var, level in self._bdd.var_levels.items()}
 
     @property
     def formula(self) -> str:
@@ -65,7 +65,7 @@ class BDDModel(VariabilityModel):
         self.features_variables = {var: var for var in self._bdd.vars}
         self.variables_features = dict(self.features_variables)
         self._root = next(iter(self._bdd.roots), None)
-        self._levels_variables = {l: v for v, l in self._bdd.var_levels.items()}
+        self._levels_variables = {level: var for var, level in self._bdd.var_levels.items()}
 
     @property
     def root(self) -> Union[_bdd.Function, int]:
@@ -76,7 +76,7 @@ class BDDModel(VariabilityModel):
         self._root = new_root
         self.features_variables = {var: var for var in self._bdd.vars}
         self.variables_features = dict(self.features_variables)
-        self._levels_variables = {l: v for v, l in self._bdd.var_levels.items()}
+        self._levels_variables = {level: var for var, level in self._bdd.var_levels.items()}
 
     # @classmethod
     # def from_logic_formula(cls, 

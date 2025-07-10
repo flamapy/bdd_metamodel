@@ -12,17 +12,18 @@ class DDDMPWriter(BDDWriter):
         return 'dddmp'
 
     def transform(self) -> str:
-        if self.path is None:  # type: ignore[has-type]
+        if self.path is None:  
             with tempfile.NamedTemporaryFile(mode='w', encoding='utf8') as file:
                 self.path = file.name
                 result = write_to_file(self)
-                self.path = None  # type: ignore[assignment]
+                self.path = None 
         else:
             result = write_to_file(self)
         return result
 
 
 def write_to_file(writer: DDDMPWriter) -> str:
+    assert writer.path is not None
     try:
         super(type(writer), writer).transform()
         result = dddmp_v2_to_v3(writer.path)
@@ -39,12 +40,14 @@ def dddmp_v2_to_v3(filepath: str) -> str:
     with open(filepath, 'r', encoding='utf8') as file:
         lines = file.readlines()
         # Change version from 2.0 to 3.0
-        i, line = next((i, l) for i, l in enumerate(lines) if '.ver DDDMP-2.0' in l)
-        lines[i] = line.replace('2.0', '3.0')
+        index, line = next((index, line) for index, line in enumerate(lines) 
+                           if '.ver DDDMP-2.0' in line)
+        lines[index] = line.replace('2.0', '3.0')
 
         # Add '.varnames' field
-        i, line = next((i, l) for i, l in enumerate(lines) if '.orderedvarnames' in l)
-        lines.insert(i - 1, line.replace('.orderedvarnames', '.varnames'))
+        index, line = next((index, line) for index, line in enumerate(lines) 
+                           if '.orderedvarnames' in line)
+        lines.insert(index - 1, line.replace('.orderedvarnames', '.varnames'))
 
     with open(filepath, 'w', encoding='utf8') as file:
         file.writelines(lines)
