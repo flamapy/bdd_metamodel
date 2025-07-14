@@ -8,7 +8,6 @@ from flamapy.metamodels.bdd_metamodel.operations import BDDFeatureInclusionProba
 
 
 class BDDDeadFeatures(DeadFeatures):
-
     def __init__(self) -> None:
         self._result: list[Any] = []
         self._partial_configuration: Optional[Configuration] = None
@@ -16,7 +15,7 @@ class BDDDeadFeatures(DeadFeatures):
     def set_partial_configuration(self, partial_configuration: Optional[Configuration]) -> None:
         self._partial_configuration = partial_configuration
 
-    def execute(self, model: VariabilityModel) -> 'BDDDeadFeatures':
+    def execute(self, model: VariabilityModel) -> "BDDDeadFeatures":
         bdd_model = cast(BDDModel, model)
         self._result = dead_features(bdd_model, self._partial_configuration)
         return self
@@ -28,9 +27,8 @@ class BDDDeadFeatures(DeadFeatures):
         return self.get_result()
 
 
-def dead_features(bdd_model: BDDModel,
-                  config: Optional[Configuration] = None) -> list[Any]:
+def dead_features(bdd_model: BDDModel, config: Optional[Configuration] = None) -> list[Any]:
     fip_op = BDDFeatureInclusionProbability()
     fip_op.set_partial_configuration(config)
     probs = fip_op.execute(bdd_model).get_result()
-    return [feat for feat, prob, in probs.items() if prob <= 0.0]
+    return [feat for feat, prob in probs.items() if prob <= 0.0]

@@ -6,17 +6,16 @@ from flamapy.metamodels.bdd_metamodel.transformations._bdd_writer import BDDWrit
 
 
 class DDDMPWriter(BDDWriter):
-
     @staticmethod
     def get_destination_extension() -> str:
-        return 'dddmp'
+        return "dddmp"
 
     def transform(self) -> str:
-        if self.path is None:  
-            with tempfile.NamedTemporaryFile(mode='w', encoding='utf8') as file:
+        if self.path is None:
+            with tempfile.NamedTemporaryFile(mode="w", encoding="utf8") as file:
                 self.path = file.name
                 result = write_to_file(self)
-                self.path = None 
+                self.path = None
         else:
             result = write_to_file(self)
         return result
@@ -28,7 +27,7 @@ def write_to_file(writer: DDDMPWriter) -> str:
         super(type(writer), writer).transform()
         result = dddmp_v2_to_v3(writer.path)
     except Exception as exc:
-        raise FlamaException('DDDMPWriter is not supported.') from exc
+        raise FlamaException("DDDMPWriter is not supported.") from exc
     return result
 
 
@@ -37,18 +36,20 @@ def dddmp_v2_to_v3(filepath: str) -> str:
 
     The difference between versions 2.0 and 3.0 is the addition of the '.varnames' field.
     """
-    with open(filepath, 'r', encoding='utf8') as file:
+    with open(filepath, "r", encoding="utf8") as file:
         lines = file.readlines()
         # Change version from 2.0 to 3.0
-        index, line = next((index, line) for index, line in enumerate(lines) 
-                           if '.ver DDDMP-2.0' in line)
-        lines[index] = line.replace('2.0', '3.0')
+        index, line = next(
+            (index, line) for index, line in enumerate(lines) if ".ver DDDMP-2.0" in line
+        )
+        lines[index] = line.replace("2.0", "3.0")
 
         # Add '.varnames' field
-        index, line = next((index, line) for index, line in enumerate(lines) 
-                           if '.orderedvarnames' in line)
-        lines.insert(index - 1, line.replace('.orderedvarnames', '.varnames'))
+        index, line = next(
+            (index, line) for index, line in enumerate(lines) if ".orderedvarnames" in line
+        )
+        lines.insert(index - 1, line.replace(".orderedvarnames", ".varnames"))
 
-    with open(filepath, 'w', encoding='utf8') as file:
+    with open(filepath, "w", encoding="utf8") as file:
         file.writelines(lines)
     return os.linesep.join(lines)

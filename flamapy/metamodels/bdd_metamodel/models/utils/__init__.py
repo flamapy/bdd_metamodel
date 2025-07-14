@@ -1,8 +1,4 @@
-from .txtcnf import (
-    CNFLogicConnective,
-    TextCNFNotation,
-    TextCNFModel
-)
+from .txtcnf import CNFLogicConnective, TextCNFNotation, TextCNFModel
 
 
-__all__ = ['CNFLogicConnective', 'TextCNFNotation', 'TextCNFModel']
+__all__ = ["CNFLogicConnective", "TextCNFModel", "TextCNFNotation"]

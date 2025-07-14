@@ -10,13 +10,15 @@ from .svg_writer import SVGWriter
 from .pdf_writer import PDFWriter
 
 
-__all__ = ['FmToBDD', 
-           'JSONWriter',
-           'JSONReader',
-           'PickleWriter',
-           'PickleReader',
-           'DDDMPWriter',
-           'DDDMPReader',
-           'PNGWriter',
-           'SVGWriter',
-           'PDFWriter']
+__all__ = [
+    "DDDMPReader",
+    "DDDMPWriter",
+    "FmToBDD",
+    "JSONReader",
+    "JSONWriter",
+    "PDFWriter",
+    "PNGWriter",
+    "PickleReader",
+    "PickleWriter",
+    "SVGWriter",
+]

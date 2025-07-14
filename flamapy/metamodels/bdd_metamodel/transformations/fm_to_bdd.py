@@ -8,7 +8,6 @@ from flamapy.metamodels.bdd_metamodel.transformations.fm_to_bdd_cnf import FmToB
 
 
 class FmToBDD(ModelToModel):
-
     @staticmethod
     def get_source_extension() -> str:
         return "fm"

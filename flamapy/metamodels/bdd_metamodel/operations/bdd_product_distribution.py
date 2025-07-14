@@ -8,11 +8,10 @@ from flamapy.metamodels.bdd_metamodel.operations.interfaces import ProductDistri
 
 
 class BDDProductDistribution(ProductDistribution):
-
     def __init__(self) -> None:
         self._result: list[int] = []
 
-    def execute(self, model: VariabilityModel) -> 'BDDProductDistribution':
+    def execute(self, model: VariabilityModel) -> "BDDProductDistribution":
         bdd_model = cast(BDDModel, model)
         self._result = product_distribution(bdd_model)
         return self
@@ -36,9 +35,9 @@ def product_distribution(bdd_model: BDDModel) -> list[int]:
         + ...
         + How many products have all features activated?
 
-    For detailed information, see the paper: 
+    For detailed information, see the paper:
         Heradio, R., Fernandez-Amoros, D., Mayr-Dorn, C., Egyed, A.:
-        Supporting the statistical analysis of variability models. 
+        Supporting the statistical analysis of variability models.
         In: 41st International Conference on Software Engineering (ICSE), pp. 843-853. 2019.
         DOI: https://doi.org/10.1109/ICSE.2019.00091
 
@@ -54,21 +53,23 @@ def product_distribution(bdd_model: BDDModel) -> list[int]:
     mark: dict[int, bool] = defaultdict(bool)
     get_prod_dist(bdd_model, root, dist, mark, bdd_model.negated(root))
     # Complete distribution
-    distribution = dist[id_root] + [0] * \
-        (len(bdd_model.variables_features) + 1 - len(dist[id_root]))
+    distribution = dist[id_root] + [0] * (
+        len(bdd_model.variables_features) + 1 - len(dist[id_root])
+    )
     return distribution
 
 
-def get_prod_dist(bdd_model: BDDModel,
-                  node: Any, 
-                  dist: dict[int, list[int]], 
-                  mark: dict[int, bool], 
-                  complemented: bool) -> None:
+def get_prod_dist(
+    bdd_model: BDDModel,
+    node: Any,
+    dist: dict[int, list[int]],
+    mark: dict[int, bool],
+    complemented: bool,
+) -> None:
     id_node = bdd_model.get_value(node, complemented)
     mark[id_node] = not mark[id_node]
 
     if not bdd_model.is_terminal_node(node):
-
         # traverse
         low = bdd_model.get_low_node(node)
         id_low = bdd_model.get_value(low, complemented)
@@ -100,15 +101,15 @@ def get_prod_dist(bdd_model: BDDModel,
         for i in range(removed_nodes + 1):
             for j in range(len(dist[id_high])):
                 high_dist[i + j] = high_dist[i + j] + dist[id_high][j] * (
-                    math.comb(removed_nodes, i))
+                    math.comb(removed_nodes, i)
+                )
         # combine low and high distributions
         combine_distributions(id_node, dist, low_dist, high_dist)
 
 
-def combine_distributions(id_node: int, 
-                          dist: dict[int, list[int]], 
-                          low_dist: list[int], 
-                          high_dist: list[int]) -> None:
+def combine_distributions(
+    id_node: int, dist: dict[int, list[int]], low_dist: list[int], high_dist: list[int]
+) -> None:
     if len(low_dist) > len(high_dist):
         dist_length = len(low_dist)
     else:
@@ -122,18 +123,18 @@ def combine_distributions(id_node: int,
     dist[id_node] = node_dist
 
 
-def descriptive_statistics(prod_dist: list[int]) -> dict[str, Any]:
+def descriptive_statistics(prod_dist: list[int]) -> dict[str, Any]: # noqa: C901
     total_elements = sum(prod_dist)
     if total_elements == 0:
         return {
-            'Mean': 0,
-            'Standard deviation': 0,
-            'Median': 0,
-            'Median absolute deviation': 0,
-            'Mode': 0,
-            'Min': None,
-            'Max': None,
-            'Range': 0
+            "Mean": 0,
+            "Standard deviation": 0,
+            "Median": 0,
+            "Median absolute deviation": 0,
+            "Mode": 0,
+            "Min": None,
+            "Max": None,
+            "Range": 0,
         }
 
     total_sum = 0
@@ -195,13 +196,13 @@ def descriptive_statistics(prod_dist: list[int]) -> dict[str, Any]:
     mad = (mad1 + mad2) / 2 if mad1 is not None and mad2 is not None else 0
 
     statistics = {
-        'Mean': mean,
-        'Standard deviation': std_dev,
-        'Median': median,
-        'Median absolute deviation': mad,
-        'Mode': mode,
-        'Min': min_val,
-        'Max': max_val,
-        'Range': max_val - min_val if min_val is not None and max_val is not None else 0
+        "Mean": mean,
+        "Standard deviation": std_dev,
+        "Median": median,
+        "Median absolute deviation": mad,
+        "Mode": mode,
+        "Min": min_val,
+        "Max": max_val,
+        "Range": max_val - min_val if min_val is not None and max_val is not None else 0,
     }
     return statistics

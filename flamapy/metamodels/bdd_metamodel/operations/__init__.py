@@ -16,19 +16,21 @@ from .bdd_metrics import BDDMetrics
 from .bdd_satisfiable_configuration import BDDSatisfiableConfiguration
 
 
-__all__ = ['BDDConfigurationsNumber', 
-           'BDDConfigurations',
-           'BDDSampling',
-           'BDDProductDistribution',
-           'BDDFeatureInclusionProbability',
-           'BDDSatisfiable',
-           'BDDCoreFeatures',
-           'BDDDeadFeatures',
-           'BDDVariantFeatures',
-           'BDDPureOptionalFeatures',
-           'BDDUniqueFeatures',
-           'BDDVariability',
-           'BDDCommonalityFactor',
-           'BDDHomogeneity',
-           'BDDMetrics',
-           'BDDSatisfiableConfiguration']
+__all__ = [
+    "BDDCommonalityFactor",
+    "BDDConfigurations",
+    "BDDConfigurationsNumber",
+    "BDDCoreFeatures",
+    "BDDDeadFeatures",
+    "BDDFeatureInclusionProbability",
+    "BDDHomogeneity",
+    "BDDMetrics",
+    "BDDProductDistribution",
+    "BDDPureOptionalFeatures",
+    "BDDSampling",
+    "BDDSatisfiable",
+    "BDDSatisfiableConfiguration",
+    "BDDUniqueFeatures",
+    "BDDVariability",
+    "BDDVariantFeatures",
+]

@@ -12,7 +12,6 @@ from flamapy.metamodels.bdd_metamodel.models import BDDModel
 
 
 class FmToBDD(ModelToModel):
-
     @staticmethod
     def get_source_extension() -> str:
         return "fm"
@@ -68,10 +67,7 @@ class FmToBDD(ModelToModel):
         clauses = [alt_cnf]
 
         for child in relation.children:
-            clauses.append([
-                -1 * self._get_variable(child.name),
-                value_parent
-            ])
+            clauses.append([-1 * self._get_variable(child.name), value_parent])
 
         return clauses
 
@@ -89,14 +85,13 @@ class FmToBDD(ModelToModel):
         for i, _ in enumerate(relation.children):
             for j in range(i + 1, len(relation.children)):
                 if i != j:
-                    clauses.append([
-                        -1 * self._get_variable(relation.children[i].name),
-                        -1 * self._get_variable(relation.children[j].name)
-                    ])
-            clauses.append([
-                -1 * self._get_variable(relation.children[i].name),
-                value_parent
-            ])
+                    clauses.append(
+                        [
+                            -1 * self._get_variable(relation.children[i].name),
+                            -1 * self._get_variable(relation.children[j].name),
+                        ]
+                    )
+            clauses.append([-1 * self._get_variable(relation.children[i].name), value_parent])
         return clauses
 
     def _add_constraint_relation(self, relation: Relation) -> list[list[int]]:
@@ -124,7 +119,6 @@ class FmToBDD(ModelToModel):
         # In the case of allowing 0 childs, you cannot exclude the option  in that
         # no feature in this relation is activated
         for val in range(1, len(relation.children) + 1):
-
             for combination in itertools.combinations(relation.children, val):
                 cnf = [value_parent]
                 for feat in relation.children:
@@ -140,9 +134,9 @@ class FmToBDD(ModelToModel):
             clauses = self._add_mandatory_relation(relation)
         elif relation.is_optional():
             clauses = self._add_optional_relation(relation)
-        elif relation.is_or():  
+        elif relation.is_or():
             clauses = self._add_or_relation(relation)
-        elif relation.is_alternative():  
+        elif relation.is_alternative():
             clauses = self._add_alternative_relation(relation)
         else:
             clauses = self._add_constraint_relation(relation)
@@ -154,7 +148,7 @@ class FmToBDD(ModelToModel):
 
     def add_constraint(self, ctc: Constraint) -> None:
         def get_term_variable(term: Any) -> int:
-            if term.startswith('-'):
+            if term.startswith("-"):
                 return -self._get_variable(term[1:])
 
             return self._get_variable(term)
@@ -185,18 +179,15 @@ class FmToBDD(ModelToModel):
             cnf_list.append(
                 "("
                 + or_connective.join(
-                    list(
-                        map(
-                            lambda elem: not_connective + self.features[abs(elem)]
-                            if elem < 0
-                            else self.features[abs(elem)],
-                            clause,
-                        )
-                    )
+                    [
+                        (not_connective + self.features[abs(elem)])
+                        if elem < 0
+                        else self.features[abs(elem)]
+                        for elem in clause
+                    ]
                 )
                 + ")"
             )
         cnf_formula = and_connective.join(cnf_list)
-        self.destination_model = BDDModel.from_cnf_formula(cnf_formula, 
-                                                           list(self.variables.keys()))
+        self.destination_model = BDDModel.from_cnf_formula(cnf_formula, list(self.variables.keys()))
         return self.destination_model

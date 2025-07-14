@@ -8,11 +8,10 @@ from flamapy.metamodels.bdd_metamodel.operations import BDDCommonalityFactor
 
 
 class BDDHomogeneity(Homogeneity):
-
     def __init__(self) -> None:
         self._result: float = 0.0
 
-    def execute(self, model: VariabilityModel) -> 'BDDHomogeneity':
+    def execute(self, model: VariabilityModel) -> "BDDHomogeneity":
         bdd_model = cast(BDDModel, model)
         self._result = homogeneity(bdd_model)
         return self

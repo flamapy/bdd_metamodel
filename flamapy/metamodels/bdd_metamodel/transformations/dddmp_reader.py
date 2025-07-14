@@ -7,10 +7,9 @@ from flamapy.metamodels.bdd_metamodel.models import BDDModel
 
 
 class DDDMPReader(TextToModel):
-
     @staticmethod
     def get_source_extension() -> str:
-        return 'dddmp'
+        return "dddmp"
 
     def __init__(self, path: str) -> None:
         self.path: str = path
@@ -26,24 +25,24 @@ class DDDMPReader(TextToModel):
 
 
 def dddmp_v3_to_v2(filepath: str) -> str:
-    """Convert the file with the BDD dump in format dddmp version 3 to version 2 
+    """Convert the file with the BDD dump in format dddmp version 3 to version 2
     (for compatibility).
 
     The difference between versions 2.0 and 3.0 is the addition of the '.varnames' field.
     """
-    with open(filepath, 'r', encoding='utf8') as file:
+    with open(filepath, "r", encoding="utf8") as file:
         lines = file.readlines()
         # Change version from 3.0 to 2.0
-        index, line = next((index, line) for index, line in enumerate(lines) 
-                           if '.ver DDDMP-3.0' in line)
-        lines[index] = line.replace('3.0', '2.0')
+        index, line = next(
+            (index, line) for index, line in enumerate(lines) if ".ver DDDMP-3.0" in line
+        )
+        lines[index] = line.replace("3.0", "2.0")
 
         # Add '.varnames' field
-        index, line = next((index, line) for index, line in enumerate(lines) 
-                           if '.varnames' in line)
+        index, line = next((index, line) for index, line in enumerate(lines) if ".varnames" in line)
         lines.pop(index)
 
-    with tempfile.NamedTemporaryFile(mode='w', encoding='utf8', delete=False) as temp_file:
+    with tempfile.NamedTemporaryFile(mode="w", encoding="utf8", delete=False) as temp_file:
         temp_file.writelines(lines)
         temp_file_path = temp_file.name
         return temp_file_path

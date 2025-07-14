@@ -2,7 +2,6 @@ from flamapy.metamodels.bdd_metamodel.transformations._bdd_writer import BDDWrit
 
 
 class PDFWriter(BDDWriter):
-
     @staticmethod
     def get_destination_extension() -> str:
-        return 'pdf'
+        return "pdf"

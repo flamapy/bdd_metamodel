@@ -19,7 +19,7 @@ class BDDConfigurations(Configurations):
     def set_partial_configuration(self, partial_configuration: Configuration) -> None:
         self._partial_configuration = partial_configuration
 
-    def execute(self, model: VariabilityModel) -> 'BDDConfigurations':
+    def execute(self, model: VariabilityModel) -> "BDDConfigurations":
         bdd_model = cast(BDDModel, model)
         self._result = configurations(bdd_model, self._partial_configuration)
         return self
@@ -31,8 +31,9 @@ class BDDConfigurations(Configurations):
         return self.get_result()
 
 
-def configurations(bdd_model: BDDModel,
-                   partial_config: Optional[Configuration] = None) -> list[Configuration]:
+def configurations(
+    bdd_model: BDDModel, partial_config: Optional[Configuration] = None
+) -> list[Configuration]:
     if partial_config is None:
         u_func = bdd_model.root
         care_vars = set(bdd_model.variables_features)
@@ -45,8 +46,9 @@ def configurations(bdd_model: BDDModel,
 
     configs = []
     for assignment in bdd_model.bdd.pick_iter(u_func, care_vars=care_vars):
-        features = {bdd_model.variables_features[f]: True 
-                    for f in assignment.keys() if assignment[f]}
+        features = {
+            bdd_model.variables_features[f]: True for f in assignment.keys() if assignment[f]
+        }
         features = features | elements
         configs.append(Configuration(features))
     return configs

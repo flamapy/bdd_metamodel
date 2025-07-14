@@ -6,7 +6,6 @@ from flamapy.core.exceptions import FlamaException
 
 
 class BDDWriter(ModelToText):
-
     def __init__(self, path: str, source_model: BDDModel) -> None:
         self._path: Optional[str] = path
         self._source_model: BDDModel = source_model
@@ -30,13 +29,14 @@ class BDDWriter(ModelToText):
     def transform(self) -> str:
         if not self._roots:
             try:
-                self.source_model.bdd.dump(filename=self.path, 
-                                           filetype=self.get_destination_extension())
+                self.source_model.bdd.dump(
+                    filename=self.path, filetype=self.get_destination_extension()
+                )
             except FlamaException:
                 roots = [self.source_model.root]
         else:
             roots = [self.source_model.root]
-            self.source_model.bdd.dump(filename=self.path,
-                                       roots=roots,
-                                       filetype=self.get_destination_extension())
-        return ''
+            self.source_model.bdd.dump(
+                filename=self.path, roots=roots, filetype=self.get_destination_extension()
+            )
+        return ""

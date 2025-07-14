@@ -8,11 +8,13 @@ from .homogeneity import Homogeneity
 from .variability import Variability
 
 
-__all__ = ['ProductDistribution', 
-           'FeatureInclusionProbability',
-           'PureOptionalFeatures',
-           'UniqueFeatures',
-           'VariantFeatures',
-           'CommonalityFactor',
-           'Homogeneity',
-           'Variability']
+__all__ = [
+    "CommonalityFactor",
+    "FeatureInclusionProbability",
+    "Homogeneity",
+    "ProductDistribution",
+    "PureOptionalFeatures",
+    "UniqueFeatures",
+    "Variability",
+    "VariantFeatures",
+]

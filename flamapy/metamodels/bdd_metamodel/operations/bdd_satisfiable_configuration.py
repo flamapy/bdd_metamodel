@@ -8,7 +8,6 @@ from flamapy.metamodels.bdd_metamodel.operations import BDDConfigurationsNumber
 
 
 class BDDSatisfiableConfiguration(SatisfiableConfiguration):
-
     def __init__(self) -> None:
         self._result: bool = False
         self._configuration: Optional[Configuration] = None
@@ -16,7 +15,7 @@ class BDDSatisfiableConfiguration(SatisfiableConfiguration):
     def set_configuration(self, configuration: Configuration) -> None:
         self._configuration = configuration
 
-    def execute(self, model: VariabilityModel) -> 'BDDSatisfiableConfiguration':
+    def execute(self, model: VariabilityModel) -> "BDDSatisfiableConfiguration":
         bdd_model = cast(BDDModel, model)
         self._result = is_satisfiable(bdd_model, self._configuration)
         return self
@@ -28,8 +27,7 @@ class BDDSatisfiableConfiguration(SatisfiableConfiguration):
         return self.get_result()
 
 
-def is_satisfiable(bdd_model: BDDModel,
-                   configuration: Configuration) -> bool:
+def is_satisfiable(bdd_model: BDDModel, configuration: Configuration) -> bool:
     config_number_op = BDDConfigurationsNumber()
     if not configuration.is_full:
         config_number_op.set_partial_configuration(configuration)

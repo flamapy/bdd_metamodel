@@ -8,7 +8,6 @@ from flamapy.metamodels.bdd_metamodel.operations import BDDConfigurationsNumber
 
 
 class BDDCommonalityFactor(CommonalityFactor):
-
     def __init__(self) -> None:
         self._result: float = 0.0
         self._configuration: Configuration = Configuration(elements={})
@@ -16,7 +15,7 @@ class BDDCommonalityFactor(CommonalityFactor):
     def set_configuration(self, configuration: Configuration) -> None:
         self._configuration = configuration
 
-    def execute(self, model: VariabilityModel) -> 'BDDCommonalityFactor':
+    def execute(self, model: VariabilityModel) -> "BDDCommonalityFactor":
         bdd_model = cast(BDDModel, model)
         self._result = commonality_factor(bdd_model, self._configuration)
         return self

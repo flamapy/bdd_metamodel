@@ -98,9 +98,7 @@ class TextCNFModel:
         assert self._cnf_notation is not None
         return self._cnf_notation
 
-    def get_textual_cnf_formula(
-        self, syntax: TextCNFNotation = TextCNFNotation.JAVA_SHORT
-    ) -> str:
+    def get_textual_cnf_formula(self, syntax: TextCNFNotation = TextCNFNotation.JAVA_SHORT) -> str:
         """Return the CNF formula in the specified notation syntax.
 
         Default syntax is TextCNFNotation.JAVA_SHORT: (A) & (!B | C) && ...
@@ -210,26 +208,22 @@ def extract_variables(cnf_formula: str) -> list[str]:
 
     # Remove initial and final parenthesis
     and_symbol_pattern = " " + cnf_notation.value[CNFLogicConnective.AND] + " "
-    clauses = list(
-        map(lambda c: c[1:len(c) - 1], cnf_formula.split(and_symbol_pattern))
-    )
-
+    clauses = [
+        clause[1:-1]
+        for clause in cnf_formula.split(and_symbol_pattern)
+    ]
     # Remove final parenthesis of last clause (because of the possible end of line: '\n')
     if ")" in clauses[len(clauses) - 1]:
         clauses[len(clauses) - 1] = clauses[len(clauses) - 1][:-1]
 
     for clause in clauses:
         tokens = clause.split(" ")
-        tokens = list(
-            filter(lambda t: t != cnf_notation.value[CNFLogicConnective.OR], tokens)
-        )
+        tokens = list(filter(lambda t: t != cnf_notation.value[CNFLogicConnective.OR], tokens))
         for feature in tokens:
             if feature == cnf_notation.value[CNFLogicConnective.NOT]:
                 continue
             if feature.startswith(cnf_notation.value[CNFLogicConnective.NOT]):
-                variables.add(
-                    feature.replace(cnf_notation.value[CNFLogicConnective.NOT], "", 1)
-                )
+                variables.add(feature.replace(cnf_notation.value[CNFLogicConnective.NOT], "", 1))
             else:
                 variables.add(feature)
     return list(variables)
