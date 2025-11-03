@@ -39,6 +39,8 @@ class BDDModel(VariabilityModel):
         self.variables_features: dict[Any, Any] = {}
         self._levels_variables: dict[int, Any] = {}
         self._formula: Any = None
+        self.mapping_secure_names: dict[str, str] = {}
+        self.mapping_secure_names_inverted: dict[str, str] = {}
 
     def build_bdd(self, expression: str) -> None:
         """Built a BDD from an expression representing a logical formula.

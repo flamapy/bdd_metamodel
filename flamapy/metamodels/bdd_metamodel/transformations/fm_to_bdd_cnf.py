@@ -189,5 +189,6 @@ class FmToBDD(ModelToModel):
                 + ")"
             )
         cnf_formula = and_connective.join(cnf_list)
-        self.destination_model = BDDModel.from_cnf_formula(cnf_formula, list(self.variables.keys()))
+        self.destination_model = BDDModel.from_cnf_formula(cnf_formula,
+                                                           list(self.variables.keys()))
         return self.destination_model

@@ -80,7 +80,8 @@ def random_configuration(
         values = {}
     else:
         values = {
-            bdd_model.features_variables[f]: selected for f, selected in p_config.elements.items()
+            bdd_model.features_variables[bdd_model.mapping_secure_names[f]]: selected
+            for f, selected in p_config.elements.items()
         }
 
     # Set the BDD nodes with the already known features values
@@ -107,5 +108,6 @@ def random_configuration(
 
         n_vars -= 1
     return Configuration(
-        {bdd_model.variables_features[v]: selected for v, selected in values.items()}
+        {bdd_model.mapping_secure_names_inverted[bdd_model.variables_features[v]]: selected
+         for v, selected in values.items()}
     )

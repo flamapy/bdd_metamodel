@@ -39,7 +39,7 @@ def configurations_number(
         n_vars = len(bdd_model.variables_features)
     else:
         values = {
-            bdd_model.features_variables[f]: selected
+            bdd_model.features_variables[bdd_model.mapping_secure_names[f]]: selected
             for f, selected in partial_configuration.elements.items()
         }
         u_func = bdd_model.bdd.let(values, bdd_model.root)

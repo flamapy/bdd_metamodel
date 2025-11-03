@@ -46,6 +46,7 @@ class SATToBDD(ModelToModel):
 
             )
         cnf_formula = and_connective.join(cnf_list)
-        bdd_model = BDDModel.from_textual_cnf(cnf_formula, list(self.source_model.variables.keys()))
+        bdd_model = BDDModel.from_textual_cnf(cnf_formula,
+                                              list(self.source_model.variables.keys()))
         self.destination_model = bdd_model
         return self.destination_model

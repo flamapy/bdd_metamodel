@@ -54,7 +54,8 @@ def feature_inclusion_probability(
             prob[feature] = bdd_model.bdd.count(u_func, nvars=n_vars) / total_configs
     else:
         values = {
-            bdd_model.features_variables[f]: selected for f, selected in config.elements.items()
+            bdd_model.features_variables[bdd_model.mapping_secure_names[f]]: selected
+            for f, selected in config.elements.items()
         }
         for variable, feature in bdd_model.variables_features.items():
             feature_selected = values.get(variable, None)
