@@ -51,7 +51,8 @@ def feature_inclusion_probability(
             values = {variable: True}
             u_func = bdd_model.bdd.let(values, bdd_model.root)
             n_vars = len(bdd_model.variables_features) - len(values)
-            prob[feature] = bdd_model.bdd.count(u_func, nvars=n_vars) / total_configs
+            feature_real_name = bdd_model.mapping_secure_names_inverted[feature]
+            prob[feature_real_name] = bdd_model.bdd.count(u_func, nvars=n_vars) / total_configs
     else:
         values = {
             bdd_model.features_variables[bdd_model.mapping_secure_names[f]]: selected
@@ -62,7 +63,8 @@ def feature_inclusion_probability(
             values = {variable: True}
             u_func = bdd_model.bdd.let(values, bdd_model.root)
             n_vars = len(bdd_model.variables_features) - len(values)
-            prob[feature] = bdd_model.bdd.count(u_func, nvars=n_vars) / total_configs
+            feature_real_name = bdd_model.mapping_secure_names_inverted[feature]
+            prob[feature_real_name] = bdd_model.bdd.count(u_func, nvars=n_vars) / total_configs
             if feature_selected is None:
                 values.pop(variable)
             else:

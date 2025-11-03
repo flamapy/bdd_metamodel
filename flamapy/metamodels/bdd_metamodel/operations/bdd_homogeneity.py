@@ -28,7 +28,8 @@ def homogeneity(bdd_model: BDDModel) -> float:
     commonality_op = BDDCommonalityFactor()
 
     for feature in bdd_model.features_variables:
-        config = Configuration(elements={feature: True})
+        feature_real_name = bdd_model.mapping_secure_names_inverted[feature]
+        config = Configuration(elements={feature_real_name: True})
         commonality_op.set_configuration(config)
         commonality_sum += commonality_op.execute(bdd_model).get_result()
     return commonality_sum / len(bdd_model.variables_features)
