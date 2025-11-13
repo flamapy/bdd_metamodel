@@ -18,7 +18,7 @@ dev_requirements = read_requirements("requirements-dev.txt")
 
 setuptools.setup(
     name="flamapy-bdd",
-    version="2.1.0.dev0",
+    version="2.1.0.dev1",
     author="Flamapy",
     author_email="flamapy@us.es",
     description="bdd-plugin for the automated analysis of feature models",
