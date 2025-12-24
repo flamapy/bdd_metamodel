@@ -30,4 +30,6 @@ class BDDSatisfiable(Satisfiable):
 
 
 def is_satisfiable(bdd_model: BDDModel) -> bool:
-    return not bdd_model.is_terminal_n0(bdd_model.root)
+    if bdd_model.root is None:
+        return False
+    return bdd_model.root != bdd_model.bdd.false

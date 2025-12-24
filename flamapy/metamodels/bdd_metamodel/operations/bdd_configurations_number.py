@@ -36,12 +36,16 @@ def configurations_number(
 ) -> int:
     if partial_configuration is None:
         u_func = bdd_model.root
-        n_vars = len(bdd_model.variables_features)
+        n_vars = len(bdd_model.vars_order)
     else:
         values = {
-            bdd_model.features_variables[bdd_model.mapping_secure_names[f]]: selected
+            bdd_model.features_vars[f]: selected
             for f, selected in partial_configuration.elements.items()
         }
+        if partial_configuration.is_full:
+            for feature, variable in bdd_model.features_vars.items():
+                if feature not in partial_configuration.elements:
+                    values[variable] = False
         u_func = bdd_model.bdd.let(values, bdd_model.root)
-        n_vars = len(bdd_model.variables_features) - len(values)
+        n_vars = len(bdd_model.vars_order) - len(values)
     return int(bdd_model.bdd.count(u_func, nvars=n_vars))

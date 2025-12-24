@@ -1,15 +1,10 @@
 from enum import Enum
-from typing import Optional, Any, Union
+from typing import Any, Optional
 
-# Low-level interface to pure Python implementation (wrapped by dd.autoref.BDD).
-import dd.bdd as _dd_bdd
-
-# Import the best available interface:
-# try:
-#     import dd.cudd as _bdd  # High-level interface to a C implementation.
-# except ImportError:
-#     import dd.autoref as _bdd  # High-level interface to pure Python implementation.
-import dd.autoref as _bdd
+try:
+    from dd.cudd import BDD
+except ImportError:
+    from dd.autoref import BDD
 
 from flamapy.core.models import VariabilityModel
 
@@ -33,166 +28,142 @@ class BDDModel(VariabilityModel):
         return "bdd"
 
     def __init__(self) -> None:
-        self._bdd: _bdd.BDD = _bdd.BDD()  # BDD manager
-        self._root: Optional[Union[_bdd.Function, int]] = None
-        self.features_variables: dict[Any, Any] = {}
-        self.variables_features: dict[Any, Any] = {}
-        self._levels_variables: dict[int, Any] = {}
-        self._formula: Any = None
-        self.mapping_secure_names: dict[str, str] = {}
-        self.mapping_secure_names_inverted: dict[str, str] = {}
+        self.bdd: BDD = BDD()  # BDD manager
+        self.root: Any = None
+        self.features_vars: dict[str, str] = {}  # Mapping feature name -> variable name
+        self.vars_features: dict[str, str] = {}  # Mapping variable name -> feature name
+        self.vars_order: list[str] = []  # Ordered list of variables according to the BDD
 
-    def build_bdd(self, expression: str) -> None:
-        """Built a BDD from an expression representing a logical formula.
+    def build_bdd(self, expression: str, variables: list[str]) -> None:
+        """Built a BDD from an expression representing a logical formula."""
+        self.bdd.configure(reordering=False)  # Disable dynamic reordering for consistency
+        for var in variables:
+            self.bdd.declare(var)  # Declare variables in the BDD manager
+        self.vars_order = variables  # The order is crucial to detect skipped variables
+        self.root = self.bdd.add_expr(expression)  # Build the logical formula (root node)
 
-        It assumes that all variables have been added to
-        features_variables and variables_features.
-        """
-        self._formula = expression
-        self._bdd.declare(*self.variables_features.keys())
-        self._root = self._bdd.add_expr(expression)
-        _bdd.reorder(self._bdd)
-        self._levels_variables = {level: var for var, level in self._bdd.var_levels.items()}
+    def get_expression(self) -> str:
+        """ Converts the BDD to a readable Boolean expression string."""
+        return self.bdd.to_expr(self.root)
 
-    @property
-    def formula(self) -> str:
-        return self._formula
+    def get_all_paths(self) -> list[dict[str, bool]]:
+        """Transverses the BDD to find all models (paths to True)."""
+        return list(self.bdd.pick_iter(self.root))
 
-    @property
-    def bdd(self) -> Union[_bdd.BDD, _dd_bdd.BDD]:
-        return self._bdd
+    def count_solutions(self) -> int:
+        """Count the number of valid configurations (SAT)."""
+        return self.bdd.count(self.root, len(self.vars))  # count(node, n_vars)
 
-    @bdd.setter
-    def bdd(self, new_bdd: Union[_bdd.BDD, _dd_bdd.BDD]) -> None:
-        self._bdd = new_bdd
-        self.features_variables = {var: var for var in self._bdd.vars}
-        self.variables_features = dict(self.features_variables)
-        self._root = next(iter(self._bdd.roots), None)
-        self._levels_variables = {level: var for var, level in self._bdd.var_levels.items()}
+    def dump_structure(self) -> None:
+        """Prints the structure of the BDD for debugging purposes."""
+        if self.root is None:
+            print("Empty BDD.")
+            return
 
-    @property
-    def root(self) -> Union[_bdd.Function, int]:
-        return self._root
+        visited = set()
+        # In dd.autoref, bdd.true is the unique terminal.
+        # bdd.false is just ~bdd.true
 
-    @root.setter
-    def root(self, new_root: Union[_bdd.Function, int]) -> None:
-        self._root = new_root
-        self.features_variables = {var: var for var in self._bdd.vars}
-        self.variables_features = dict(self.features_variables)
-        self._levels_variables = {level: var for var, level in self._bdd.var_levels.items()}
+        def _dump(node: Any, indent: str = "") -> None:
+            if node == self.bdd.true:
+                print(f"{indent} leaf: TRUE")
+                return
+            if node == self.bdd.false:
+                print(f"{indent} leaf: FALSE")
+                return
 
-    def level_of_var(self, var: Any) -> Optional[int]:
-        """Return the level of a given variable."""
-        return self._bdd.var_levels.get(var, None)
+            # We use the node object for the visited set
+            if node in visited:
+                print(f"{indent} (Ref: {node.var})")
+                return
+            visited.add(node)
 
-    def var_at_level(self, level: int) -> Optional[Any]:
-        """Return the variable at the given level."""
-        return self._levels_variables.get(level, None)
+            print(f"{indent} Node [Var: {node.var}]")
+            # Safe access: only internal nodes have children
+            _dump(node.low, indent + "  Low: ")
+            _dump(node.high, indent + " High: ")
 
-    def var(self, node: Union[_bdd.Function, int]) -> Optional[Any]:
-        """Return the variable of the node.
+        print(f"Exploring BDD (Root: {self.root})")
+        _dump(self.root)
 
-        It returns None if the node is a terminal node.
-        """
-        if self.is_terminal_node(node):
-            return None
-        if isinstance(node, int):
-            level, _, _ = self._bdd.succ(node)
-            return self.var_at_level(level)
-        return node.var
+    def save_bdd(self,
+                 path: str,
+                 roots: Optional[Any] = None,
+                 filetype: Optional[str] = None) -> None:
+        if filetype is None:
+            filetype = self.bdd.dump(filename=path, roots=roots)
+        else:
+            self.bdd.dump(filename=path, roots=roots, filetype=filetype)
 
-    def level(self, node: Union[_bdd.Function, int]) -> Optional[int]:
-        """Return the level of the node.
-
-        Non-terminal nodes start at 0.
-        Terminal nodes have level `s' being the `s' the number of variables.
-        """
-        # level, _, _ = self._bdd.succ(node)
-        return self.level_of_var(self.var(node))
-
-    def nof_nodes(self) -> int:
-        """Return number of nodes in the BDD."""
-        return len(self._bdd)
-
-    def get_node(self, var: Any) -> Union[_bdd.Function, int]:
-        """Return the node of the variable."""
-        return self._bdd.var(var)
-
-    def index(self, node: Union[_bdd.Function, int]) -> Optional[int]:
-        """Position (index) of the variable that labels the node `n` in the ordering.
-
-        Indexes start at 1.
-        Terminal nodes (n0 and n1) have indexes `s + 1`, being `s' the number of variables.
-        Note that index(n) = level(n) + 1.
-
-        Example: node `n4` is labeled `B`, and `B` is in the 2nd position in ordering `[A,B,C]`,
-        thus level(n4) = 2.
-        """
-        if self.is_terminal_node(node):
-            return len(self.variables_features) + 1
-        level = self.level(node)
-        return level + 1 if level is not None else None
-
-    def negated(self, node: Union[_bdd.Function, int]) -> bool:
-        """Return whether the node is negated."""
-        if isinstance(node, int):
-            return node < 0
-        return node.negated
-
-    def get_terminal_node_n0(self) -> Union[_bdd.Function, int]:
-        return self._bdd.false
-
-    def get_terminal_node_n1(self) -> Union[_bdd.Function, int]:
-        return self._bdd.true
-
-    def is_terminal_node(self, node: Union[_bdd.Function, int]) -> bool:
-        """Check if the node is a terminal node."""
-        return self.is_terminal_n0(node) or self.is_terminal_n1(node)
-
-    def is_terminal_n1(self, node: Union[_bdd.Function, int]) -> bool:
-        """Check if the node is the terminal node 1 (n1)."""
-        return node == 1 if isinstance(node, int) else node == self.get_terminal_node_n1()
-
-    def is_terminal_n0(self, node: Union[_bdd.Function, int]) -> bool:
-        """Check if the node is the terminal node 0 (n0)."""
-        return node == 0 if isinstance(node, int) else node == self.get_terminal_node_n0()
-
-    def get_high_node(self, node: Union[_bdd.Function, int]) -> Optional[Union[_bdd.Function, int]]:
-        """Return the high (right, solid) node."""
-        _, _, high = self._bdd.succ(node)
-        return high
-
-    def get_low_node(self, node: Union[_bdd.Function, int]) -> Optional[Union[_bdd.Function, int]]:
-        """Return the low (left, dashed) node."""
-        _, low, _ = self._bdd.succ(node)
-        return low
-
-    def get_value(self, node: Union[_bdd.Function, int], complemented: bool = False) -> int:
-        """Return the value (id) of the node considering complemented arcs."""
-        value = int(node)
-        if self.is_terminal_n0(node):
-            value = 1 if complemented else 0
-        elif self.is_terminal_n1(node):
-            value = 0 if complemented else 1
-        return value
-
-    def pretty_node_str(self, node: Union[_bdd.Function, int]) -> str:
-        return (
-            f"{self.var(node)} "
-            f"(id: {self.get_value(node)}) "
-            f"(level: {self.level(node)}) "
-            f"(index: {self.index(node)}) "
-        )
+    @staticmethod
+    def load_bdd(path: str, vars: Optional[list[str]] = None) -> 'BDDModel':
+        bdd_model = BDDModel()
+        if vars is not None:
+            for var in vars:
+                bdd_model.bdd.declare(var)
+        roots = bdd_model.bdd.load(path)
+        if isinstance(roots, dict):
+            bdd_model.root = next(iter(roots.values()))
+        elif isinstance(roots, list):
+            bdd_model.root = roots[0]
+        else:
+            bdd_model.root = roots
+        all_vars = list(bdd_model.bdd.vars)
+        sorted_vars = sorted(all_vars, key=lambda v: bdd_model.bdd.level_of_var(v))
+        bdd_model.vars_order = sorted_vars
+        bdd_model.vars_features = {var: var for var in bdd_model.vars_order}
+        bdd_model.features_vars = {var: var for var in bdd_model.vars_order}
+        return bdd_model
 
     def __str__(self) -> str:
-        result = "Binary Decision Diagram (BDD):\n"
-        result += f"Instance class: {type(self._bdd)}\n"
-        result += f"#Nodes: {self.nof_nodes()}\n"
-        result += f"Root: {self.pretty_node_str(self.root)}\n"
-        levels_vars = dict(sorted(self._levels_variables.items(), key=lambda item: item[0]))
-        for _level, var in levels_vars.items():
-            node = self.get_node(var)
-            result += f" |-{self.pretty_node_str(node)}\n"
-        result += f"Terminal node (n0): {self.pretty_node_str(self.get_terminal_node_n0())}\n"
-        result += f"Terminal node (n1): {self.pretty_node_str(self.get_terminal_node_n1())}\n"
+        bdd = self.bdd
+        root = self.root
+        # Recolect reachable nodes from the root
+        # This avoids counting orphan nodes that are in the manager's memory
+        reachable_nodes = set()
+        to_visit = [root]
+        while to_visit:
+            u = to_visit.pop()
+            if u not in reachable_nodes:
+                reachable_nodes.add(u)
+                if u.var is not None:
+                    to_visit.extend([u.low, u.high])
+
+        result = ""
+        result += f"Total nodes in manager: {len(self.bdd)}\n"
+        result += f"Nodes in this formula: {len(reachable_nodes)}\n"
+
+        root_var = root.var if root.var is not None else "Terminal"
+        result += f"Root node: {root} (Variable: {root_var}, Negated: {root.negated})\n"
+
+        # Group nodes by level
+        # In dd, level 0 is the top (root) and goes down
+        nodes_by_level: dict[int, list[Any]] = {}
+        terminals: list[Any] = []
+        for node in reachable_nodes:
+            if node.var is not None:
+                # Get the level of the variable
+                level = bdd.level_of_var(node.var)
+                if level not in nodes_by_level:
+                    nodes_by_level[level] = []
+                nodes_by_level[level].append(node)
+            else:
+                terminals.append(node)
+
+        # Print levels in order
+        for level in sorted(nodes_by_level.keys()):
+            var_name = self.vars_order[level]
+            num_nodes = len(nodes_by_level[level])
+            result += f"Level {level:2} | Variable: {var_name:15} | Nodes: {num_nodes}"
+            # Optional: print IDs of nodes at this level
+            node_ids = [str(n) for n in nodes_by_level[level]]
+            result += f"   IDs: {', '.join(node_ids)}\n"
+
+        # Terminal nodes
+        # IIn dd (CUDD), there is only one real terminal node (True)
+        # The value False is represented as a negated edge to True
+        for t in terminals:
+            val = "TRUE" if not t.negated else "FALSE"
+            result += f"Terminal Node ID: {t} (Semantic Value: {val})\n"
+        #result += f"Expression: {self.get_expression()}\n"
         return result

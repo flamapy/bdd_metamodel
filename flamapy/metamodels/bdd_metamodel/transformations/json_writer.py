@@ -1,29 +1,34 @@
 import os
 import tempfile
+from typing import Optional
 
-from flamapy.metamodels.bdd_metamodel.transformations._bdd_writer import BDDWriter
+from flamapy.core.transformations import ModelToText
+from flamapy.metamodels.bdd_metamodel.models import BDDModel
 
 
-class JSONWriter(BDDWriter):
+class JSONWriter(ModelToText):
+
     @staticmethod
     def get_destination_extension() -> str:
         return "json"
 
+    def __init__(self, path: str, source_model: BDDModel) -> None:
+        self._path: Optional[str] = path
+        self._source_model: BDDModel = source_model
+
     def transform(self) -> str:
-        if self.path is None:
+        if self._path is None:
             with tempfile.NamedTemporaryFile(mode="w", encoding="utf8") as file:
-                self.path = file.name
-                result = write_to_file(self)
-                self.path = None
+                self._path = file.name
+                result = write_to_file(self._source_model, self._path)
+                self._path = None
         else:
-            result = write_to_file(self)
+            result = write_to_file(self._source_model, self._path)
         return result
 
 
-def write_to_file(writer: JSONWriter) -> str:
-    super(type(writer), writer).transform()
-    if writer.path is None:
-        raise ValueError("Writer path is None")
-    with open(writer.path, "r", encoding="utf8") as file:
+def write_to_file(source_model: BDDModel, path: str) -> str:
+    source_model.save_bdd(path, [source_model.root], JSONWriter.get_destination_extension())
+    with open(path, "r", encoding="utf8") as file:
         result = os.linesep.join(file.readlines())
     return result

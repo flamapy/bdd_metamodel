@@ -1,34 +1,34 @@
 import os
 import tempfile
+from typing import Optional
 
-from flamapy.core.exceptions import FlamaException
-from flamapy.metamodels.bdd_metamodel.transformations._bdd_writer import BDDWriter
+from flamapy.core.transformations import ModelToText
+from flamapy.metamodels.bdd_metamodel.models import BDDModel
 
 
-class DDDMPWriter(BDDWriter):
+class DDDMPWriter(ModelToText):
+
     @staticmethod
     def get_destination_extension() -> str:
         return "dddmp"
 
+    def __init__(self, path: str, source_model: BDDModel) -> None:
+        self._path: Optional[str] = path
+        self._source_model: BDDModel = source_model
+
     def transform(self) -> str:
-        if self.path is None:
+        if self._path is None:
             with tempfile.NamedTemporaryFile(mode="w", encoding="utf8") as file:
-                self.path = file.name
-                result = write_to_file(self)
-                self.path = None
+                self._source_model.save_bdd(file.name,
+                                            [self._source_model.root],
+                                            DDDMPWriter.get_destination_extension())
+                result = dddmp_v2_to_v3(file.name)
         else:
-            result = write_to_file(self)
+            self._source_model.save_bdd(self._path,
+                                        [self._source_model.root],
+                                        DDDMPWriter.get_destination_extension())
+            result = dddmp_v2_to_v3(self._path)
         return result
-
-
-def write_to_file(writer: DDDMPWriter) -> str:
-    assert writer.path is not None
-    try:
-        super(type(writer), writer).transform()
-        result = dddmp_v2_to_v3(writer.path)
-    except Exception as exc:
-        raise FlamaException("DDDMPWriter is not supported.") from exc
-    return result
 
 
 def dddmp_v2_to_v3(filepath: str) -> str:

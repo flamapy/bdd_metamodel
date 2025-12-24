@@ -7,7 +7,6 @@ from flamapy.metamodels.bdd_metamodel.models import BDDModel
 from flamapy.metamodels.bdd_metamodel.transformations import (
     FmToBDD,
     JSONReader,
-    PickleReader,
     DDDMPReader,
 )
 from flamapy.metamodels.bdd_metamodel.operations import (
@@ -39,8 +38,6 @@ def _read_model(path: str) -> BDDModel:
         bdd_model = JSONReader(path).transform()
     elif path.endswith(".dddmp"):
         bdd_model = DDDMPReader(path).transform()
-    elif path.endswith(".p"):
-        bdd_model = PickleReader(path).transform()
     if bdd_model is None:
         raise ValueError(f"Unsupported file extension for path: {path}")
     return bdd_model

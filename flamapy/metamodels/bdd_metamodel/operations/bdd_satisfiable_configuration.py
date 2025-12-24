@@ -33,7 +33,7 @@ def is_satisfiable(bdd_model: BDDModel, configuration: Configuration) -> bool:
         config_number_op.set_partial_configuration(configuration)
     else:
         config = Configuration(dict(configuration.elements))
-        for feature in bdd_model.features_variables.keys():
+        for feature in bdd_model.features_vars.keys():
             if feature not in config.elements:
                 config.elements[feature] = False
         config_number_op.set_partial_configuration(config)

@@ -36,22 +36,21 @@ def configurations(
 ) -> list[Configuration]:
     if partial_config is None:
         u_func = bdd_model.root
-        care_vars = set(bdd_model.variables_features)
+        care_vars = set(bdd_model.vars_order)
         elements = {}
     else:
-        values = {bdd_model.mapping_secure_names[f]: selected
+        values = {bdd_model.features_vars[f]: selected
                   for f, selected in partial_config.elements.items()}
         u_func = bdd_model.bdd.let(values, bdd_model.root)
-        care_vars = set(bdd_model.variables_features) - set(values.keys())
-        elements = {bdd_model.mapping_secure_names[f]: selected
-                    for f, selected in partial_config.elements.items()}
+        care_vars = set(bdd_model.vars_order) - set(values.keys())
+        elements = partial_config.elements.items()
 
     configs = []
     for assignment in bdd_model.bdd.pick_iter(u_func, care_vars=care_vars):
         features = {
-            bdd_model.variables_features[f]: True for f in assignment.keys() if assignment[f]
+            bdd_model.vars_features[f]: True for f in assignment.keys() if assignment[f]
         }
+
         features = features | elements
-        new_features = {bdd_model.mapping_secure_names_inverted[f]: v for f, v in features.items()}
-        configs.append(Configuration(new_features))
+        configs.append(Configuration(features))
     return configs

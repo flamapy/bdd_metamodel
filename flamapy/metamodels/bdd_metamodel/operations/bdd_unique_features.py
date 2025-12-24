@@ -29,27 +29,30 @@ class BDDUniqueFeatures(UniqueFeatures):
 def unique_features(bdd_model: BDDModel, config: Optional[Configuration] = None) -> list[Any]:
     unique_features_list = []
     if config is None:
-        for variable, feature in bdd_model.variables_features.items():
+        for variable, feature in bdd_model.vars_features.items():
             values = {variable: True}
             u_func = bdd_model.bdd.let(values, bdd_model.root)
-            n_vars = len(bdd_model.variables_features) - len(values)
+            n_vars = len(bdd_model.vars_order) - len(values)
             n_configs = bdd_model.bdd.count(u_func, nvars=n_vars)
             if n_configs == 1:
                 unique_features_list.append(feature)
     else:
         values = {
-            bdd_model.features_variables[bdd_model.mapping_secure_names[f]]: selected
+            bdd_model.features_vars[f]: selected
             for f, selected in config.elements.items()
         }
-        for variable, feature in bdd_model.variables_features.items():
+        if config.is_full:
+            for feature, variable in bdd_model.features_vars.items():
+                if feature not in config.elements:
+                    values[variable] = False
+        for variable, feature in bdd_model.vars_features.items():
             feature_selected = values.get(variable, None)
-            values = {variable: True}
+            values[variable] = True
             u_func = bdd_model.bdd.let(values, bdd_model.root)
-            n_vars = len(bdd_model.variables_features) - len(values)
+            n_vars = len(bdd_model.vars_order) - len(values)
             n_configs = bdd_model.bdd.count(u_func, nvars=n_vars)
             if n_configs == 1:
                 unique_features_list.append(feature)
-
             if feature_selected is None:
                 values.pop(variable)
             else:
