@@ -8,6 +8,7 @@ from flamapy.metamodels.bdd_metamodel.operations.bdd_product_distribution import
 
 
 class BDDConfigurationsWithNFeatures(Operation):
+    """Operation to get all configurations with exactly n selected features from a BDD model."""
 
     def __init__(self) -> None:
         self._result: Generator[Configuration, None, None]
