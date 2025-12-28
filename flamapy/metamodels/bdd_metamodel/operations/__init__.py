@@ -15,12 +15,14 @@ from .bdd_homogeneity import BDDHomogeneity
 from .bdd_metrics import BDDMetrics
 from .bdd_satisfiable_configuration import BDDSatisfiableConfiguration
 from .bdd_false_optional_features import BDDFalseOptionalFeatures
+from .bdd_configurations_with_n_features import BDDConfigurationsWithNFeatures
 
 
 __all__ = [
     "BDDCommonalityFactor",
     "BDDConfigurations",
     "BDDConfigurationsNumber",
+    "BDDConfigurationsWithNFeatures",
     "BDDCoreFeatures",
     "BDDDeadFeatures",
     "BDDFalseOptionalFeatures",
