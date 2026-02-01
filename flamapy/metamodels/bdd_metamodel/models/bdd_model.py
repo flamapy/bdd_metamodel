@@ -1,3 +1,4 @@
+import logging
 from enum import Enum
 from typing import Any, Optional
 
@@ -7,6 +8,8 @@ except ImportError:
     from dd.autoref import BDD
 
 from flamapy.core.models import VariabilityModel
+
+logger = logging.getLogger(__name__)
 
 
 class BDDModel(VariabilityModel):
@@ -57,7 +60,7 @@ class BDDModel(VariabilityModel):
     def dump_structure(self) -> None:
         """Prints the structure of the BDD for debugging purposes."""
         if self.root is None:
-            print("Empty BDD.")
+            logger.debug("Empty BDD.")
             return
 
         visited = set()
@@ -66,24 +69,24 @@ class BDDModel(VariabilityModel):
 
         def _dump(node: Any, indent: str = "") -> None:
             if node == self.bdd.true:
-                print(f"{indent} leaf: TRUE")
+                logger.debug("%s leaf: TRUE", indent)
                 return
             if node == self.bdd.false:
-                print(f"{indent} leaf: FALSE")
+                logger.debug("%s leaf: FALSE", indent)
                 return
 
             # We use the node object for the visited set
             if node in visited:
-                print(f"{indent} (Ref: {node.var})")
+                logger.debug("%s (Ref: %s)", indent, node.var)
                 return
             visited.add(node)
 
-            print(f"{indent} Node [Var: {node.var}]")
+            logger.debug("%s Node [Var: %s]", indent, node.var)
             # Safe access: only internal nodes have children
             _dump(node.low, indent + "  Low: ")
             _dump(node.high, indent + " High: ")
 
-        print(f"Exploring BDD (Root: {self.root})")
+        logger.debug("Exploring BDD (Root: %s)", self.root)
         _dump(self.root)
 
     def save_bdd(self,
