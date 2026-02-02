@@ -107,24 +107,39 @@ class PLModel():
 
     def _get_cardinality_formula(self, relation: Relation) -> str:
         parent = relation.parent.name
-        children = {child.name for child in relation.children}
-        or_ctc = []
-        and_str = self.logic_connectives['AND']
+        children = [child.name for child in relation.children]
         not_str = self.logic_connectives['NOT']
+        and_str = self.logic_connectives['AND']
         or_str = self.logic_connectives['OR']
-        for k in range(relation.card_min, relation.card_max + 1):
-            combi_k = list(itertools.combinations(children, k))
-            for positives in combi_k:
-                negatives = children - set(positives)
-                positives_and_ctc = f' {and_str} '.join(positives)
-                negatives_and_ctc = f' {and_str} '.join(f"{not_str} {f}" for f in negatives)
-                if positives_and_ctc and negatives_and_ctc:
-                    and_ctc = f"{positives_and_ctc} {and_str} {negatives_and_ctc}"
-                else:
-                    and_ctc = f"{positives_and_ctc}{negatives_and_ctc}"
-                or_ctc.append(and_ctc)
-        formula_or_ctc = f"{f' {or_str} '.join(or_ctc)}"
-        return f"{parent} {self.logic_connectives['EQUIVALENCE']} {formula_or_ctc}"
+
+        all_clauses = []
+
+        # 1. If the parent is active, prohibit combinations outside the range [min..max]
+        for val in range(len(children) + 1):
+            if val < relation.card_min or val > relation.card_max:
+                for combination in itertools.combinations(children, val):
+                    # To prohibit an exact combination: (NOT parent OR NOT child1 OR child2...)
+                    clause_parts = [f"{not_str}{parent}"]
+                    for child in children:
+                        if child in combination:
+                            clause_parts.append(f"{not_str}{child}")
+                        else:
+                            clause_parts.append(child)
+                    all_clauses.append(f"({f' {or_str} '.join(clause_parts)})")
+
+        # 2. If the parent is inactive, NO child can be active (or combinations not allowed)
+        # Following the logic of the first script to maintain consistency:
+        for val in range(1, len(children) + 1):
+            for combination in itertools.combinations(children, val):
+                clause_parts = [parent]
+                for child in children:
+                    if child in combination:
+                        clause_parts.append(f"{not_str}{child}")
+                    else:
+                        clause_parts.append(child)
+                all_clauses.append(f"({f' {or_str} '.join(clause_parts)})")
+
+        return f" {and_str} ".join(all_clauses)
 
     def _get_constraint_formula(self, ctc: Constraint) -> str:
         constraint_str = ctc.ast.pretty_str()
