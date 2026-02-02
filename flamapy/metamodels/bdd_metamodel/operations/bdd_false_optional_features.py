@@ -40,10 +40,10 @@ def get_false_optional_features(bdd_model: BDDModel, feature_model: FeatureModel
                               if not f.is_root() and not f.is_mandatory()]
     for feature in real_optional_features:
         parent_feature = feature.get_parent()
-        u_parent = bdd_model.bdd.var(bdd_model.features_vars[parent_feature.name])
-        u_feature = bdd_model.bdd.var(bdd_model.features_vars[feature.name])
+        u_parent = bdd_model.bdd.var(parent_feature.name)
+        u_feature = bdd_model.bdd.var(feature.name)
 
         implication_check = bdd_model.root & u_parent & ~u_feature
         if implication_check == bdd_model.bdd.false:
-            false_optional_features.append(feature.name)
+            false_optional_features.append(bdd_model.vars_features[feature.name])
     return false_optional_features
