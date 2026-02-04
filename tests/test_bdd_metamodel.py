@@ -51,6 +51,7 @@ def _read_model(path: str) -> BDDModel:
         ("resources/models/uvl_models/Pizzas.uvl", True),
         ("resources/models/uvl_models/Pizzas_complex.uvl", True),
         ("resources/models/uvl_models/Truck.uvl", True),
+        ("resources/models/uvl_models/group_cardinalities.uvl", True),
         # ('resources/models/uvl_models/Trimesh_NFM.uvl', True),
     ],
 )
@@ -68,6 +69,7 @@ def test_bdd_satisfiable(path: str, expected: bool):
         ("resources/models/uvl_models/Pizzas.uvl", 42),
         ("resources/models/uvl_models/Pizzas_complex.uvl", 25),
         ("resources/models/uvl_models/Truck.uvl", 234),
+        ("resources/models/uvl_models/group_cardinalities.uvl", 16),
         # ('resources/models/uvl_models/Trimesh_NFM.uvl', 734720),
     ],
 )
@@ -175,6 +177,10 @@ def test_nconfigs(path: str, expected: int):
                 0,
                 0,
             ],
+        ),
+        (
+            "resources/models/uvl_models/group_cardinalities.uvl",
+            [0, 1, 0, 0, 0, 0, 8, 6, 1],
         ),
         # ('resources/models/uvl_models/Trimesh_NFM.uvl', [0, 0, 0, 1, 15, 115, 625, 2669, 9084, 24500, 52364, 89251, 122277, 135507, 121826, 88721, 51980, 24176, 8734, 2366, 452, 54, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0]),
     ],
@@ -343,6 +349,22 @@ def test_bdd_product_distribution(path: str, expected: list):
                 },
             ),
         ),
+        (
+            "resources/models/uvl_models/group_cardinalities.uvl",
+            defaultdict(
+                float,
+                {
+                    "root": 1.0,
+                    "test 1": 0.9375,
+                    "test 2": 0.625,
+                    "test 3": 0.625,
+                    "test 4": 0.75,
+                    "test 5": 0.75,
+                    "test 6": 0.75,
+                    "test 7": 0.75,
+                },
+            ),
+        ),
         # ('resources/models/uvl_models/Trimesh_NFM.uvl', defaultdict(float,{'v0': 1.0, 'Cycle': 1.0, 'Smoother': 1.0, 'v1': 0.55, 'v2': 0.45, 'v3': 0.45, 'v4': 0.1, 'v5': 0.0, 'v6': 0.45, 'v7': 0.45, 'v8': 0.475, 'v9': 0.125, 'v10': 0.0, 'v11': 0.49825783972125437, 'v12': 0.49825783972125437, 'v13': 0.49825783972125437, 'v14': 0.49825783972125437, 'v15': 0.0, 'v16': 0.0, 'v17': 0.49825783972125437, 'v18': 0.445993031358885, 'v19': 0.445993031358885, 'v20': 0.445993031358885, 'v21': 0.10801393728222997, 'v22': 0.0, 'V': 0.5, 'F': 0.5, 'Jacobi': 0.5, 'ColorGS': 0.5, 'Line': 0.5, 'ZebraLine': 0.5})),
     ],
 )
@@ -376,7 +398,7 @@ def test_probabilities(path: str, expected: dict):
             "resources/models/uvl_models/Truck.uvl",
             ["Truck", "Weight", "Type", "Engine", "Cabin", "Axles", "Count", "Drivetrain"],
         ),
-        # ('resources/models/uvl_models/Trimesh_NFM.uvl', ['v0', 'Cycle', 'Smoother']),
+        ("resources/models/uvl_models/group_cardinalities.uvl", ['root']),
     ],
 )
 def test_core_features(path: str, expected: list):
@@ -393,6 +415,7 @@ def test_core_features(path: str, expected: list):
         ("resources/models/uvl_models/Pizzas.uvl", []),
         ("resources/models/uvl_models/Pizzas_complex.uvl", []),
         ("resources/models/uvl_models/Truck.uvl", ["Beds2"]),
+        ("resources/models/uvl_models/group_cardinalities.uvl", []),
         # ('resources/models/uvl_models/Trimesh_NFM.uvl', ['v5', 'v10', 'v15', 'v16', 'v22']),
     ],
 )
@@ -507,6 +530,18 @@ def test_dead_features(path: str, expected: list):
                 "Tons18",
             ],
         ),
+        (
+            "resources/models/uvl_models/group_cardinalities.uvl",
+            [
+                "test 1",
+                "test 2",
+                "test 3",
+                "test 4",
+                "test 5",
+                "test 6",
+                "test 7",
+            ],
+        ),
         # ('resources/models/uvl_models/Trimesh_NFM.uvl', ['v1', 'v2', 'v3', 'v4', 'v6', 'v7', 'v8', 'v9', 'v11', 'v12', 'v13', 'v14', 'v17', 'v18', 'v19', 'v20', 'v21', 'V', 'F', 'Jacobi', 'ColorGS', 'Line', 'ZebraLine']),
     ],
 )
@@ -527,6 +562,7 @@ def test_variant_features(path: str, expected: list):
         ("resources/models/uvl_models/Pizzas.uvl", ["Neapolitan", "Sicilian"]),
         ("resources/models/uvl_models/Pizzas_complex.uvl", []),
         ("resources/models/uvl_models/Truck.uvl", []),
+        ("resources/models/uvl_models/group_cardinalities.uvl", []),
         # ('resources/models/uvl_models/Trimesh_NFM.uvl', ['V', 'F', 'Jacobi', 'ColorGS', 'Line', 'ZebraLine']),
     ],
 )
@@ -544,6 +580,7 @@ def test_pure_optional_features(path: str, expected: list):
         ("resources/models/uvl_models/Pizzas.uvl", []),
         ("resources/models/uvl_models/Pizzas_complex.uvl", []),
         ("resources/models/uvl_models/Truck.uvl", []),
+        ("resources/models/uvl_models/group_cardinalities.uvl", []),
         # ('resources/models/uvl_models/Trimesh_NFM.uvl', []),
     ],
 )
@@ -565,6 +602,7 @@ def test_unique_features(path: str, expected: list):
             0.09803921568627451,
         ),
         ("resources/models/uvl_models/Truck.uvl", 2.7241185310674038e-08, 1.3947487708776456e-05),
+        ("resources/models/uvl_models/group_cardinalities.uvl", 0.06274509803921569, 0.12598425196850394),
         # ('resources/models/uvl_models/Trimesh_NFM.uvl',  0.0003421306611700592, 0.08758545965975043),
     ],
 )
@@ -585,7 +623,7 @@ def test_variability(path: str, expected_total: float, expected_partial: float):
         ("resources/models/uvl_models/Pizzas.uvl", 0.6706349206349206),
         ("resources/models/uvl_models/Pizzas_complex.uvl", 0.6633333333333333),
         ("resources/models/uvl_models/Truck.uvl", 0.49158249158249157),
-        # ('resources/models/uvl_models/Trimesh_NFM.uvl',  0.41894458806339213),
+        ("resources/models/uvl_models/group_cardinalities.uvl", 0.7734375),
     ],
 )
 def test_homogeneity(path: str, expected: float):
@@ -602,7 +640,7 @@ def test_homogeneity(path: str, expected: float):
         ("resources/models/uvl_models/Pizzas.uvl", 5, 5),
         ("resources/models/uvl_models/Pizzas_complex.uvl", 5, 5),
         ("resources/models/uvl_models/Truck.uvl", 5, 5),
-        # ('resources/models/uvl_models/Trimesh_NFM.uvl',  5, 5),
+        ("resources/models/uvl_models/group_cardinalities.uvl", 5, 5),
     ],
 )
 def test_sampling(path: str, sample_size: int, expected: list):
