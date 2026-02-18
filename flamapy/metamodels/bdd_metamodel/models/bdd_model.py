@@ -112,7 +112,7 @@ class BDDModel(VariabilityModel):
         else:
             bdd_model.root = roots
         all_vars = list(bdd_model.bdd.vars)
-        sorted_vars = sorted(all_vars, key=lambda v: bdd_model.bdd.level_of_var(v))
+        sorted_vars = sorted(all_vars, key=bdd_model.bdd.level_of_var)
         bdd_model.vars_order = sorted_vars
         bdd_model.vars_features = {var: var for var in bdd_model.vars_order}
         bdd_model.features_vars = {var: var for var in bdd_model.vars_order}
