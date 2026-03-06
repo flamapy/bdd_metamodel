@@ -1,0 +1,9 @@
+features
+	root
+		optional
+			parent
+				[0..1]
+					a
+					b
+					c
+					d
