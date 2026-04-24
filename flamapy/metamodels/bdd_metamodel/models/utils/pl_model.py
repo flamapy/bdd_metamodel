@@ -111,11 +111,13 @@ class PLModel():
         and_str = self.logic_connectives['AND']
         or_str = self.logic_connectives['OR']
 
+        card_min = relation.card_min
+        card_max = relation.card_max if relation.card_max != -1 else len(children)
         all_clauses = []
 
         # 1. If the parent is active, prohibit combinations outside the range [min..max]
         for val in range(len(children) + 1):
-            if val < relation.card_min or val > relation.card_max:
+            if val < card_min or val > card_max:
                 for combination in itertools.combinations(children, val):
                     # To prohibit an exact combination: (NOT parent OR NOT child1 OR child2...)
                     clause_parts = [f"{not_str}{parent}"]
