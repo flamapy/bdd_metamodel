@@ -89,21 +89,20 @@ class PLModel():
         return f" {and_str} ".join(f"({f})" for f in formula)
 
     def _get_mutex_formula(self, relation: Relation) -> str:
-        formula = []
-        parent = relation.parent.name
-        children = {child.name for child in relation.children}
         equiv_str = self.logic_connectives['EQUIVALENCE']
         and_str = self.logic_connectives['AND']
         not_str = self.logic_connectives['NOT']
         or_str = self.logic_connectives['OR']
+        parent = relation.parent.name
+        children = {child.name for child in relation.children}
+
+        one_child_formula = []
         for child in children:
-            children_negatives = children - {child}
-            neg_children = f" {and_str} ".join(not_str + cn for cn in children_negatives)
-            formula.append(f"{child} {equiv_str} ({neg_children} {and_str} {parent})")
-        formula_str = f" {and_str} ".join(f"({f})" for f in formula)
-        children_or = f" {or_str} ".join(child for child in children)
-        left = f"({parent} {equiv_str} {not_str} ({children_or}))"
-        return f"{left} {or_str} ({formula_str})"
+            other_children_or = f" {or_str} ".join(c for c in children - {child})
+            one_child_formula.append(f"({not_str} {child} {equiv_str} ({other_children_or}))")
+        one_child_str = f" {and_str} ".join(f for f in one_child_formula)
+        no_child_str = f" {and_str} ".join(f"{not_str} {c}" for c in children)
+        return f"({no_child_str}) {or_str} (({one_child_str}) {and_str} {parent})"
 
     def _get_cardinality_formula(self, relation: Relation) -> str:
         parent = relation.parent.name
