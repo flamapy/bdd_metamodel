@@ -52,7 +52,7 @@ class BDDMetrics(Metrics):
         self.model = cast(BDDModel, model)
 
         # Do some basic calculations to speedup the rest
-        self._features = list(self.model.features_variables.keys())
+        self._features = list(self.model.features_vars.keys())
         self._configurations_number = (
             bdd_operations.BDDConfigurationsNumber().execute(self.model).get_result()
         )
