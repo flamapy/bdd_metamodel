@@ -4,15 +4,15 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "flamapy-bdd"
-version = "2.6.0.dev2"
+version = "2.6.0.dev3"
 description = "bdd-plugin for the automated analysis of feature models"
 readme = "README.md"
 license = "GPL-3.0-or-later"
 authors = [{ name = "Flamapy", email = "flamapy@us.es" }]
 requires-python = ">=3.11"
 dependencies = [
-    "flamapy-fw~=2.6.0.dev2",
-    "flamapy-fm~=2.6.0.dev2",
+    "flamapy-fw~=2.6.0.dev3",
+    "flamapy-fm~=2.6.0.dev3",
     "dd~=0.6.0",
     "graphviz~=0.20",
 ]
