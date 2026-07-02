@@ -55,7 +55,7 @@ class BDDModel(VariabilityModel):
 
     def count_solutions(self) -> int:
         """Count the number of valid configurations (SAT)."""
-        return self.bdd.count(self.root, len(self.vars))  # count(node, n_vars)
+        return self.bdd.count(self.root, len(self.vars_order))  # count(node, n_vars)
 
     def dump_structure(self) -> None:
         """Prints the structure of the BDD for debugging purposes."""

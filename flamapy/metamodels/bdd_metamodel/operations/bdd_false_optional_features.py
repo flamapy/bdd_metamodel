@@ -9,7 +9,7 @@ from flamapy.metamodels.fm_metamodel.models import FeatureModel
 from flamapy.metamodels.bdd_metamodel.models import BDDModel
 
 
-LOGGER = logging.getLogger('PySATFalseOptionalFeatures')
+LOGGER = logging.getLogger('BDDFalseOptionalFeatures')
 
 
 class BDDFalseOptionalFeatures(FalseOptionalFeatures):
@@ -25,11 +25,11 @@ class BDDFalseOptionalFeatures(FalseOptionalFeatures):
 
     def execute(self, model: VariabilityModel) -> 'BDDFalseOptionalFeatures':
         bdd_model = cast(BDDModel, model)
-        try:
-            feature_model = cast(FeatureModel, model.original_model)
-        except FlamaException:
-            LOGGER.exception("The transformation didn't attach the source model, "
-                             "which is required for this operation.")
+        original_model = getattr(model, 'original_model', None)
+        if original_model is None:
+            raise FlamaException("The transformation didn't attach the source model, "
+                                 "which is required for this operation.")
+        feature_model = cast(FeatureModel, original_model)
         self._result = get_false_optional_features(bdd_model, feature_model)
         return self
 
