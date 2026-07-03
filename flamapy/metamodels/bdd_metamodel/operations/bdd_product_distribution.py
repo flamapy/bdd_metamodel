@@ -9,6 +9,12 @@ from flamapy.metamodels.bdd_metamodel.operations.interfaces import ProductDistri
 class BDDProductDistribution(ProductDistribution):
 
     facade = OperationDescriptor(
+        doc=(
+            'Returns the distribution of products by number of activated features. The\n'
+            'value at index i is the count of valid configurations that have exactly i\n'
+            'features selected.'
+        ),
+        returns='Union[None, List[int]]',
         name='product_distribution', operation='BDDProductDistribution', default_backend='bdd'
     )
     def __init__(self) -> None:

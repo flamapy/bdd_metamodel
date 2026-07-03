@@ -16,6 +16,10 @@ class BDDConfigurationsWithNFeatures(Operation):
     """Operation to get all configurations with exactly n selected features from a BDD model."""
 
     facade = OperationDescriptor(
+        doc=(
+            'Returns all valid configurations that have exactly n features selected.'
+        ),
+        returns='Union[None, List[Configuration]]',
         name='configurations_with_n_features', operation='BDDConfigurationsWithNFeatures',
         default_backend='bdd',
         inputs=(Input('n', int, required=True, setter='set_n_features'),),

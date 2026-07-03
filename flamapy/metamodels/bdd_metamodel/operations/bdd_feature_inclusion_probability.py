@@ -16,6 +16,12 @@ class BDDFeatureInclusionProbability(FeatureInclusionProbability):
     """
 
     facade = OperationDescriptor(
+        doc=(
+            'Returns a mapping from each feature name to its inclusion probability: the\n'
+            'fraction of valid configurations in which that feature is selected. Core\n'
+            'features have probability 1.0 and dead features have probability 0.0.'
+        ),
+        returns='Union[None, Dict[str, float]]',
         name='feature_inclusion_probability', operation='BDDFeatureInclusionProbability',
         default_backend='bdd',
     )

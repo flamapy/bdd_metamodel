@@ -11,6 +11,12 @@ from flamapy.metamodels.bdd_metamodel.operations import BDDFeatureInclusionProba
 class BDDPureOptionalFeatures(PureOptionalFeatures):
 
     facade = OperationDescriptor(
+        doc=(
+            'Returns features with a feature inclusion probability of exactly 0.5, meaning\n'
+            'they are selected in exactly half of the valid configurations. These are the\n'
+            'most unconstrained optional features.'
+        ),
+        returns='Union[None, List[str]]',
         name='pure_optional_features', operation='BDDPureOptionalFeatures', default_backend='bdd'
     )
     def __init__(self) -> None:

@@ -10,6 +10,11 @@ from flamapy.metamodels.bdd_metamodel.operations.interfaces import UniqueFeature
 class BDDUniqueFeatures(UniqueFeatures):
 
     facade = OperationDescriptor(
+        doc=(
+            'Returns features that appear in exactly one valid configuration. These\n'
+            'features uniquely identify a single product in the product line.'
+        ),
+        returns='Union[None, List[str]]',
         name='unique_features', operation='BDDUniqueFeatures', default_backend='bdd'
     )
     def __init__(self) -> None:
