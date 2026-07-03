@@ -70,6 +70,7 @@ def test_bdd_satisfiable(path: str, expected: bool):
         ("resources/models/uvl_models/Pizzas_complex.uvl", 25),
         ("resources/models/uvl_models/Truck.uvl", 234),
         ("resources/models/uvl_models/group_cardinalities.uvl", 16),
+        ("resources/models/uvl_models/mutex.uvl", 6)
         # ('resources/models/uvl_models/Trimesh_NFM.uvl', 734720),
     ],
 )

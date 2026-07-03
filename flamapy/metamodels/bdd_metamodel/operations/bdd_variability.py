@@ -1,12 +1,23 @@
 from typing import cast
 
 from flamapy.core.models import VariabilityModel
+from flamapy.core.operations.descriptor import OperationDescriptor
 from flamapy.metamodels.bdd_metamodel.models import BDDModel
 from flamapy.metamodels.bdd_metamodel.operations.interfaces import Variability
 from flamapy.metamodels.bdd_metamodel.operations import BDDConfigurationsNumber, BDDVariantFeatures
 
 
 class BDDVariability(Variability):
+
+    facade = OperationDescriptor(
+        doc=(
+            'Returns a tuple of (total_variability, partial_variability). Total variability\n'
+            'is the ratio of valid configurations to the theoretical maximum; partial\n'
+            'variability is the ratio relative to only the variant features.'
+        ),
+        returns='Union[None, Tuple[float, float]]',
+        name='variability', operation='BDDVariability', default_backend='bdd'
+    )
     def __init__(self) -> None:
         self._result: tuple[float, float] = (0.0, 0.0)
 

@@ -1,12 +1,22 @@
 from typing import Any, Optional, cast
 
 from flamapy.core.models import VariabilityModel
+from flamapy.core.operations.descriptor import OperationDescriptor
 from flamapy.metamodels.configuration_metamodel.models.configuration import Configuration
 from flamapy.metamodels.bdd_metamodel.models import BDDModel
 from flamapy.metamodels.bdd_metamodel.operations.interfaces import UniqueFeatures
 
 
 class BDDUniqueFeatures(UniqueFeatures):
+
+    facade = OperationDescriptor(
+        doc=(
+            'Returns features that appear in exactly one valid configuration. These\n'
+            'features uniquely identify a single product in the product line.'
+        ),
+        returns='Union[None, List[str]]',
+        name='unique_features', operation='BDDUniqueFeatures', default_backend='bdd'
+    )
     def __init__(self) -> None:
         self._result: list[Any] = []
         self._partial_configuration: Optional[Configuration] = None

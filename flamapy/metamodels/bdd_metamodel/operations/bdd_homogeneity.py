@@ -1,6 +1,7 @@
 from typing import cast
 
 from flamapy.core.models import VariabilityModel
+from flamapy.core.operations.descriptor import OperationDescriptor
 from flamapy.metamodels.configuration_metamodel.models.configuration import Configuration
 from flamapy.metamodels.bdd_metamodel.models import BDDModel
 from flamapy.metamodels.bdd_metamodel.operations.interfaces import Homogeneity
@@ -8,6 +9,16 @@ from flamapy.metamodels.bdd_metamodel.operations import BDDCommonalityFactor
 
 
 class BDDHomogeneity(Homogeneity):
+
+    facade = OperationDescriptor(
+        doc=(
+            'Measures how similar the products of the feature model are to each other. It\n'
+            'is computed as the average commonality factor across all features. A value of\n'
+            '1.0 means all products are identical; lower values indicate more diversity.'
+        ),
+        returns='Union[None, float]',
+        name='homogeneity', operation='BDDHomogeneity', default_backend='bdd'
+    )
     def __init__(self) -> None:
         self._result: float = 0.0
 

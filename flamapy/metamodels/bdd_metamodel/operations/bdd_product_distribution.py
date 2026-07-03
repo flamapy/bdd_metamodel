@@ -1,11 +1,22 @@
 from typing import cast, Any
 
 from flamapy.core.models import VariabilityModel
+from flamapy.core.operations.descriptor import OperationDescriptor
 from flamapy.metamodels.bdd_metamodel.models import BDDModel
 from flamapy.metamodels.bdd_metamodel.operations.interfaces import ProductDistribution
 
 
 class BDDProductDistribution(ProductDistribution):
+
+    facade = OperationDescriptor(
+        doc=(
+            'Returns the distribution of products by number of activated features. The\n'
+            'value at index i is the count of valid configurations that have exactly i\n'
+            'features selected.'
+        ),
+        returns='Union[None, List[int]]',
+        name='product_distribution', operation='BDDProductDistribution', default_backend='bdd'
+    )
     def __init__(self) -> None:
         self._result: list[int] = []
 
