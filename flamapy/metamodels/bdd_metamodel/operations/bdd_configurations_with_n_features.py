@@ -2,13 +2,25 @@ from typing import cast, Any, Generator
 
 from flamapy.core.models import VariabilityModel
 from flamapy.core.operations import Operation
+from flamapy.core.operations.descriptor import OperationDescriptor, Input
 from flamapy.metamodels.configuration_metamodel.models import Configuration
 from flamapy.metamodels.bdd_metamodel.models import BDDModel
 from flamapy.metamodels.bdd_metamodel.operations.bdd_product_distribution import DistributionEngine
 
 
+def _configurations_with_n_features_result(result: Any) -> Any:
+    return list(result)
+
+
 class BDDConfigurationsWithNFeatures(Operation):
     """Operation to get all configurations with exactly n selected features from a BDD model."""
+
+    facade = OperationDescriptor(
+        name='configurations_with_n_features', operation='BDDConfigurationsWithNFeatures',
+        default_backend='bdd',
+        inputs=(Input('n', int, required=True, setter='set_n_features'),),
+        result_adapter=_configurations_with_n_features_result,
+    )
 
     def __init__(self) -> None:
         self._result: Generator[Configuration, None, None]

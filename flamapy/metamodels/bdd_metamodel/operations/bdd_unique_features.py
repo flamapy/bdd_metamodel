@@ -1,12 +1,17 @@
 from typing import Any, Optional, cast
 
 from flamapy.core.models import VariabilityModel
+from flamapy.core.operations.descriptor import OperationDescriptor
 from flamapy.metamodels.configuration_metamodel.models.configuration import Configuration
 from flamapy.metamodels.bdd_metamodel.models import BDDModel
 from flamapy.metamodels.bdd_metamodel.operations.interfaces import UniqueFeatures
 
 
 class BDDUniqueFeatures(UniqueFeatures):
+
+    facade = OperationDescriptor(
+        name='unique_features', operation='BDDUniqueFeatures', default_backend='bdd'
+    )
     def __init__(self) -> None:
         self._result: list[Any] = []
         self._partial_configuration: Optional[Configuration] = None

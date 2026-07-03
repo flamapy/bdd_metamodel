@@ -1,6 +1,7 @@
 from typing import Any, Optional, cast
 
 from flamapy.core.models import VariabilityModel
+from flamapy.core.operations.descriptor import OperationDescriptor
 from flamapy.metamodels.configuration_metamodel.models.configuration import Configuration
 from flamapy.metamodels.bdd_metamodel.models import BDDModel
 from flamapy.metamodels.bdd_metamodel.operations.interfaces import FeatureInclusionProbability
@@ -13,6 +14,11 @@ class BDDFeatureInclusionProbability(FeatureInclusionProbability):
     Ref.: [Heradio et al. 2019. Supporting the Statistical Analysis of Variability Models.
     (https://doi.org/10.1109/ICSE.2019.00091)]
     """
+
+    facade = OperationDescriptor(
+        name='feature_inclusion_probability', operation='BDDFeatureInclusionProbability',
+        default_backend='bdd',
+    )
 
     def __init__(self) -> None:
         self._result: dict[Any, float] = {}

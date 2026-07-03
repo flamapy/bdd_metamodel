@@ -1,6 +1,7 @@
 from typing import cast
 
 from flamapy.core.models import VariabilityModel
+from flamapy.core.operations.descriptor import OperationDescriptor
 from flamapy.metamodels.configuration_metamodel.models.configuration import Configuration
 from flamapy.metamodels.bdd_metamodel.models import BDDModel
 from flamapy.metamodels.bdd_metamodel.operations.interfaces import Homogeneity
@@ -8,6 +9,10 @@ from flamapy.metamodels.bdd_metamodel.operations import BDDCommonalityFactor
 
 
 class BDDHomogeneity(Homogeneity):
+
+    facade = OperationDescriptor(
+        name='homogeneity', operation='BDDHomogeneity', default_backend='bdd'
+    )
     def __init__(self) -> None:
         self._result: float = 0.0
 

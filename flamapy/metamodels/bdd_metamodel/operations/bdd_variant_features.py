@@ -1,6 +1,7 @@
 from typing import Any, Optional, cast
 
 from flamapy.core.models import VariabilityModel
+from flamapy.core.operations.descriptor import OperationDescriptor
 from flamapy.metamodels.configuration_metamodel.models.configuration import Configuration
 from flamapy.metamodels.bdd_metamodel.models import BDDModel
 from flamapy.metamodels.bdd_metamodel.operations.interfaces import VariantFeatures
@@ -8,6 +9,10 @@ from flamapy.metamodels.bdd_metamodel.operations import BDDFeatureInclusionProba
 
 
 class BDDVariantFeatures(VariantFeatures):
+
+    facade = OperationDescriptor(
+        name='variant_features', operation='BDDVariantFeatures', default_backend='bdd'
+    )
     def __init__(self) -> None:
         self._result: list[Any] = []
         self._partial_configuration: Optional[Configuration] = None

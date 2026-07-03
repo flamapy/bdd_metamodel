@@ -1,12 +1,17 @@
 from typing import cast
 
 from flamapy.core.models import VariabilityModel
+from flamapy.core.operations.descriptor import OperationDescriptor
 from flamapy.metamodels.bdd_metamodel.models import BDDModel
 from flamapy.metamodels.bdd_metamodel.operations.interfaces import Variability
 from flamapy.metamodels.bdd_metamodel.operations import BDDConfigurationsNumber, BDDVariantFeatures
 
 
 class BDDVariability(Variability):
+
+    facade = OperationDescriptor(
+        name='variability', operation='BDDVariability', default_backend='bdd'
+    )
     def __init__(self) -> None:
         self._result: tuple[float, float] = (0.0, 0.0)
 
