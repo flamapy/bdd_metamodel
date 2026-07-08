@@ -26,6 +26,9 @@ dev = [
     "coverage",
 ]
 
+[project.entry-points."flamapy.plugins"]
+bdd = "flamapy.metamodels.bdd_metamodel"
+
 [project.urls]
 Homepage = "https://github.com/flamapy/bdd_metamodel"
 
