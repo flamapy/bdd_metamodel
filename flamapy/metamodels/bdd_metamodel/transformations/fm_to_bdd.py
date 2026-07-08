@@ -1,14 +1,23 @@
 from typing import Optional
 
-from flamapy.core.transformations import ModelToModel
+from flamapy.core.models import VariabilityModel
+from flamapy.core.transformations import CacheableModelToModel
 from flamapy.metamodels.fm_metamodel.models import FeatureModel
 from flamapy.metamodels.fm_metamodel.transformations import FMSecureFeaturesNames
 from flamapy.metamodels.bdd_metamodel.models import BDDModel
 from flamapy.metamodels.bdd_metamodel.models.utils import PLModel
 
 
-class FmToBDD(ModelToModel):
-    """Transforms a Feature Model into a BDD Model."""
+class FmToBDD(CacheableModelToModel):
+    """Transforms a Feature Model into a BDD Model.
+
+    BDD compilation is the expensive step, so the transformation is cacheable: the compiled
+    BDD round-trips through the DDDMP serialization (opt-in via FLAMAPY_CACHE=1), and only
+    the cheap feature-name mapping is recomputed on a cache load.
+    """
+
+    artifact_suffix = "dddmp"
+    artifact_format_version = 1
 
     @staticmethod
     def get_source_extension() -> str:
@@ -21,6 +30,25 @@ class FmToBDD(ModelToModel):
     def __init__(self, source_model: FeatureModel) -> None:
         self.source_model = source_model
         self.destination_model: Optional[BDDModel] = None
+
+    def dump_artifact(self, model: VariabilityModel, path: str) -> None:
+        # Local import: the writer imports models, keep module import light.
+        from flamapy.metamodels.bdd_metamodel.transformations.dddmp_writer import (  # noqa: PLC0415  pylint: disable=import-outside-toplevel,cyclic-import
+            DDDMPWriter,
+        )
+        DDDMPWriter(path, model).transform()  # type: ignore[arg-type]
+
+    def load_artifact(self, path: str, source_model: VariabilityModel) -> VariabilityModel:
+        from flamapy.metamodels.bdd_metamodel.transformations.dddmp_reader import (  # noqa: PLC0415  pylint: disable=import-outside-toplevel,cyclic-import
+            DDDMPReader,
+        )
+        model = DDDMPReader(path).transform()
+        fm_secure_names_op = FMSecureFeaturesNames(source_model)  # type: ignore[arg-type]
+        secured_model = fm_secure_names_op.transform()
+        model.features_vars = fm_secure_names_op.mapping_names
+        model.vars_features = {v: f for f, v in model.features_vars.items()}
+        model.original_model = secured_model
+        return model
 
     def transform(self) -> BDDModel:
         fm_secure_names_op = FMSecureFeaturesNames(self.source_model)
