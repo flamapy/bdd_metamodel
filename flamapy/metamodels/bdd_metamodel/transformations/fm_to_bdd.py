@@ -1,22 +1,30 @@
-from typing import Optional
+from typing import Any, Optional, cast
 
 from flamapy.core.models import VariabilityModel
 from flamapy.core.transformations import CacheableModelToModel
 from flamapy.metamodels.fm_metamodel.models import FeatureModel
 from flamapy.metamodels.fm_metamodel.transformations import FMSecureFeaturesNames
 from flamapy.metamodels.bdd_metamodel.models import BDDModel
+from flamapy.metamodels.bdd_metamodel.models.bdd_model import BDD
 from flamapy.metamodels.bdd_metamodel.models.utils import PLModel
+
+
+# The dd package ships two engines: 'cudd' (C extension, only when dd is built against
+# CUDD) and the pure-Python 'autoref' that a plain `pip install dd` provides. Only CUDD can
+# write DDDMP, so cached artifacts use DDDMP with CUDD and dd's JSON format otherwise.
+DD_BACKEND = BDD.__module__.rsplit('.', 1)[-1]
 
 
 class FmToBDD(CacheableModelToModel):
     """Transforms a Feature Model into a BDD Model.
 
     BDD compilation is the expensive step, so the transformation is cacheable: the compiled
-    BDD round-trips through the DDDMP serialization (opt-in via FLAMAPY_CACHE=1), and only
-    the cheap feature-name mapping is recomputed on a cache load.
+    BDD round-trips through DDDMP (dd built with CUDD) or dd's JSON format (the pure-Python
+    engine), opt-in via FLAMAPY_CACHE=1, and only the cheap feature-name mapping is
+    recomputed on a cache load.
     """
 
-    artifact_suffix = "dddmp"
+    artifact_suffix = "dddmp" if DD_BACKEND == "cudd" else "json"
     artifact_format_version = 1
 
     @staticmethod
@@ -31,19 +39,30 @@ class FmToBDD(CacheableModelToModel):
         self.source_model = source_model
         self.destination_model: Optional[BDDModel] = None
 
+    def cache_options(self) -> dict[str, Any]:
+        # Artifacts written by one dd engine are never loaded by the other.
+        return {"dd_backend": DD_BACKEND}
+
     def dump_artifact(self, model: VariabilityModel, path: str) -> None:
+        bdd_model = cast(BDDModel, model)
+        if DD_BACKEND != "cudd":
+            bdd_model.save_bdd(path, [bdd_model.root], "json")
+            return
         # Local import: the writer imports models, keep module import light.
         from flamapy.metamodels.bdd_metamodel.transformations.dddmp_writer import (  # noqa: PLC0415  pylint: disable=import-outside-toplevel,cyclic-import
             DDDMPWriter,
         )
-        DDDMPWriter(path, model).transform()  # type: ignore[arg-type]
+        DDDMPWriter(path, bdd_model).transform()
 
     def load_artifact(self, path: str, source_model: VariabilityModel) -> VariabilityModel:
-        from flamapy.metamodels.bdd_metamodel.transformations.dddmp_reader import (  # noqa: PLC0415  pylint: disable=import-outside-toplevel,cyclic-import
-            DDDMPReader,
-        )
-        model = DDDMPReader(path).transform()
-        fm_secure_names_op = FMSecureFeaturesNames(source_model)  # type: ignore[arg-type]
+        if DD_BACKEND != "cudd":
+            model = BDDModel.load_bdd(path)
+        else:
+            from flamapy.metamodels.bdd_metamodel.transformations.dddmp_reader import (  # noqa: PLC0415  pylint: disable=import-outside-toplevel,cyclic-import
+                DDDMPReader,
+            )
+            model = DDDMPReader(path).transform()
+        fm_secure_names_op = FMSecureFeaturesNames(cast(FeatureModel, source_model))
         secured_model = fm_secure_names_op.transform()
         model.features_vars = fm_secure_names_op.mapping_names
         model.vars_features = {v: f for f, v in model.features_vars.items()}

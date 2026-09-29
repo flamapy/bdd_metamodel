@@ -2,6 +2,7 @@ import pytest
 
 from flamapy.core.discover import DiscoverMetamodels
 from flamapy.metamodels.bdd_metamodel.operations import BDDConfigurationsNumber
+from flamapy.metamodels.bdd_metamodel.transformations.fm_to_bdd import FmToBDD
 
 MODEL = 'resources/models/uvl_models/Pizzas.uvl'
 
@@ -25,7 +26,7 @@ def test_bdd_cache_round_trip(cache_dir):
 
     first = dm.use_transformation_m2m(fm_model, 'bdd')
     assert not getattr(first, '_flamapy_cache_hit', False)
-    assert any(cache_dir.glob('*-bdd-*.dddmp'))
+    assert any(cache_dir.glob(f'*-bdd-*.{FmToBDD.artifact_suffix}'))
 
     second = dm.use_transformation_m2m(fm_model, 'bdd')
     assert getattr(second, '_flamapy_cache_hit', False)
