@@ -1,6 +1,7 @@
 import pytest
 from collections import defaultdict
 
+from flamapy.core.exceptions import FlamaException
 from flamapy.metamodels.configuration_metamodel.models import Configuration
 from flamapy.metamodels.fm_metamodel.transformations import UVLReader
 from flamapy.metamodels.bdd_metamodel.models import BDDModel
@@ -650,3 +651,43 @@ def test_sampling(path: str, sample_size: int, expected: list):
     sampling_op.set_sample_size(sample_size)
     sample = sampling_op.execute(bdd_model).get_result()
     assert len(sample) == expected
+
+
+_COLLIDING_NAMES_UVL = """features
+    Root
+        optional
+            "A B"
+            A_B
+constraints
+    "A B" => !A_B
+"""
+
+_REPEATED_NAMES_UVL = """features
+    Root
+        optional
+            A
+                optional
+                    X
+            B
+                optional
+                    X
+"""
+
+
+def test_names_sanitizing_to_the_same_string_are_distinct_variables(tmp_path):
+    # 'A B' and 'A_B' must not collapse into one BDD variable: {Root}, {Root, A B}, {Root, A_B}.
+    path = tmp_path / "colliding.uvl"
+    path.write_text(_COLLIDING_NAMES_UVL)
+    bdd_model = _read_model(str(path))
+    assert BDDConfigurationsNumber().execute(bdd_model).get_result() == 3
+    probabilities = BDDFeatureInclusionProbability().execute(bdd_model).get_result()
+    assert set(probabilities) == {"Root", "A B", "A_B"}
+    assert BDDCoreFeatures().execute(bdd_model).get_result() == ["Root"]
+
+
+def test_repeated_feature_names_are_rejected(tmp_path):
+    path = tmp_path / "repeated.uvl"
+    path.write_text(_REPEATED_NAMES_UVL)
+    feature_model = UVLReader(str(path)).transform()
+    with pytest.raises(FlamaException, match="repeated feature name"):
+        FmToBDD(feature_model).transform()
