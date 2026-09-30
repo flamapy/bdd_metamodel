@@ -25,7 +25,9 @@ class FmToBDD(CacheableModelToModel):
     """
 
     artifact_suffix = "dddmp" if DD_BACKEND == "cudd" else "json"
-    artifact_format_version = 1
+    # 2: feature-name mapping fixed for names that sanitize alike (FMSecureFeaturesNames);
+    # artifacts compiled before that may hold merged variables and must not be reused.
+    artifact_format_version = 2
 
     @staticmethod
     def get_source_extension() -> str:
