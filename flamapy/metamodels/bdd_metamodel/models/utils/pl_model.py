@@ -1,4 +1,3 @@
-import re
 import itertools
 
 from flamapy.core.models.ast import ASTOperation
@@ -143,37 +142,20 @@ class PLModel():
         return f" {and_str} ".join(all_clauses)
 
     def _get_constraint_formula(self, ctc: Constraint) -> str:
-        constraint_str = ctc.ast.pretty_str()
-        constraint_str = re.sub(
-            rf"\b{ASTOperation.XOR.value}\b", self.logic_connectives['XOR'], constraint_str
-        )
-        constraint_str = re.sub(
-            rf"\b{ASTOperation.NOT.value}\b", self.logic_connectives['NOT'], constraint_str
-        )
-        constraint_str = re.sub(
-            rf"\b{ASTOperation.AND.value}\b", self.logic_connectives['AND'], constraint_str
-        )
-        constraint_str = re.sub(
-            rf"\b{ASTOperation.OR.value}\b", self.logic_connectives['OR'], constraint_str
-        )
-        constraint_str = re.sub(
-            rf"\b{ASTOperation.IMPLIES.value}\b",
-            self.logic_connectives['IMPLIES'],
-            constraint_str,
-        )
-        constraint_str = re.sub(
-            rf"\b{ASTOperation.EQUIVALENCE.value}\b",
-            self.logic_connectives['EQUIVALENCE'],
-            constraint_str,
-        )
-        constraint_str = re.sub(
-            rf"\b{ASTOperation.REQUIRES.value}\b",
-            self.logic_connectives['IMPLIES'],
-            constraint_str,
-        )
-        constraint_str = re.sub(
-            rf"\b{ASTOperation.EXCLUDES.value}\b",
-            f"{self.logic_connectives['IMPLIES']} {self.logic_connectives['NOT']}",
-            constraint_str,
-        )
-        return constraint_str
+        """Write a logical constraint with this model's connectives.
+
+        `AST.pretty_str` replaces the operators node by node, so a feature called, e.g., `OR`
+        is never taken for an operator.
+        """
+        conn = self.logic_connectives
+        operators = {
+            ASTOperation.NOT: conn['NOT'],
+            ASTOperation.AND: conn['AND'],
+            ASTOperation.OR: conn['OR'],
+            ASTOperation.XOR: conn['XOR'],
+            ASTOperation.IMPLIES: conn['IMPLIES'],
+            ASTOperation.REQUIRES: conn['IMPLIES'],
+            ASTOperation.EQUIVALENCE: conn['EQUIVALENCE'],
+            ASTOperation.EXCLUDES: f"{conn['IMPLIES']} {conn['NOT']}",
+        }
+        return ctc.ast.pretty_str(operators)
