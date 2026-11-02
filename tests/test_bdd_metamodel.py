@@ -691,3 +691,23 @@ def test_repeated_feature_names_are_rejected(tmp_path):
     feature_model = UVLReader(str(path)).transform()
     with pytest.raises(FlamaException, match="repeated feature name"):
         FmToBDD(feature_model).transform()
+
+
+@pytest.mark.parametrize(
+    "uvl, expected_total",
+    [
+        # a single configuration ({R}): no variant features
+        ("features\n    R\n        optional\n            A\nconstraints\n    !A\n", 1 / 3),
+        # void model: no configurations, no variant features
+        ("features\n    R\n        mandatory\n            A\nconstraints\n    !A\n", 0.0),
+    ],
+)
+def test_variability_without_variant_features(tmp_path, uvl: str, expected_total: float):
+    """Partial variability is 0 when there are no variant features (FLAME); it used to divide
+    by 2^0 - 1 = 0."""
+    path = tmp_path / "model.uvl"
+    path.write_text(uvl)
+    bdd_model = FmToBDD(UVLReader(str(path)).transform()).transform()
+    variability_op = BDDVariability().execute(bdd_model)
+    assert round(variability_op.total_variability(), PRECISION) == round(expected_total, PRECISION)
+    assert variability_op.partial_variability() == 0.0

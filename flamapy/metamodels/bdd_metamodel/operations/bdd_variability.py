@@ -37,8 +37,14 @@ class BDDVariability(Variability):
 
 
 def variability(bdd_model: BDDModel) -> tuple[float, float]:
+    """(total, partial) variability as defined in FLAME (see the Variability interface):
+    configurations / (2^n - 1), with n all the features or only the variant ones. Partial
+    variability is 0 when there are no variant features (void model or a single configuration).
+    """
     n_configs = BDDConfigurationsNumber().execute(bdd_model).get_result()
     total_variability = n_configs / (2 ** len(bdd_model.vars_order) - 1)
     variant_features = BDDVariantFeatures().execute(bdd_model).get_result()
+    if not variant_features:
+        return (total_variability, 0.0)
     partial_variability = n_configs / (2 ** len(variant_features) - 1)
     return (total_variability, partial_variability)
