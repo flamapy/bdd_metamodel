@@ -7,7 +7,7 @@ from flamapy.core.operations.metrics_operation import Metrics
 from flamapy.metamodels.bdd_metamodel.models import BDDModel
 from flamapy.metamodels.bdd_metamodel import operations as bdd_operations
 from flamapy.metamodels.bdd_metamodel.operations.bdd_feature_inclusion_probability import (
-    exact_feature_inclusion,
+    feature_inclusion_counts,
 )
 
 
@@ -38,7 +38,7 @@ class BDDMetrics(Metrics):
         self._configurations_number: int = 0
         self._fip: dict[Any, float] = {}
         self._fip_exact: dict[Any, Fraction] = {}
-        self._prod_dist: list[int] = []
+        self._true_counts: dict[Any, int] = {}
         self._prod_dist_op: bdd_operations.BDDProductDistribution | None = None
         self._variant_features: list[Any] = []
 
@@ -58,13 +58,16 @@ class BDDMetrics(Metrics):
 
         # Do some basic calculations to speedup the rest
         self._features = list(self.model.features_vars.keys())
-        self._configurations_number = (
-            bdd_operations.BDDConfigurationsNumber().execute(self.model).get_result()
-        )
-        self._prod_dist_op = bdd_operations.BDDProductDistribution()
-        self._prod_dist = self._prod_dist_op.execute(self.model).get_result()
-        # exact probabilities decide core / dead / variant / pure optional; the floats are reported
-        self._fip_exact = exact_feature_inclusion(self.model)
+        self._prod_dist_op = None  # the product distribution is computed on first use
+        # One traversal gives the number of configurations and, per feature, how many select
+        # it: exact probabilities decide core / dead / variant / pure optional / unique and the
+        # homogeneity; the floats are reported.
+        self._configurations_number, self._true_counts = feature_inclusion_counts(self.model)
+        self._fip_exact = {
+            feat: (Fraction(count, self._configurations_number)
+                   if self._configurations_number else Fraction(0))
+            for feat, count in self._true_counts.items()
+        }
         self._fip = {feat: float(prob) for feat, prob in self._fip_exact.items()}
         self._variant_features = [feat for feat, prob in self._fip_exact.items() if 0 < prob < 1]
         # Get all methods that are marked with the metric_method decorator
@@ -78,6 +81,15 @@ class BDDMetrics(Metrics):
             metric_methods = [method for method in metric_methods if method.__name__ in self.filter]
 
         return [method() for method in metric_methods]
+
+    def _product_distribution(self) -> bdd_operations.BDDProductDistribution:
+        """The product distribution, computed once on first use: it costs a traversal with
+        one big-integer list per node, far more than the other metrics."""
+        if self._prod_dist_op is None:
+            if self.model is None:
+                raise FlamaException("Model not initialized.")
+            self._prod_dist_op = bdd_operations.BDDProductDistribution().execute(self.model)
+        return self._prod_dist_op
 
     @metric_method
     def satisfiable(self) -> dict[str, Any]:
@@ -156,7 +168,7 @@ class BDDMetrics(Metrics):
         if self.model is None:
             raise FlamaException("Model not initialized.")
         name = "Unique features"
-        _unique_features = bdd_operations.BDDUniqueFeatures().execute(self.model).get_result()
+        _unique_features = [feat for feat, count in self._true_counts.items() if count == 1]
         return self.construct_result(
             name=name,
             doc=self.unique_features.__doc__,
@@ -198,7 +210,8 @@ class BDDMetrics(Metrics):
         if self.model is None:
             raise FlamaException("Model not initialized.")
         name = "Homogeneity"
-        _homogeneity = bdd_operations.BDDHomogeneity().execute(self.model).get_result()
+        _homogeneity = (float(sum(self._fip_exact.values()) / len(self._fip_exact))
+                        if self._fip_exact else 0.0)
         return self.construct_result(name=name, doc=self.homogeneity.__doc__, result=_homogeneity)
 
     @metric_method
@@ -236,7 +249,7 @@ class BDDMetrics(Metrics):
         if self.model is None:
             raise FlamaException("Model not initialized.")
         name = "Product distribution"
-        _dist = self._prod_dist
+        _dist = self._product_distribution().get_result()
         return self.construct_result(name=name, doc=self.product_distribution.__doc__, result=_dist)
 
     @metric_method
@@ -246,9 +259,8 @@ class BDDMetrics(Metrics):
         Min, Max, and Range, of the product distribution of the variability model."""
         if self.model is None:
             raise FlamaException("Model not initialized.")
-        assert self._prod_dist_op is not None
         name = "Descriptive statistics"
-        _desc_stats = self._prod_dist_op.descriptive_statistics()
+        _desc_stats = self._product_distribution().descriptive_statistics()
         return self.construct_result(
             name=name, doc=self.descriptive_statistics.__doc__, result=_desc_stats
         )

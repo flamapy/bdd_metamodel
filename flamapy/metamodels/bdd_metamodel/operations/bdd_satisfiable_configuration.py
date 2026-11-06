@@ -4,7 +4,9 @@ from flamapy.core.models import VariabilityModel
 from flamapy.metamodels.configuration_metamodel.models import Configuration
 from flamapy.core.operations import SatisfiableConfiguration
 from flamapy.metamodels.bdd_metamodel.models import BDDModel
-from flamapy.metamodels.bdd_metamodel.operations import BDDConfigurationsNumber
+from flamapy.metamodels.bdd_metamodel.operations.bdd_feature_inclusion_probability import (
+    partial_assignment,
+)
 
 
 class BDDSatisfiableConfiguration(SatisfiableConfiguration):
@@ -27,15 +29,9 @@ class BDDSatisfiableConfiguration(SatisfiableConfiguration):
         return self.get_result()
 
 
-def is_satisfiable(bdd_model: BDDModel, configuration: Configuration) -> bool:
-    config_number_op = BDDConfigurationsNumber()
-    if not configuration.is_full:
-        config_number_op.set_partial_configuration(configuration)
-    else:
-        config = Configuration(dict(configuration.elements))
-        for feature in bdd_model.features_vars.keys():
-            if feature not in config.elements:
-                config.elements[feature] = False
-        config_number_op.set_partial_configuration(config)
-    n_configs = config_number_op.execute(bdd_model).get_result()
-    return n_configs > 0
+def is_satisfiable(bdd_model: BDDModel, configuration: Optional[Configuration]) -> bool:
+    """Whether some product extends the configuration (every product, for a full one): the
+    BDD restricted to the configuration is not the false node. No counting is needed."""
+    assignment = partial_assignment(bdd_model, configuration) or {}
+    root = bdd_model.bdd.let(assignment, bdd_model.root) if assignment else bdd_model.root
+    return root != bdd_model.bdd.false

@@ -2,10 +2,11 @@ from typing import cast
 
 from flamapy.core.models import VariabilityModel
 from flamapy.core.operations.descriptor import OperationDescriptor
-from flamapy.metamodels.configuration_metamodel.models.configuration import Configuration
 from flamapy.metamodels.bdd_metamodel.models import BDDModel
 from flamapy.metamodels.bdd_metamodel.operations.interfaces import Homogeneity
-from flamapy.metamodels.bdd_metamodel.operations import BDDCommonalityFactor
+from flamapy.metamodels.bdd_metamodel.operations.bdd_feature_inclusion_probability import (
+    feature_inclusion_fractions,
+)
 
 
 class BDDHomogeneity(Homogeneity):
@@ -35,12 +36,12 @@ class BDDHomogeneity(Homogeneity):
 
 
 def homogeneity(bdd_model: BDDModel) -> float:
-    commonality_sum = 0.0
-    commonality_op = BDDCommonalityFactor()
+    """The mean commonality factor of the features.
 
-    for feature in bdd_model.features_vars.keys():
-        config = Configuration(elements={feature: True})
-        commonality_op.set_configuration(config)
-        commonality_sum += commonality_op.execute(bdd_model).get_result()
-    return commonality_sum / len(bdd_model.features_vars)
-
+    The commonality factor of a feature is its inclusion probability, so the mean of the exact
+    probabilities (one traversal of the BDD for every feature) is the homogeneity.
+    """
+    fractions = feature_inclusion_fractions(bdd_model)
+    if not fractions:
+        return 0.0
+    return float(sum(fractions.values()) / len(fractions))

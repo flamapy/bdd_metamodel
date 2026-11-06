@@ -5,6 +5,9 @@ from flamapy.core.operations.descriptor import OperationDescriptor
 from flamapy.metamodels.configuration_metamodel.models.configuration import Configuration
 from flamapy.metamodels.bdd_metamodel.models import BDDModel
 from flamapy.metamodels.bdd_metamodel.operations.interfaces import UniqueFeatures
+from flamapy.metamodels.bdd_metamodel.operations.bdd_feature_inclusion_probability import (
+    feature_inclusion_counts,
+)
 
 
 class BDDUniqueFeatures(UniqueFeatures):
@@ -37,34 +40,35 @@ class BDDUniqueFeatures(UniqueFeatures):
 
 
 def unique_features(bdd_model: BDDModel, config: Optional[Configuration] = None) -> list[Any]:
-    unique_features_list = []
+    """Features selected in exactly one configuration.
+
+    Without a configuration, the number of configurations selecting each feature comes from one
+    run of the inclusion-probability engine (one traversal for every feature). With a partial
+    configuration each feature is forced selected on top of the configuration and the remaining
+    configurations are counted, as before.
+    """
     if config is None:
-        for variable, feature in bdd_model.vars_features.items():
-            values = {variable: True}
-            u_func = bdd_model.bdd.let(values, bdd_model.root)
-            n_vars = len(bdd_model.vars_order) - len(values)
-            n_configs = bdd_model.count_models(u_func, n_vars)
-            if n_configs == 1:
-                unique_features_list.append(feature)
-    else:
-        values = {
-            bdd_model.features_vars[f]: selected
-            for f, selected in config.elements.items()
-        }
-        if config.is_full:
-            for feature, variable in bdd_model.features_vars.items():
-                if feature not in config.elements:
-                    values[variable] = False
-        for variable, feature in bdd_model.vars_features.items():
-            feature_selected = values.get(variable, None)
-            values[variable] = True
-            u_func = bdd_model.bdd.let(values, bdd_model.root)
-            n_vars = len(bdd_model.vars_order) - len(values)
-            n_configs = bdd_model.count_models(u_func, n_vars)
-            if n_configs == 1:
-                unique_features_list.append(feature)
-            if feature_selected is None:
-                values.pop(variable)
-            else:
-                values[variable] = feature_selected
+        _total, counts = feature_inclusion_counts(bdd_model)
+        return [feature for feature, count in counts.items() if count == 1]
+    unique_features_list = []
+    values = {
+        bdd_model.features_vars[f]: selected
+        for f, selected in config.elements.items()
+    }
+    if config.is_full:
+        for feature, variable in bdd_model.features_vars.items():
+            if feature not in config.elements:
+                values[variable] = False
+    for variable, feature in bdd_model.vars_features.items():
+        feature_selected = values.get(variable, None)
+        values[variable] = True
+        u_func = bdd_model.bdd.let(values, bdd_model.root)
+        n_vars = len(bdd_model.vars_order) - len(values)
+        n_configs = bdd_model.count_models(u_func, n_vars)
+        if n_configs == 1:
+            unique_features_list.append(feature)
+        if feature_selected is None:
+            values.pop(variable)
+        else:
+            values[variable] = feature_selected
     return unique_features_list

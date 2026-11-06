@@ -62,6 +62,8 @@ class FeatureInclusionEngine:
         # a Python int, as the counts of large models do not fit in a float (and the CUDD
         # engine's count() returns a float).
         self.total_sat = 0
+        # Solutions that select each feature, filled by run() (feature name -> count)
+        self.true_counts: dict[str, int] = {}
 
         # Counting stores
         self.s_count: dict[Any, int] = {}  # Solutions in sub-BDDs
@@ -69,9 +71,11 @@ class FeatureInclusionEngine:
         self.sol_node_high = dict.fromkeys(self.rem_vars, 0)
 
     def run(self) -> dict[str, Fraction]:
-        if not self.rem_vars:
-            return {self.bdd_model.vars_features[v]: Fraction(1 if self.assignment.get(v) else 0)
-                    for v in self.bdd_model.vars_order}
+        if not self.rem_vars:  # a full, satisfying assignment: the one solution
+            self.total_sat = 1
+            self.true_counts = {self.bdd_model.vars_features[v]: 1 if self.assignment.get(v) else 0
+                                for v in self.bdd_model.vars_order}
+            return {feat: Fraction(count) for feat, count in self.true_counts.items()}
 
         internal_nodes = self._get_internal_nodes()
 
@@ -175,23 +179,28 @@ class FeatureInclusionEngine:
                     self.w_minus[act_c] += wp * skip_factor
 
     def _build_final_fractions(self) -> dict[str, Fraction]:
-        """The exact inclusion probability of each variable, as a fraction of two integers."""
+        """The exact inclusion probability of each variable, as a fraction of two integers.
+
+        Also fills `true_counts`: the number of solutions that select each variable.
+        """
         final_fip: dict[str, Fraction] = {}
         for var in self.bdd_model.vars_order:
             feat = self.bdd_model.vars_features[var]
             if var in self.assignment:
-                final_fip[feat] = Fraction(1 if self.assignment[var] else 0)
+                count_v1 = self.total_sat if self.assignment[var] else 0
             else:
                 # Solutions with var = 1: those through a node of var taking its high branch,
-                # plus half of those that skip var. Exact integers, no division until the caller
-                # asks for a float: decisions such as "core" (= 1) or "dead" (= 0) must not be
-                # taken on a float, as on models with many configurations a probability within
-                # 1e-16 of 1 rounds to 1.0 and one below ~1e-308 underflows to 0.0.
+                # plus half of those that skip var (they come in pairs, one per value of var).
+                # Exact integers, no division until the caller asks for a float: decisions such
+                # as "core" (= 1) or "dead" (= 0) must not be taken on a float, as on models with
+                # many configurations a probability within 1e-16 of 1 rounds to 1.0 and one below
+                # ~1e-308 underflows to 0.0.
                 s_high = self.sol_node_high.get(var, 0)
                 s_total = self.sol_node_total.get(var, 0)
-                count_v1_twice = 2 * s_high + (self.total_sat - s_total)
-                final_fip[feat] = (Fraction(count_v1_twice, 2 * self.total_sat)
-                                   if self.total_sat > 0 else Fraction(0))
+                count_v1 = s_high + (self.total_sat - s_total) // 2
+            self.true_counts[feat] = count_v1
+            final_fip[feat] = (Fraction(count_v1, self.total_sat)
+                               if self.total_sat > 0 else Fraction(0))
         return final_fip
 
 
@@ -232,16 +241,34 @@ def feature_inclusion_fractions(bdd_model: BDDModel,
                                 assignment: Optional[dict[str, bool]] = None
                                ) -> dict[str, Fraction]:
     """Exact inclusion probability of each feature, as a Fraction."""
+    engine = _run_engine(bdd_model, assignment)
+    if engine is None:
+        return {bdd_model.vars_features[var]: Fraction(0) for var in bdd_model.vars_order}
+    return engine.run()
+
+
+def feature_inclusion_counts(bdd_model: BDDModel,
+                             assignment: Optional[dict[str, bool]] = None
+                             ) -> tuple[int, dict[str, int]]:
+    """The number of configurations (under the assignment) and, per feature, the number of
+    them that select the feature: exact integers from the same traversal as the probabilities.
+
+    A feature is core iff its count equals the total, dead iff it is 0, unique iff it is 1.
+    """
+    engine = _run_engine(bdd_model, assignment)
+    if engine is None:
+        return 0, {bdd_model.vars_features[var]: 0 for var in bdd_model.vars_order}
+    engine.run()
+    return engine.total_sat, engine.true_counts
+
+
+def _run_engine(bdd_model: BDDModel,
+                assignment: Optional[dict[str, bool]]) -> Optional[FeatureInclusionEngine]:
+    """The engine over the BDD restricted to the assignment, or None when no configuration
+    satisfies it (the restricted BDD is the false node)."""
     if assignment is None:
         assignment = {}
-
-    # 1. Restrict the BDD root based on the partial assignment
     target_root = bdd_model.bdd.let(assignment, bdd_model.root) if assignment else bdd_model.root
-
-    # 2. If the combination is impossible (UNSAT), all probabilities are 0
     if target_root == bdd_model.bdd.false:
-        return {bdd_model.vars_features[var]: Fraction(0) for var in bdd_model.vars_order}
-
-    # 3. Run the Feature Inclusion Probability Engine
-    engine = FeatureInclusionEngine(bdd_model, target_root, assignment)
-    return engine.run()
+        return None
+    return FeatureInclusionEngine(bdd_model, target_root, assignment)
