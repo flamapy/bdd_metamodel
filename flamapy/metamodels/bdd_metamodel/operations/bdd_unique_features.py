@@ -43,7 +43,7 @@ def unique_features(bdd_model: BDDModel, config: Optional[Configuration] = None)
             values = {variable: True}
             u_func = bdd_model.bdd.let(values, bdd_model.root)
             n_vars = len(bdd_model.vars_order) - len(values)
-            n_configs = bdd_model.bdd.count(u_func, nvars=n_vars)
+            n_configs = bdd_model.count_models(u_func, n_vars)
             if n_configs == 1:
                 unique_features_list.append(feature)
     else:
@@ -60,7 +60,7 @@ def unique_features(bdd_model: BDDModel, config: Optional[Configuration] = None)
             values[variable] = True
             u_func = bdd_model.bdd.let(values, bdd_model.root)
             n_vars = len(bdd_model.vars_order) - len(values)
-            n_configs = bdd_model.bdd.count(u_func, nvars=n_vars)
+            n_configs = bdd_model.count_models(u_func, n_vars)
             if n_configs == 1:
                 unique_features_list.append(feature)
             if feature_selected is None:

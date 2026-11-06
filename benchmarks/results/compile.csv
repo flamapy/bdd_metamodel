@@ -1,0 +1,177 @@
+label,model,features,constraints,dd_backend,status,compile_s,nodes,configurations,peak_rss_mb,options
+baseline-autoref,Truck.uvl,33,10,autoref,ok,0.006,353,234,45.3,{}
+baseline-autoref,Trimesh_NFM.uvl,31,21,autoref,ok,0.0253,227,734720,51.7,{}
+baseline-autoref,miband8.uvl,37,22,autoref,ok,0.0075,253,17,46.0,{}
+baseline-autoref,CDI.uvl,43,7,autoref,ok,0.0283,2967,50400,53.4,{}
+baseline-autoref,JHipster.uvl,45,13,autoref,ok,0.0223,2150,26256,51.1,{}
+baseline-autoref,strategies.uvl,57,12,autoref,ok,0.3161,29586,547891200,180.9,{}
+baseline-autoref,30-1.uvl,100,30,autoref,ok,6.2229,6727,30139520,1936.8,{}
+baseline-autoref,dm_DissModel.csv.uvl,116,0,autoref,ok,0.2145,654,130895,134.9,{}
+baseline-autoref,model_20200316_153170359.uvl,124,7,autoref,ok,10.1914,75474,11303239680,2992.6,{}
+baseline-autoref,30-1.uvl,,,,memout,20.6,,,6000.0,{}
+baseline-autoref,2007-11-02_23-31-10.uvl,,,,memout,17.9,,,6000.0,{}
+baseline-autoref,1-1.uvl,,,,memout,21.2,,,6000.0,{}
+baseline-autoref,1-1.uvl,,,,memout,16.7,,,6000.0,{}
+baseline-autoref,busybox_simple.uvl,,,,memout,22.4,,,6000.0,{}
+baseline-autoref,embtoolkit.uvl,,,,memout,16.2,,,6000.0,{}
+baseline-autoref,XSEngine.uvl,,,,memout,22.4,,,6000.0,{}
+baseline-cudd,Truck.uvl,33,10,cudd,ok,0.007,479,234.0,62.6,{}
+baseline-cudd,Trimesh_NFM.uvl,31,21,cudd,ok,0.0217,212,734720.0,67.3,{}
+baseline-cudd,miband8.uvl,37,22,cudd,ok,0.0052,218,17.0,61.0,{}
+baseline-cudd,CDI.uvl,43,7,cudd,ok,0.0052,2128,50400.0,61.3,{}
+baseline-cudd,JHipster.uvl,45,13,cudd,ok,0.0056,783,26256.0,61.2,{}
+baseline-cudd,strategies.uvl,57,12,cudd,ok,0.0427,52265,547891200.0,73.0,{}
+baseline-cudd,30-1.uvl,100,30,cudd,ok,7.3717,11944,30139520.0,916.1,{}
+baseline-cudd,dm_DissModel.csv.uvl,116,0,cudd,ok,0.0497,853,130895.0,65.2,{}
+baseline-cudd,model_20200316_153170359.uvl,124,7,cudd,ok,3.0741,191614,11303239680.0,709.1,{}
+baseline-cudd,30-1.uvl,,,,memout,89.2,,,6000.0,{}
+baseline-cudd,2007-11-02_23-31-10.uvl,,,,memout,51.3,,,6000.0,{}
+baseline-cudd,1-1.uvl,,,,timeout,120.0,,,,{}
+baseline-cudd,1-1.uvl,,,,memout,89.8,,,6000.0,{}
+baseline-cudd,busybox_simple.uvl,,,,memout,62.4,,,6000.0,{}
+baseline-cudd,embtoolkit.uvl,,,,memout,114.3,,,6000.0,{}
+baseline-cudd,XSEngine.uvl,,,,timeout,120.0,,,,{}
+new-autoref-tree,Truck.uvl,33,10,autoref,ok,0.0037,99,234,44.7,{}
+new-autoref-tree,Trimesh_NFM.uvl,31,21,autoref,ok,0.0233,65,734720,50.9,{}
+new-autoref-tree,miband8.uvl,37,22,autoref,ok,0.0061,188,17,45.5,{}
+new-autoref-tree,CDI.uvl,43,7,autoref,ok,0.0042,74,50400,44.6,{}
+new-autoref-tree,JHipster.uvl,45,13,autoref,ok,0.006,215,26256,45.4,{}
+new-autoref-tree,strategies.uvl,57,12,autoref,ok,0.0061,822,547891200,45.3,{}
+new-autoref-tree,30-1.uvl,100,30,autoref,ok,0.0201,390,30139520,49.6,{}
+new-autoref-tree,dm_DissModel.csv.uvl,116,0,autoref,ok,0.2352,331,130895,168.5,{}
+new-autoref-tree,model_20200316_153170359.uvl,124,7,autoref,ok,0.0171,263,11303239680,47.7,{}
+new-autoref-tree,30-1.uvl,200,60,autoref,ok,0.1479,6636,74221316196,109.6,{}
+new-autoref-tree,2007-11-02_23-31-10.uvl,,,,memout,18.2,,,6000.0,{}
+new-autoref-tree,1-1.uvl,500,5,autoref,ok,0.1553,5038,468819296905483033175969209342035183680790403261341396960,115.1,{}
+new-autoref-tree,1-1.uvl,,,,error: RecursionError: maximum recursion depth exceeded,,,,,{}
+new-autoref-tree,busybox_simple.uvl,,,,memout,18.5,,,6000.0,{}
+new-autoref-tree,embtoolkit.uvl,,,,memout,16.4,,,6000.0,{}
+new-autoref-tree,XSEngine.uvl,,,,error: RecursionError: maximum recursion depth exceeded,,,,,{}
+new-autoref-force,Truck.uvl,33,10,autoref,ok,0.0038,108,234,44.6,"{""var_order"": ""force""}"
+new-autoref-force,Trimesh_NFM.uvl,31,21,autoref,ok,0.0243,74,734720,51.1,"{""var_order"": ""force""}"
+new-autoref-force,miband8.uvl,37,22,autoref,ok,0.0064,146,17,45.3,"{""var_order"": ""force""}"
+new-autoref-force,CDI.uvl,43,7,autoref,ok,0.0042,70,50400,44.3,"{""var_order"": ""force""}"
+new-autoref-force,JHipster.uvl,45,13,autoref,ok,0.0064,161,26256,45.1,"{""var_order"": ""force""}"
+new-autoref-force,strategies.uvl,57,12,autoref,ok,0.0066,457,547891200,45.7,"{""var_order"": ""force""}"
+new-autoref-force,30-1.uvl,100,30,autoref,ok,0.0256,688,30139520,50.5,"{""var_order"": ""force""}"
+new-autoref-force,dm_DissModel.csv.uvl,116,0,autoref,ok,0.2364,331,130895,168.5,"{""var_order"": ""force""}"
+new-autoref-force,model_20200316_153170359.uvl,124,7,autoref,ok,0.0186,262,11303239680,47.5,"{""var_order"": ""force""}"
+new-autoref-force,30-1.uvl,200,60,autoref,ok,0.3073,6147,74221316196,187.6,"{""var_order"": ""force""}"
+new-autoref-force,2007-11-02_23-31-10.uvl,,,,memout,23.0,,,6000.0,"{""var_order"": ""force""}"
+new-autoref-force,1-1.uvl,500,5,autoref,ok,0.2118,5185,468819296905483033175969209342035183680790403261341396960,136.9,"{""var_order"": ""force""}"
+new-autoref-force,1-1.uvl,1000,10,autoref,ok,0.9391,31083,142017261083746306401232882459088969899928600148942072949731078145647828935161429870228751368062672938292708409285112276325120,443.7,"{""var_order"": ""force""}"
+new-autoref-force,busybox_simple.uvl,,,,memout,14.5,,,6000.0,"{""var_order"": ""force""}"
+new-autoref-force,embtoolkit.uvl,,,,memout,15.9,,,6000.0,"{""var_order"": ""force""}"
+new-autoref-force,XSEngine.uvl,,,,error: RecursionError: maximum recursion depth exceeded,,,,,"{""var_order"": ""force""}"
+new-cudd-tree-reorder,Truck.uvl,33,10,cudd,ok,0.0047,99,234.0,61.2,{}
+new-cudd-tree-reorder,Trimesh_NFM.uvl,31,21,cudd,ok,0.0225,65,734720.0,67.6,{}
+new-cudd-tree-reorder,miband8.uvl,37,22,cudd,ok,0.0051,188,17.0,61.1,{}
+new-cudd-tree-reorder,CDI.uvl,43,7,cudd,ok,0.0047,74,50400.0,61.1,{}
+new-cudd-tree-reorder,JHipster.uvl,45,13,cudd,ok,0.0053,215,26256.0,61.1,{}
+new-cudd-tree-reorder,strategies.uvl,57,12,cudd,ok,0.0051,822,547891200.0,61.4,{}
+new-cudd-tree-reorder,30-1.uvl,100,30,cudd,ok,0.007,390,30139520.0,61.9,{}
+new-cudd-tree-reorder,dm_DissModel.csv.uvl,116,0,cudd,ok,0.0527,331,130895.0,65.4,{}
+new-cudd-tree-reorder,model_20200316_153170359.uvl,124,7,cudd,ok,0.0081,263,11303239680.0,61.9,{}
+new-cudd-tree-reorder,30-1.uvl,200,60,cudd,ok,0.2899,7317,74221316196.0,63.9,{}
+new-cudd-tree-reorder,2007-11-02_23-31-10.uvl,475,511,cudd,ok,27.9823,63247,1.2620846293097093e+109,74.3,{}
+new-cudd-tree-reorder,1-1.uvl,500,5,cudd,ok,0.7266,4182,4.688192969054831e+56,68.1,{}
+new-cudd-tree-reorder,1-1.uvl,,,,timeout,120.0,,,,{}
+new-cudd-tree-reorder,busybox_simple.uvl,,,,timeout,120.0,,,,{}
+new-cudd-tree-reorder,embtoolkit.uvl,1179,323,cudd,ok,29.8417,21352,5.134555717728401e+96,199.5,{}
+new-cudd-tree-reorder,XSEngine.uvl,,,,timeout,120.0,,,,{}
+new-cudd-tree-noreorder,Truck.uvl,33,10,cudd,ok,0.0047,99,234.0,61.2,"{""reorder"": false}"
+new-cudd-tree-noreorder,Trimesh_NFM.uvl,31,21,cudd,ok,0.0224,65,734720.0,67.2,"{""reorder"": false}"
+new-cudd-tree-noreorder,miband8.uvl,37,22,cudd,ok,0.0052,188,17.0,61.4,"{""reorder"": false}"
+new-cudd-tree-noreorder,CDI.uvl,43,7,cudd,ok,0.0049,74,50400.0,61.3,"{""reorder"": false}"
+new-cudd-tree-noreorder,JHipster.uvl,45,13,cudd,ok,0.0052,215,26256.0,61.4,"{""reorder"": false}"
+new-cudd-tree-noreorder,strategies.uvl,57,12,cudd,ok,0.005,822,547891200.0,61.2,"{""reorder"": false}"
+new-cudd-tree-noreorder,30-1.uvl,100,30,cudd,ok,0.0069,390,30139520.0,61.9,"{""reorder"": false}"
+new-cudd-tree-noreorder,dm_DissModel.csv.uvl,116,0,cudd,ok,0.0522,331,130895.0,65.5,"{""reorder"": false}"
+new-cudd-tree-noreorder,model_20200316_153170359.uvl,124,7,cudd,ok,0.0082,263,11303239680.0,61.9,"{""reorder"": false}"
+new-cudd-tree-noreorder,30-1.uvl,200,60,cudd,ok,0.0148,6636,74221316196.0,65.8,"{""reorder"": false}"
+new-cudd-tree-noreorder,2007-11-02_23-31-10.uvl,,,,timeout,120.0,,,,"{""reorder"": false}"
+new-cudd-tree-noreorder,1-1.uvl,500,5,cudd,ok,0.0195,5038,4.688192969054829e+56,68.7,"{""reorder"": false}"
+new-cudd-tree-noreorder,1-1.uvl,1000,10,cudd,ok,0.0515,23204,1.420172610837464e+125,84.0,"{""reorder"": false}"
+new-cudd-tree-noreorder,busybox_simple.uvl,,,,memout,105.0,,,6000.0,"{""reorder"": false}"
+new-cudd-tree-noreorder,embtoolkit.uvl,1179,323,cudd,ok,19.5454,84824,5.134555717728411e+96,1550.6,"{""reorder"": false}"
+new-cudd-tree-noreorder,XSEngine.uvl,,,,timeout,120.0,,,,"{""reorder"": false}"
+new-cudd-force-reorder,Truck.uvl,33,10,cudd,ok,0.0048,108,234.0,61.2,"{""var_order"": ""force""}"
+new-cudd-force-reorder,Trimesh_NFM.uvl,31,21,cudd,ok,0.0229,74,734720.0,67.5,"{""var_order"": ""force""}"
+new-cudd-force-reorder,miband8.uvl,37,22,cudd,ok,0.0055,146,17.0,61.2,"{""var_order"": ""force""}"
+new-cudd-force-reorder,CDI.uvl,43,7,cudd,ok,0.0052,70,50400.0,61.0,"{""var_order"": ""force""}"
+new-cudd-force-reorder,JHipster.uvl,45,13,cudd,ok,0.0056,161,26256.0,61.5,"{""var_order"": ""force""}"
+new-cudd-force-reorder,strategies.uvl,57,12,cudd,ok,0.0054,457,547891200.0,61.5,"{""var_order"": ""force""}"
+new-cudd-force-reorder,30-1.uvl,100,30,cudd,ok,0.0079,688,30139520.0,61.7,"{""var_order"": ""force""}"
+new-cudd-force-reorder,dm_DissModel.csv.uvl,116,0,cudd,ok,0.0526,331,130895.0,65.7,"{""var_order"": ""force""}"
+new-cudd-force-reorder,model_20200316_153170359.uvl,124,7,cudd,ok,0.0096,262,11303239680.0,62.0,"{""var_order"": ""force""}"
+new-cudd-force-reorder,30-1.uvl,200,60,cudd,ok,1.1171,3494,74221316196.0,64.0,"{""var_order"": ""force""}"
+new-cudd-force-reorder,2007-11-02_23-31-10.uvl,475,511,cudd,ok,15.6401,63137,1.2620846293097095e+109,74.0,"{""var_order"": ""force""}"
+new-cudd-force-reorder,1-1.uvl,500,5,cudd,ok,2.1524,9521,4.688192969054831e+56,68.5,"{""var_order"": ""force""}"
+new-cudd-force-reorder,1-1.uvl,,,,timeout,120.0,,,,"{""var_order"": ""force""}"
+new-cudd-force-reorder,busybox_simple.uvl,,,,timeout,120.0,,,,"{""var_order"": ""force""}"
+new-cudd-force-reorder,embtoolkit.uvl,,,,timeout,120.0,,,,"{""var_order"": ""force""}"
+new-cudd-force-reorder,XSEngine.uvl,,,,timeout,120.0,,,,"{""var_order"": ""force""}"
+native-autoref,Truck.uvl,33,10,autoref,ok,0.0087,73,234,86.1,"{""builder"": ""native""}"
+native-autoref,Trimesh_NFM.uvl,31,21,autoref,ok,0.0291,45,734720,93.7,"{""builder"": ""native""}"
+native-autoref,miband8.uvl,37,22,autoref,ok,0.011,84,17,85.8,"{""builder"": ""native""}"
+native-autoref,CDI.uvl,43,7,autoref,ok,0.0073,65,50400,85.5,"{""builder"": ""native""}"
+native-autoref,JHipster.uvl,45,13,autoref,ok,0.0142,154,26256,85.9,"{""builder"": ""native""}"
+native-autoref,strategies.uvl,57,12,autoref,ok,0.0125,169,547891200,85.8,"{""builder"": ""native""}"
+native-autoref,30-1.uvl,100,30,autoref,ok,0.0376,321,30139520,86.6,"{""builder"": ""native""}"
+native-autoref,dm_DissModel.csv.uvl,116,0,autoref,ok,0.0286,240,130895,87.2,"{""builder"": ""native""}"
+native-autoref,model_20200316_153170359.uvl,124,7,autoref,ok,0.0192,184,11303239680,86.7,"{""builder"": ""native""}"
+native-autoref,30-1.uvl,200,60,autoref,ok,0.297,1197,74221316196,89.2,"{""builder"": ""native""}"
+native-autoref,2007-11-02_23-31-10.uvl,475,511,autoref,ok,0.2295,2084,12620846293097094563629159449530069427442811471384671549564355582761363776858888701018203420023937500000000000,96.5,"{""builder"": ""native""}"
+native-autoref,1-1.uvl,500,5,autoref,ok,0.2243,3048,468819296905483033175969209342035183680790403261341396960,100.7,"{""builder"": ""native""}"
+native-autoref,1-1.uvl,1000,10,autoref,ok,2.6684,18648,142017261083746306401232882459088969899928600148942072949731078145647828935161429870228751368062672938292708409285112276325120,136.9,"{""builder"": ""native""}"
+native-autoref,busybox_simple.uvl,1108,930,autoref,ok,2.7791,70122,39247322175044716553125381331818377195982216499169029379698734940593106287122987362502910168672707788664102051067092395284598718749296881191036240477056584742109825588518956188340000000000000000000,220.9,"{""builder"": ""native""}"
+native-autoref,embtoolkit.uvl,1179,323,autoref,ok,1.3587,3647,5134555717728405373874099868199035516442186387628134162059302739740605826105226151439263334400000,199.9,"{""builder"": ""native""}"
+native-autoref,XSEngine.uvl,,,,timeout,120.0,,,,"{""builder"": ""native""}"
+native-cudd,Truck.uvl,33,10,cudd,ok,0.01,73,234.0,94.2,"{""builder"": ""native""}"
+native-cudd,Trimesh_NFM.uvl,31,21,cudd,ok,0.0325,45,734720.0,102.6,"{""builder"": ""native""}"
+native-cudd,miband8.uvl,37,22,cudd,ok,0.013,84,17.0,94.7,"{""builder"": ""native""}"
+native-cudd,CDI.uvl,43,7,cudd,ok,0.0086,65,50400.0,94.5,"{""builder"": ""native""}"
+native-cudd,JHipster.uvl,45,13,cudd,ok,0.0168,154,26256.0,94.6,"{""builder"": ""native""}"
+native-cudd,strategies.uvl,57,12,cudd,ok,0.0151,169,547891200.0,94.4,"{""builder"": ""native""}"
+native-cudd,30-1.uvl,100,30,cudd,ok,0.0414,321,30139520.0,95.5,"{""builder"": ""native""}"
+native-cudd,dm_DissModel.csv.uvl,116,0,cudd,ok,0.0302,240,130895.0,95.7,"{""builder"": ""native""}"
+native-cudd,model_20200316_153170359.uvl,124,7,cudd,ok,0.021,184,11303239680.0,95.6,"{""builder"": ""native""}"
+native-cudd,30-1.uvl,200,60,cudd,ok,0.3083,1197,74221316196.0,97.9,"{""builder"": ""native""}"
+native-cudd,2007-11-02_23-31-10.uvl,475,511,cudd,ok,0.2326,2084,1.2620846293097095e+109,105.8,"{""builder"": ""native""}"
+native-cudd,1-1.uvl,500,5,cudd,ok,0.2196,3048,4.688192969054829e+56,109.4,"{""builder"": ""native""}"
+native-cudd,1-1.uvl,1000,10,cudd,ok,2.674,18648,1.4201726108374641e+125,138.7,"{""builder"": ""native""}"
+native-cudd,busybox_simple.uvl,1108,930,cudd,ok,2.6428,70122,3.9247322175044735e+196,193.1,"{""builder"": ""native""}"
+native-cudd,embtoolkit.uvl,1179,323,cudd,ok,1.3784,3647,5.134555717728399e+96,199.8,"{""builder"": ""native""}"
+native-cudd,XSEngine.uvl,,,,timeout,120.0,,,,"{""builder"": ""native""}"
+python-autoref-v2,Truck.uvl,33,10,autoref,ok,0.0036,99,234,44.6,"{""builder"": ""python""}"
+python-autoref-v2,Trimesh_NFM.uvl,31,21,autoref,ok,0.0235,65,734720,50.6,"{""builder"": ""python""}"
+python-autoref-v2,miband8.uvl,37,22,autoref,ok,0.0063,188,17,45.5,"{""builder"": ""python""}"
+python-autoref-v2,CDI.uvl,43,7,autoref,ok,0.0044,74,50400,44.4,"{""builder"": ""python""}"
+python-autoref-v2,JHipster.uvl,45,13,autoref,ok,0.0061,215,26256,45.3,"{""builder"": ""python""}"
+python-autoref-v2,strategies.uvl,57,12,autoref,ok,0.0062,822,547891200,45.2,"{""builder"": ""python""}"
+python-autoref-v2,30-1.uvl,100,30,autoref,ok,0.0209,390,30139520,49.5,"{""builder"": ""python""}"
+python-autoref-v2,dm_DissModel.csv.uvl,116,0,autoref,ok,0.2316,331,130895,168.4,"{""builder"": ""python""}"
+python-autoref-v2,model_20200316_153170359.uvl,124,7,autoref,ok,0.0179,263,11303239680,48.0,"{""builder"": ""python""}"
+python-autoref-v2,30-1.uvl,200,60,autoref,ok,0.1538,6636,74221316196,109.7,"{""builder"": ""python""}"
+python-autoref-v2,2007-11-02_23-31-10.uvl,,,,memout,19.0,,,6000.0,"{""builder"": ""python""}"
+python-autoref-v2,1-1.uvl,500,5,autoref,ok,0.1605,5038,468819296905483033175969209342035183680790403261341396960,115.1,"{""builder"": ""python""}"
+python-autoref-v2,1-1.uvl,1000,10,autoref,ok,0.6228,23204,142017261083746306401232882459088969899928600148942072949731078145647828935161429870228751368062672938292708409285112276325120,335.0,"{""builder"": ""python""}"
+python-autoref-v2,busybox_simple.uvl,,,,memout,19.2,,,6000.0,"{""builder"": ""python""}"
+python-autoref-v2,embtoolkit.uvl,,,,memout,17.1,,,6000.0,"{""builder"": ""python""}"
+python-autoref-v2,XSEngine.uvl,,,,memout,21.5,,,6000.0,"{""builder"": ""python""}"
+python-cudd-v2,Truck.uvl,33,10,cudd,ok,0.0051,99,234.0,61.2,"{""builder"": ""python""}"
+python-cudd-v2,Trimesh_NFM.uvl,31,21,cudd,ok,0.0229,65,734720.0,67.5,"{""builder"": ""python""}"
+python-cudd-v2,miband8.uvl,37,22,cudd,ok,0.006,188,17.0,61.2,"{""builder"": ""python""}"
+python-cudd-v2,CDI.uvl,43,7,cudd,ok,0.0052,74,50400.0,61.3,"{""builder"": ""python""}"
+python-cudd-v2,JHipster.uvl,45,13,cudd,ok,0.0059,215,26256.0,61.3,"{""builder"": ""python""}"
+python-cudd-v2,strategies.uvl,57,12,cudd,ok,0.0056,822,547891200.0,61.1,"{""builder"": ""python""}"
+python-cudd-v2,30-1.uvl,100,30,cudd,ok,0.0105,390,30139520.0,61.9,"{""builder"": ""python""}"
+python-cudd-v2,dm_DissModel.csv.uvl,116,0,cudd,ok,0.0531,331,130895.0,65.5,"{""builder"": ""python""}"
+python-cudd-v2,model_20200316_153170359.uvl,124,7,cudd,ok,0.0108,263,11303239680.0,61.9,"{""builder"": ""python""}"
+python-cudd-v2,30-1.uvl,200,60,cudd,ok,0.04,6636,74221316196.0,65.7,"{""builder"": ""python""}"
+python-cudd-v2,2007-11-02_23-31-10.uvl,475,511,cudd,ok,42.671,80199,1.262084629309709e+109,93.5,"{""builder"": ""python""}"
+python-cudd-v2,1-1.uvl,500,5,cudd,ok,0.131,5038,4.688192969054829e+56,68.8,"{""builder"": ""python""}"
+python-cudd-v2,1-1.uvl,1000,10,cudd,ok,0.8207,23204,1.420172610837464e+125,83.9,"{""builder"": ""python""}"
+python-cudd-v2,busybox_simple.uvl,,,,timeout,120.0,,,,"{""builder"": ""python""}"
+python-cudd-v2,embtoolkit.uvl,1179,323,cudd,ok,14.2673,16193,5.134555717728408e+96,275.0,"{""builder"": ""python""}"
+python-cudd-v2,XSEngine.uvl,,,,timeout,120.0,,,,"{""builder"": ""python""}"

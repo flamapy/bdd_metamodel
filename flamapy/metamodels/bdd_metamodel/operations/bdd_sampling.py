@@ -85,7 +85,7 @@ def get_random_solutions(bdd_model: BDDModel,
         return []
 
     remaining_vars = [v for v in bdd_model.vars_order if v not in assignment]
-    total_sat = bdd_model.bdd.count(target_root, len(remaining_vars))
+    total_sat = bdd_model.count_models(target_root, len(remaining_vars))
 
     if not with_replacement:
         n_samples = min(n_samples, total_sat)

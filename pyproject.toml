@@ -25,6 +25,10 @@ dev = [
     "mypy",
     "coverage",
 ]
+# Native BDD construction (Logic2BDD on CUDD); FmToBDD uses it automatically.
+fast = [
+    "flamapy-cudd~=0.1",
+]
 
 [project.entry-points."flamapy.plugins"]
 bdd = "flamapy.metamodels.bdd_metamodel"

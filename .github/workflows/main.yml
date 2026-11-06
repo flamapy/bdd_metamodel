@@ -40,6 +40,11 @@ jobs:
           mypy -p flamapy
   pytest:
     runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        # dd ships a pure-Python engine (autoref); the CUDD engine needs dd built from source.
+        dd-engine: [autoref, cudd]
     steps:
       - uses: actions/checkout@v4
       - name: Set up Python 3.11
@@ -56,6 +61,15 @@ jobs:
           sudo apt update
           sudo apt install graphviz -y
           pip install graphviz
+      - name: Build dd with CUDD
+        if: matrix.dd-engine == 'cudd'
+        run: |
+          pip install cython setuptools wheel
+          DD_FETCH=1 DD_CUDD=1 pip install --force-reinstall --no-deps --no-build-isolation \
+            --no-binary dd "dd==0.6.0"
+      - name: Check the dd engine
+        run: |
+          python -c "from flamapy.metamodels.bdd_metamodel.models.bdd_model import DD_BACKEND as b; print(b); assert b == '${{ matrix.dd-engine }}'"
       - name: Running test
         run: |
           python -m pytest

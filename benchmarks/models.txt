@@ -1,0 +1,18 @@
+# Benchmark model set, paths relative to the bdd_metamodel directory (flamapy workspace layout).
+# features/constraints in the comment of each line.
+resources/models/uvl_models/Truck.uvl                                  # 33/10
+resources/models/uvl_models/Trimesh_NFM.uvl                            # 31/21
+../../experimentation/flamapy-gnn-experiments/models/combined/uvlhub/dataset_46/miband8.uvl                                              # 37/22
+../../experimentation/flamapy-gnn-experiments/models/combined/uvlhub/dataset_52/CDI.uvl                                                  # 43/7
+resources/models/uvl_models/JHipster.uvl                               # 45/13
+../../experimentation/flamapy-gnn-experiments/models/combined/uvlhub/dataset_70/strategies.uvl                                           # 57/12
+../../experimentation/FlamaExperimentExecutor/corpus/fetched/models/synthetic/simple_betty_gen_models/100/30-1.uvl                                                        # 100/30
+../../experimentation/flamapy-gnn-experiments/models/combined/uvlhub/dataset_2/dm_DissModel.csv.uvl                                      # 116/0
+../../experimentation/flamapy-gnn-experiments/models/combined/uvlhub/dataset_20/model_20200316_153170359.uvl                             # 124/7
+../../experimentation/FlamaExperimentExecutor/corpus/fetched/models/synthetic/simple_betty_gen_models/200/30-1.uvl                                                        # 200/60
+../../experimentation/flamapy-gnn-experiments/models/combined/uvlhub/dataset_14/2007-11-02_23-31-10.uvl                                  # 475/511
+../../experimentation/FlamaExperimentExecutor/corpus/fetched/models/synthetic/simple_betty_gen_models/500/1-1.uvl                                                         # 500/5
+../../experimentation/FlamaExperimentExecutor/corpus/fetched/models/synthetic/simple_betty_gen_models/1000/1-1.uvl                                                        # 1000/10
+resources/models/uvl_models/busybox_simple.uvl                         # 1108/930
+../../experimentation/flamapy-gnn-experiments/models/combined/uvlhub/dataset_12/embtoolkit.uvl                                           # 1179/323
+../../experimentation/flamapy-gnn-experiments/models/combined/uvlhub/dataset_11/XSEngine.uvl                                             # 1273/886

@@ -1,6 +1,8 @@
+import importlib
 import logging
+import sys
 from enum import Enum
-from typing import Any, Optional
+from typing import Any, Iterable, Optional
 
 try:
     from dd.cudd import BDD
@@ -10,6 +12,77 @@ except ImportError:
 from flamapy.core.models import VariabilityModel
 
 logger = logging.getLogger(__name__)
+
+# The dd engine in use: 'cudd' (C extension, only when dd is built against CUDD) or the
+# pure-Python 'autoref' that a plain `pip install dd` provides.
+DD_BACKEND = BDD.__module__.rsplit('.', 1)[-1]
+_reorder = importlib.import_module(BDD.__module__).reorder  # sifting, in both engines
+
+# Dynamic reordering while building (see BDDModel.build_bdd_incremental): sift once the
+# manager holds REORDER_MIN_NODES nodes, then again each time it grows by REORDER_GROWTH
+# since the last reordering. Small BDDs are never reordered: sifting thousands of variables
+# costs more than it saves on a BDD that stays small.
+REORDER_MIN_NODES = 50_000
+REORDER_GROWTH = 2.0
+
+# The pure-Python engine recurses once per BDD level (and the node-walking operations too),
+# so Python's recursion limit must grow with the number of variables.
+_RECURSION_BASE = 1_000
+_RECURSION_PER_VARIABLE = 4
+
+
+def exact_count(bdd: Any, node: Any, nvars: int) -> int:
+    """Exact model count of `node` over `nvars` variables, with Python integers.
+
+    Works on any dd engine with complement edges: the nodes of the support are counted
+    bottom-up (without recursion) over the levels of the support, and the variables outside
+    the support double the count.
+    """
+    def regular(edge: Any) -> Any:
+        return ~edge if edge.negated else edge
+
+    nodes: list[Any] = []
+    seen: set[Any] = set()
+    top = regular(node)
+    stack = [top] if top.var is not None else []
+    while stack:
+        current = stack.pop()
+        if current in seen:
+            continue
+        seen.add(current)
+        nodes.append(current)
+        for edge in (current.low, current.high):
+            child = regular(edge)
+            if child.var is not None and child not in seen:
+                stack.append(child)
+    level = {var: bdd.level_of_var(var) for var in {n.var for n in nodes}}
+    rank = {var: i for i, var in enumerate(sorted(level, key=level.__getitem__))}
+    n_support = len(rank)
+    counts: dict[Any, int] = {}
+
+    def edge_count(edge: Any, parent_rank: int) -> int:
+        """Models of `edge` over the support variables below `parent_rank`."""
+        if edge.var is None:
+            value, child_rank = (0 if edge.negated else 1), n_support
+        else:
+            child_rank = rank[edge.var]
+            value = counts[regular(edge)]
+            if edge.negated:
+                value = 2 ** (n_support - child_rank) - value
+        return value * 2 ** (child_rank - parent_rank - 1)
+
+    for current in sorted(nodes, key=lambda n: rank[n.var], reverse=True):
+        current_rank = rank[current.var]
+        counts[current] = (edge_count(current.low, current_rank)
+                           + edge_count(current.high, current_rank))
+    return edge_count(node, -1) * 2 ** max(nvars - n_support, 0)
+
+
+def ensure_recursion_limit(n_variables: int) -> None:
+    """Raise Python's recursion limit, if needed, for BDDs over `n_variables` variables."""
+    needed = _RECURSION_BASE + _RECURSION_PER_VARIABLE * n_variables
+    if sys.getrecursionlimit() < needed:
+        sys.setrecursionlimit(needed)
 
 
 class BDDModel(VariabilityModel):
@@ -39,11 +112,42 @@ class BDDModel(VariabilityModel):
 
     def build_bdd(self, expression: str, variables: list[str]) -> None:
         """Built a BDD from an expression representing a logical formula."""
+        ensure_recursion_limit(len(variables))
         self.bdd.configure(reordering=False)  # Disable dynamic reordering for consistency
         for var in variables:
             self.bdd.declare(var)  # Declare variables in the BDD manager
         self.vars_order = variables  # The order is crucial to detect skipped variables
         self.root = self.bdd.add_expr(expression)  # Build the logical formula (root node)
+
+    def build_bdd_incremental(self,
+                              clauses: Iterable[str],
+                              variables: list[str],
+                              reorder: bool = False) -> None:
+        """Build a BDD as the conjunction of `clauses`, one clause at a time.
+
+        The variables are declared in the given order (the first one is the top level).
+        Conjoining clause by clause keeps the intermediate BDDs small when the clauses are
+        scheduled well, instead of parsing one huge expression. With `reorder`, the variables
+        are sifted between clauses when the BDD grows (REORDER_MIN_NODES, REORDER_GROWTH);
+        the engine's own automatic reordering stays disabled so that levels never change in
+        the middle of an operation, and `vars_order` is set to the final level order.
+        """
+        ensure_recursion_limit(len(variables))
+        self.bdd.configure(reordering=False)
+        for var in variables:
+            self.bdd.declare(var)
+        threshold = REORDER_MIN_NODES
+        root = self.bdd.true
+        for clause in clauses:
+            root = root & self.bdd.add_expr(clause)
+            if root == self.bdd.false:
+                break  # The model is void: further clauses cannot change the result
+            if reorder and len(self.bdd) >= threshold:
+                _reorder(self.bdd)
+                threshold = max(REORDER_MIN_NODES, int(REORDER_GROWTH * len(self.bdd)))
+        self.root = root
+        # Operations rely on vars_order[i] being the variable at level i.
+        self.vars_order = sorted(variables, key=self.bdd.level_of_var)
 
     def get_expression(self) -> str:
         """ Converts the BDD to a readable Boolean expression string."""
@@ -55,7 +159,19 @@ class BDDModel(VariabilityModel):
 
     def count_solutions(self) -> int:
         """Count the number of valid configurations (SAT)."""
-        return self.bdd.count(self.root, len(self.vars_order))  # count(node, n_vars)
+        return self.count_models(self.root, len(self.vars_order))
+
+    def count_models(self, node: Any, nvars: int) -> int:
+        """Exact number of assignments of `nvars` variables (a superset of the support of
+        `node`) that satisfy `node`.
+
+        dd's pure-Python engine counts with Python integers; the CUDD engine counts with
+        floating point, which is approximate beyond 2**53 and overflows beyond ~1e308, so for
+        CUDD the count is computed here with integers.
+        """
+        if DD_BACKEND != "cudd":
+            return int(self.bdd.count(node, nvars))
+        return exact_count(self.bdd, node, nvars)
 
     def dump_structure(self) -> None:
         """Prints the structure of the BDD for debugging purposes."""
@@ -102,6 +218,7 @@ class BDDModel(VariabilityModel):
     def load_bdd(path: str, vars: Optional[list[str]] = None) -> 'BDDModel':
         bdd_model = BDDModel()
         if vars is not None:
+            ensure_recursion_limit(len(vars))
             for var in vars:
                 bdd_model.bdd.declare(var)
         roots = bdd_model.bdd.load(path)
@@ -112,6 +229,7 @@ class BDDModel(VariabilityModel):
         else:
             bdd_model.root = roots
         all_vars = list(bdd_model.bdd.vars)
+        ensure_recursion_limit(len(all_vars))
         sorted_vars = sorted(all_vars, key=bdd_model.bdd.level_of_var)
         bdd_model.vars_order = sorted_vars
         bdd_model.vars_features = {var: var for var in bdd_model.vars_order}
