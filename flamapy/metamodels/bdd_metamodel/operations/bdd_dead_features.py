@@ -4,9 +4,7 @@ from flamapy.core.models import VariabilityModel
 from flamapy.metamodels.configuration_metamodel.models import Configuration
 from flamapy.core.operations import DeadFeatures
 from flamapy.metamodels.bdd_metamodel.models import BDDModel
-from flamapy.metamodels.bdd_metamodel.operations.bdd_feature_inclusion_probability import (
-    exact_feature_inclusion,
-)
+from flamapy.metamodels.bdd_metamodel.operations.bdd_backbone import backbone
 
 
 class BDDDeadFeatures(DeadFeatures):
@@ -30,5 +28,4 @@ class BDDDeadFeatures(DeadFeatures):
 
 
 def dead_features(bdd_model: BDDModel, config: Optional[Configuration] = None) -> list[Any]:
-    probs = exact_feature_inclusion(bdd_model, config)
-    return [feat for feat, prob in probs.items() if prob == 0]
+    return backbone(bdd_model, config)['dead']

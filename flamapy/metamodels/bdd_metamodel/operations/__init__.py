@@ -4,6 +4,7 @@ from .bdd_sampling import BDDSampling
 from .bdd_product_distribution import BDDProductDistribution
 from .bdd_feature_inclusion_probability import BDDFeatureInclusionProbability
 from .bdd_satisfiable import BDDSatisfiable
+from .bdd_backbone import BDDBackbone
 from .bdd_core_features import BDDCoreFeatures
 from .bdd_dead_features import BDDDeadFeatures
 from .bdd_variant_features import BDDVariantFeatures
@@ -19,6 +20,7 @@ from .bdd_configurations_with_n_features import BDDConfigurationsWithNFeatures
 
 
 __all__ = [
+    "BDDBackbone",
     "BDDCommonalityFactor",
     "BDDConfigurations",
     "BDDConfigurationsNumber",

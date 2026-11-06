@@ -7,6 +7,7 @@ from flamapy.core.operations import FalseOptionalFeatures
 from flamapy.core.exceptions import FlamaException
 from flamapy.metamodels.fm_metamodel.models import FeatureModel
 from flamapy.metamodels.bdd_metamodel.models import BDDModel
+from flamapy.metamodels.bdd_metamodel.operations.bdd_traversals import refuted_implications
 
 
 LOGGER = logging.getLogger('BDDFalseOptionalFeatures')
@@ -35,15 +36,13 @@ class BDDFalseOptionalFeatures(FalseOptionalFeatures):
 
 
 def get_false_optional_features(bdd_model: BDDModel, feature_model: FeatureModel) -> list[Any]:
-    false_optional_features = []
+    """The optional features their parent implies: every (parent, feature) implication is
+    checked in one traversal of the BDD (`refuted_implications`), without building any BDD.
+    A feature whose parent is dead is implied vacuously, as in the SAT and Z3 plugins.
+    """
     real_optional_features = [f for f in feature_model.get_features()
                               if not f.is_root() and not f.is_mandatory()]
-    for feature in real_optional_features:
-        parent_feature = feature.get_parent()
-        u_parent = bdd_model.bdd.var(parent_feature.name)
-        u_feature = bdd_model.bdd.var(feature.name)
-
-        implication_check = bdd_model.root & u_parent & ~u_feature
-        if implication_check == bdd_model.bdd.false:
-            false_optional_features.append(bdd_model.vars_features[feature.name])
-    return false_optional_features
+    pairs = [(feature.get_parent().name, feature.name) for feature in real_optional_features]
+    refuted = refuted_implications(bdd_model, pairs)
+    return [bdd_model.vars_features[feature.name]
+            for feature, is_refuted in zip(real_optional_features, refuted) if not is_refuted]
