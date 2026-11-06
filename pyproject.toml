@@ -30,6 +30,13 @@ fast = [
     "flamapy-cudd~=0.1",
 ]
 
+# The traversal and exact-probability tests cross-check core, dead and false-optional
+# features with the SAT plugin.
+test = [
+    "pytest",
+    "flamapy-sat~=2.9.0.dev0",
+]
+
 [project.entry-points."flamapy.plugins"]
 bdd = "flamapy.metamodels.bdd_metamodel"
 
