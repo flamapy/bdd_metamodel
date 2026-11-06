@@ -1,3 +1,4 @@
+from fractions import Fraction
 from typing import Any, cast, Callable, Optional
 
 from flamapy.core.models import VariabilityModel
@@ -5,6 +6,9 @@ from flamapy.core.exceptions import FlamaException
 from flamapy.core.operations.metrics_operation import Metrics
 from flamapy.metamodels.bdd_metamodel.models import BDDModel
 from flamapy.metamodels.bdd_metamodel import operations as bdd_operations
+from flamapy.metamodels.bdd_metamodel.operations.bdd_feature_inclusion_probability import (
+    exact_feature_inclusion,
+)
 
 
 def metric_method(func: Callable[..., Any]) -> Callable[..., Any]:
@@ -33,6 +37,7 @@ class BDDMetrics(Metrics):
         self._features: list[Any] = []
         self._configurations_number: int = 0
         self._fip: dict[Any, float] = {}
+        self._fip_exact: dict[Any, Fraction] = {}
         self._prod_dist: list[int] = []
         self._prod_dist_op: bdd_operations.BDDProductDistribution | None = None
         self._variant_features: list[Any] = []
@@ -58,8 +63,10 @@ class BDDMetrics(Metrics):
         )
         self._prod_dist_op = bdd_operations.BDDProductDistribution()
         self._prod_dist = self._prod_dist_op.execute(self.model).get_result()
-        self._fip = bdd_operations.BDDFeatureInclusionProbability().execute(self.model).get_result()
-        self._variant_features = [feat for feat, prob in self._fip.items() if 0.0 < prob < 1.0]
+        # exact probabilities decide core / dead / variant / pure optional; the floats are reported
+        self._fip_exact = exact_feature_inclusion(self.model)
+        self._fip = {feat: float(prob) for feat, prob in self._fip_exact.items()}
+        self._variant_features = [feat for feat, prob in self._fip_exact.items() if 0 < prob < 1]
         # Get all methods that are marked with the metric_method decorator
         metric_methods = [
             getattr(self, method_name)
@@ -85,7 +92,7 @@ class BDDMetrics(Metrics):
     def core_features(self) -> dict[str, Any]:
         """Features that are part of all the configurations (a.k.a., 'common features')."""
         name = "Core features"
-        _core = [feat for feat, prob in self._fip.items() if prob >= 1.0]
+        _core = [feat for feat, prob in self._fip_exact.items() if prob == 1]
         return self.construct_result(
             name=name,
             doc=self.core_features.__doc__,
@@ -100,7 +107,7 @@ class BDDMetrics(Metrics):
         if self.model is None:
             raise FlamaException("Model not initialized.")
         name = "Dead features"
-        _dead_features = [feat for feat, prob in self._fip.items() if prob <= 0.0]
+        _dead_features = [feat for feat, prob in self._fip_exact.items() if prob == 0]
         return self.construct_result(
             name=name,
             doc=self.dead_features.__doc__,
@@ -116,7 +123,8 @@ class BDDMetrics(Metrics):
         if self.model is None:
             raise FlamaException("Model not initialized.")
         name = "Pure optional features"
-        _pure_optional_features = [feat for feat, prob in self._fip.items() if prob == 0.5] # noqa: PLR2004
+        _pure_optional_features = [feat for feat, prob in self._fip_exact.items()
+                                   if prob == Fraction(1, 2)]
         return self.construct_result(
             name=name,
             doc=self.pure_optional_features.__doc__,

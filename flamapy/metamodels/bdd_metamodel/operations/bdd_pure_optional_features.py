@@ -1,3 +1,4 @@
+from fractions import Fraction
 from typing import Any, Optional, cast
 
 from flamapy.core.models import VariabilityModel
@@ -5,7 +6,9 @@ from flamapy.core.operations.descriptor import OperationDescriptor
 from flamapy.metamodels.configuration_metamodel.models.configuration import Configuration
 from flamapy.metamodels.bdd_metamodel.models import BDDModel
 from flamapy.metamodels.bdd_metamodel.operations.interfaces import PureOptionalFeatures
-from flamapy.metamodels.bdd_metamodel.operations import BDDFeatureInclusionProbability
+from flamapy.metamodels.bdd_metamodel.operations.bdd_feature_inclusion_probability import (
+    exact_feature_inclusion,
+)
 
 
 class BDDPureOptionalFeatures(PureOptionalFeatures):
@@ -41,7 +44,5 @@ class BDDPureOptionalFeatures(PureOptionalFeatures):
 def pure_optional_features(
     bdd_model: BDDModel, config: Optional[Configuration] = None
 ) -> list[Any]:
-    fip_op = BDDFeatureInclusionProbability()
-    fip_op.set_partial_configuration(config)
-    probs = fip_op.execute(bdd_model).get_result()
-    return [feat for feat, prob in probs.items() if prob == 0.5] # noqa: PLR2004
+    probs = exact_feature_inclusion(bdd_model, config)
+    return [feat for feat, prob in probs.items() if prob == Fraction(1, 2)]

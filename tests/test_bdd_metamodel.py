@@ -711,3 +711,21 @@ def test_variability_without_variant_features(tmp_path, uvl: str, expected_total
     variability_op = BDDVariability().execute(bdd_model)
     assert round(variability_op.total_variability(), PRECISION) == round(expected_total, PRECISION)
     assert variability_op.partial_variability() == 0.0
+
+
+@pytest.mark.parametrize("builder", ["python", "auto"])
+def test_probabilities_beyond_float_range(tmp_path, builder):
+    # 1100 independent optional features and a mandatory one: 2**1100 configurations, beyond
+    # what a float can hold. Probabilities, core and dead features must still be exact.
+    lines = ["features", "    R", "        mandatory", "            M", "        optional"]
+    lines += [f"            F{i}" for i in range(1100)]
+    path = tmp_path / "wide.uvl"
+    path.write_text("\n".join(lines) + "\n")
+    feature_model = UVLReader(str(path)).transform()
+    bdd_model = FmToBDD(feature_model, builder=builder).transform()
+    assert BDDConfigurationsNumber().execute(bdd_model).get_result() == 2 ** 1100
+    probabilities = BDDFeatureInclusionProbability().execute(bdd_model).get_result()
+    assert probabilities["R"] == 1.0 and probabilities["M"] == 1.0
+    assert all(probabilities[f"F{i}"] == 0.5 for i in range(1100))
+    assert sorted(BDDCoreFeatures().execute(bdd_model).get_result()) == ["M", "R"]
+    assert BDDDeadFeatures().execute(bdd_model).get_result() == []
