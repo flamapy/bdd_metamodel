@@ -39,6 +39,9 @@ MANIFEST = PluginManifest(
         'satisfiable_configuration': OperationCapability(cost=1),
         'configurations_number': OperationCapability(
             cost_curve=((100, 1), (200, 4), (500, 9), (1000, 29))),
+        # Two counts: all the products and those that include the configuration.
+        'commonality': OperationCapability(
+            cost_curve=((100, 2), (200, 8), (500, 18), (1000, 58))),
         'core_features': OperationCapability(
             cost_curve=((100, 1), (200, 20), (500, 33), (1000, 130))),
         'dead_features': OperationCapability(

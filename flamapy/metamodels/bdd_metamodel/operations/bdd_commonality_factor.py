@@ -1,13 +1,19 @@
 from typing import cast
 
 from flamapy.core.models import VariabilityModel
+from flamapy.core.operations import Commonality
 from flamapy.metamodels.configuration_metamodel.models.configuration import Configuration
 from flamapy.metamodels.bdd_metamodel.models import BDDModel
 from flamapy.metamodels.bdd_metamodel.operations.interfaces import CommonalityFactor
 from flamapy.metamodels.bdd_metamodel.operations import BDDConfigurationsNumber
 
 
-class BDDCommonalityFactor(CommonalityFactor):
+class BDDCommonalityFactor(Commonality, CommonalityFactor):
+    """The commonality of a (partial) configuration: the products that include it over all
+    the products, both counted on the BDD. It implements the core ``Commonality`` operation
+    (the facade's ``commonality`` with ``backend='bdd'``) besides the plugin's own
+    ``CommonalityFactor`` interface."""
+
     def __init__(self) -> None:
         self._result: float = 0.0
         self._configuration: Configuration = Configuration(elements={})
@@ -24,6 +30,9 @@ class BDDCommonalityFactor(CommonalityFactor):
         return self._result
 
     def commonality_factor(self) -> float:
+        return self.get_result()
+
+    def get_commonality(self) -> float:
         return self.get_result()
 
 
