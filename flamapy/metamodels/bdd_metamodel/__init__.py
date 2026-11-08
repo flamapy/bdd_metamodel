@@ -1,16 +1,17 @@
 from flamapy.core.manifest import OperationCapability, PluginManifest
 from flamapy.core.models.language_level import LanguageLevel, MajorLevel, MinorLevel
 
-# Costs are estimated milliseconds from the 2026-11-06 calibration with the pure-Python dd
-# engine (what 2.9 ships): betty synthetic models at 1% and 30% constraint density plus
-# JHipster and busybox, worst case of the two densities, never decreasing. Compiling the BDD is
-# the wall, and it is erratic: 0.2 s for both 200-feature models, 0.4 s for the sparse
-# 500-feature model but more than 5 minutes for the dense one, 1.7 s / 32 s at 1,000, and
-# busybox (1,108 features) did not compile in 10 minutes. The journal benchmark with the same
-# engine (300 s cap, real UVLHub models) compiled 29 of 41 models of 501-1,000 features and 2
-# of 120 beyond, hence the 1,000-feature ceiling. Once compiled, every query is cheap (counting
-# 29 ms, core/dead 140 ms, false-optional 300 ms at 1,000 features). The experimental native
-# builder (flamapy-cudd, not released) is opt-in and not reflected here.
+# Costs are estimated milliseconds from the 2026-11-06 calibration with dd's pure-Python engine
+# (what dd installs on macOS, Windows and Pyodide; its Linux x86_64 wheels bring CUDD, which is
+# faster, so on Linux these costs overestimate): betty synthetic models at 1% and 30% constraint
+# density plus JHipster and busybox, worst case of the two densities, never decreasing. Compiling
+# the BDD is the wall, and it is erratic: 0.2 s for both 200-feature models, 0.4 s for the sparse
+# 500-feature model but more than 5 minutes for the dense one, 1.7 s / 32 s at 1,000, and busybox
+# (1,108 features) did not compile in 10 minutes, hence the 1,000-feature ceiling. The journal
+# benchmark (Linux, so dd with CUDD; 300 s cap, real UVLHub models) compiled 29 of 41 models of
+# 501-1,000 features and 2 of 120 beyond, so the ceiling holds for CUDD too. Once compiled, every
+# query is cheap (counting 29 ms, core/dead 140 ms, false-optional 300 ms at 1,000 features). The
+# experimental native builder (flamapy-cudd, not released) is opt-in and not reflected here.
 _MAX_FEATURES = 1000
 
 MANIFEST = PluginManifest(

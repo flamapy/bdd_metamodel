@@ -11,9 +11,10 @@ the [dd](https://github.com/tulip-control/dd) library.
 pip install flamapy-bdd
 ```
 
-`pip install dd` provides dd's pure-Python engine. For larger models, build dd against
-[CUDD](https://github.com/ivmai/cudd), which is much faster and enables dynamic variable
-reordering:
+Which BDD engine you get depends on the platform. On Linux x86_64, dd installs from wheels
+that already include [CUDD](https://github.com/ivmai/cudd), which is much faster and enables
+dynamic variable reordering. On macOS, Windows and Pyodide, dd installs from source with its
+pure-Python engine; to use CUDD there, build dd against it:
 
 ```bash
 pip install cython

@@ -14,7 +14,8 @@ from flamapy.core.models import VariabilityModel
 logger = logging.getLogger(__name__)
 
 # The dd engine in use: 'cudd' (C extension, only when dd is built against CUDD) or the
-# pure-Python 'autoref' that a plain `pip install dd` provides.
+# pure-Python 'autoref'. dd's Linux x86_64 wheels include CUDD; elsewhere `pip install dd` builds
+# dd from source with the pure-Python engine only.
 DD_BACKEND = BDD.__module__.rsplit('.', 1)[-1]
 _reorder = importlib.import_module(BDD.__module__).reorder  # sifting, in both engines
 
