@@ -11,7 +11,7 @@ from .bdd_variant_features import BDDVariantFeatures
 from .bdd_pure_optional_features import BDDPureOptionalFeatures
 from .bdd_unique_features import BDDUniqueFeatures
 from .bdd_variability import BDDVariability
-from .bdd_commonality_factor import BDDCommonalityFactor
+from .bdd_commonality_factor import BDDCommonality, BDDCommonalityFactor
 from .bdd_homogeneity import BDDHomogeneity
 from .bdd_metrics import BDDMetrics
 from .bdd_satisfiable_configuration import BDDSatisfiableConfiguration
@@ -21,6 +21,7 @@ from .bdd_configurations_with_n_features import BDDConfigurationsWithNFeatures
 
 __all__ = [
     "BDDBackbone",
+    "BDDCommonality",
     "BDDCommonalityFactor",
     "BDDConfigurations",
     "BDDConfigurationsNumber",

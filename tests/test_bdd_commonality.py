@@ -10,7 +10,11 @@ from flamapy.core.planner import _implements
 from flamapy.metamodels.configuration_metamodel.models import Configuration
 from flamapy.metamodels.fm_metamodel.transformations import UVLReader
 from flamapy.metamodels.bdd_metamodel import MANIFEST
-from flamapy.metamodels.bdd_metamodel.operations import BDDCommonalityFactor, BDDConfigurations
+from flamapy.metamodels.bdd_metamodel.operations import (
+    BDDCommonality,
+    BDDCommonalityFactor,
+    BDDConfigurations,
+)
 from flamapy.metamodels.bdd_metamodel.operations.interfaces import CommonalityFactor
 from flamapy.metamodels.bdd_metamodel.transformations import FmToBDD
 
@@ -61,7 +65,7 @@ def _bdd(uvl):
 
 
 def _commonality(bdd, elements):
-    operation = BDDCommonalityFactor()
+    operation = BDDCommonality()
     operation.set_configuration(Configuration(elements))
     return operation.execute(bdd).get_commonality()
 
@@ -87,11 +91,21 @@ def test_void_model_has_commonality_zero():
 
 
 def test_implements_the_core_operation():
-    operation = BDDCommonalityFactor()
-    assert isinstance(operation, Commonality) and isinstance(operation, CommonalityFactor)
-    assert BDDCommonalityFactor.facade is Commonality.facade
+    operation = BDDCommonality()
+    assert isinstance(operation, Commonality)
+    assert BDDCommonality.facade is Commonality.facade
     assert Commonality.facade.name == 'commonality'
     assert MANIFEST.operations['commonality'].exact
     plugin = DiscoverMetamodels().plugins.get_plugin_by_extension('bdd')
     assert _implements(plugin, 'commonality')
-    assert plugin.get_operation('Commonality').__class__ is BDDCommonalityFactor
+    assert plugin.get_operation('Commonality').__class__ is BDDCommonality
+
+
+def test_commonality_factor_keeps_its_2_8_name():
+    plugin = DiscoverMetamodels().plugins.get_plugin_by_extension('bdd')
+    assert plugin.get_operation('CommonalityFactor').__class__ is BDDCommonalityFactor
+    assert not isinstance(BDDCommonalityFactor(), Commonality)
+    bdd = _bdd(SMARTWATCH)
+    factor = BDDCommonalityFactor()
+    factor.set_configuration(Configuration({'Camera': True}))
+    assert factor.execute(bdd).commonality_factor() == _commonality(bdd, {'Camera': True})

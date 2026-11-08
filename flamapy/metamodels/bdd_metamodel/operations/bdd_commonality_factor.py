@@ -8,11 +8,10 @@ from flamapy.metamodels.bdd_metamodel.operations.interfaces import CommonalityFa
 from flamapy.metamodels.bdd_metamodel.operations import BDDConfigurationsNumber
 
 
-class BDDCommonalityFactor(Commonality, CommonalityFactor):
+class BDDCommonalityFactor(CommonalityFactor):
     """The commonality of a (partial) configuration: the products that include it over all
-    the products, both counted on the BDD. It implements the core ``Commonality`` operation
-    (the facade's ``commonality`` with ``backend='bdd'``) besides the plugin's own
-    ``CommonalityFactor`` interface."""
+    the products, both counted on the BDD (the plugin's ``CommonalityFactor`` interface, found
+    by that name as in 2.8; the core operation is ``BDDCommonality``)."""
 
     def __init__(self) -> None:
         self._result: float = 0.0
@@ -31,6 +30,30 @@ class BDDCommonalityFactor(Commonality, CommonalityFactor):
 
     def commonality_factor(self) -> float:
         return self.get_result()
+
+    def get_commonality(self) -> float:
+        return self.get_result()
+
+
+
+class BDDCommonality(Commonality):
+    """The core ``Commonality`` operation on the BDD (the facade's ``commonality`` with
+    ``backend='bdd'``): the products that include the (partial) configuration over all the
+    products. Same computation as ``BDDCommonalityFactor``."""
+
+    def __init__(self) -> None:
+        self._result: float = 0.0
+        self._configuration: Configuration = Configuration(elements={})
+
+    def set_configuration(self, configuration: Configuration) -> None:
+        self._configuration = configuration
+
+    def execute(self, model: VariabilityModel) -> "BDDCommonality":
+        self._result = commonality_factor(cast(BDDModel, model), self._configuration)
+        return self
+
+    def get_result(self) -> float:
+        return self._result
 
     def get_commonality(self) -> float:
         return self.get_result()
