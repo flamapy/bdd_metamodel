@@ -61,10 +61,9 @@ def _env_reorder() -> Optional[bool]:
 class FmToBDD(CacheableModelToModel):
     """Transforms a Feature Model into a BDD Model.
 
-    With the optional native package flamapy-cudd installed (`pip install flamapy-bdd[fast]`)
-    the BDD is built by Logic2BDD on CUDD (`builder="native"`; `"auto"`, the default, uses it
-    whenever it is installed) and loaded into the dd engine in use; it handles much larger
-    models. Otherwise (`builder="python"`) it is built with dd as follows.
+    The BDD is built with dd (`builder="python"`, the default) as follows. `builder="native"`
+    (and `"auto"`, native when available) builds it with Logic2BDD on CUDD instead; that needs
+    the flamapy-cudd package, which is experimental and not released yet.
 
     By default the BDD is built clause by clause (`build="incremental"`): the variables are
     declared in feature-tree order (`var_order`), the clauses are conjoined following a
@@ -105,7 +104,7 @@ class FmToBDD(CacheableModelToModel):
                  builder: Optional[str] = None) -> None:
         self.source_model = source_model
         self.destination_model: Optional[BDDModel] = None
-        builder = builder or _env_choice("FLAMAPY_BDD_BUILDER", "auto", BUILDERS)
+        builder = builder or _env_choice("FLAMAPY_BDD_BUILDER", "python", BUILDERS)
         if builder not in BUILDERS:
             raise ValueError(f"Unknown builder '{builder}'. Use one of {BUILDERS}.")
         self._native = _native_module() if builder in ("auto", "native") else None

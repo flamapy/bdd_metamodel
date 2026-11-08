@@ -1,16 +1,5 @@
-import os
-from importlib.util import find_spec
-
 from flamapy.core.manifest import OperationCapability, PluginManifest
 from flamapy.core.models.language_level import LanguageLevel, MajorLevel, MinorLevel
-
-
-def _installed(module: str) -> bool:
-    try:
-        return find_spec(module) is not None
-    except (ImportError, ValueError):
-        return False
-
 
 # Costs are estimated milliseconds from the 2026-11-06 calibration with the pure-Python dd
 # engine (what 2.9 ships): betty synthetic models at 1% and 30% constraint density plus
@@ -20,12 +9,9 @@ def _installed(module: str) -> bool:
 # busybox (1,108 features) did not compile in 10 minutes. The journal benchmark with the same
 # engine (300 s cap, real UVLHub models) compiled 29 of 41 models of 501-1,000 features and 2
 # of 120 beyond, hence the 1,000-feature ceiling. Once compiled, every query is cheap (counting
-# 29 ms, core/dead 140 ms, false-optional 300 ms at 1,000 features). The native builder
-# (flamapy-cudd, not part of 2.9) reaches ~1,200 features; its curves are not measured yet, so
-# these overestimate it.
-_NATIVE = (_installed("flamapy_cudd")
-           and os.environ.get("FLAMAPY_BDD_BUILDER", "auto").strip().lower() != "python")
-_MAX_FEATURES = 1200 if _NATIVE else 1000
+# 29 ms, core/dead 140 ms, false-optional 300 ms at 1,000 features). The experimental native
+# builder (flamapy-cudd, not released) is opt-in and not reflected here.
+_MAX_FEATURES = 1000
 
 MANIFEST = PluginManifest(
     name='bdd',

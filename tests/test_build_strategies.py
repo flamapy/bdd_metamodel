@@ -73,7 +73,7 @@ def test_strategies_build_equivalent_bdds(path):
         assert _summary(path, **options) == reference, options
 
 
-@pytest.mark.skipif(not HAS_NATIVE, reason="needs flamapy-cudd (pip install flamapy-bdd[fast])")
+@pytest.mark.skipif(not HAS_NATIVE, reason="needs the experimental flamapy-cudd package")
 @pytest.mark.parametrize("path", MODELS)
 def test_native_builder_is_equivalent(path):
     reference = _summary(path, build="monolithic", var_order="model")
@@ -84,8 +84,7 @@ def test_native_builder_is_equivalent(path):
 def test_builder_option(monkeypatch):
     feature_model = UVLReader("resources/models/uvl_models/Pizzas.uvl").transform()
     assert FmToBDD(feature_model, builder="python").cache_options()["builder"] == "python"
-    expected = "native" if HAS_NATIVE else "python"
-    assert FmToBDD(feature_model).cache_options()["builder"] == expected
+    assert FmToBDD(feature_model).cache_options()["builder"] == "python"
     monkeypatch.setenv("FLAMAPY_BDD_BUILDER", "python")
     assert FmToBDD(feature_model).cache_options()["builder"] == "python"
     with pytest.raises(ValueError):

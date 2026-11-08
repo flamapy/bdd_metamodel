@@ -25,11 +25,6 @@ dev = [
     "mypy",
     "coverage",
 ]
-# Native BDD construction (Logic2BDD on CUDD); FmToBDD uses it automatically.
-fast = [
-    "flamapy-cudd~=0.1",
-]
-
 # The traversal and exact-probability tests cross-check core, dead and false-optional
 # features with the SAT plugin.
 test = [
