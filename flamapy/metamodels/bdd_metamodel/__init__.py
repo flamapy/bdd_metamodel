@@ -38,7 +38,12 @@ MANIFEST = PluginManifest(
         # Uniform random sampling over the compiled BDD.
         'sampling': OperationCapability(
             cost_curve=((50, 2), (100, 3), (200, 29), (500, 57), (1000, 200))),
-        # Listing configurations is bounded by their number, whatever the builder.
-        'configurations': OperationCapability(max_features=150),
+        # Listing is bounded by the number of configurations, not by the BDD: about 3 us and
+        # 1 KB per configuration (measured 2026-11-08 on 16 UVLHub models of 1e3-1.5e6
+        # configurations), so a million already takes ~1 GB. Using the exact counts of the SoSyM
+        # benchmark (rq2_bdd_final), the share of UVLHub models with at most a million
+        # configurations is 100% up to 30 features, 76% at 31-50, 36% at 51-75 and under 25%
+        # beyond; with the same ~70% rule as the compilation ceiling, the limit is 50 features.
+        'configurations': OperationCapability(max_features=50),
     },
 )
