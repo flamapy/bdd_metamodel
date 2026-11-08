@@ -15,6 +15,7 @@ _MAX_FEATURES = 1000
 
 MANIFEST = PluginManifest(
     name='bdd',
+    calibration='2026-11-06',
     extension='bdd',
     supported_level=LanguageLevel(MajorLevel.BOOLEAN, {MinorLevel.GROUP_CARDINALITY}),
     # Every operation needs the compiled BDD, so the ceiling is plugin-wide.
