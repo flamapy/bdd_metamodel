@@ -11,7 +11,7 @@ from flamapy.metamodels.bdd_metamodel.operations import BDDConfigurationsNumber
 class BDDCommonalityFactor(CommonalityFactor):
     """The commonality of a (partial) configuration: the products that include it over all
     the products, both counted on the BDD (the plugin's ``CommonalityFactor`` interface, found
-    by that name as in 2.8; the core operation is ``BDDCommonality``)."""
+    by that name as in 2.6; the core operation is ``BDDCommonality``)."""
 
     def __init__(self) -> None:
         self._result: float = 0.0
