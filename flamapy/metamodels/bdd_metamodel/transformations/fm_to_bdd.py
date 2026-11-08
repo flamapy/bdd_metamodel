@@ -4,6 +4,7 @@ import os
 from types import ModuleType
 from typing import Any, Optional, cast
 
+from flamapy.core.exceptions import FlamaException
 from flamapy.core.models import VariabilityModel
 from flamapy.core.transformations import CacheableModelToModel
 from flamapy.metamodels.fm_metamodel.models import FeatureModel
@@ -14,6 +15,7 @@ from flamapy.metamodels.bdd_metamodel.models.utils import PLModel
 from flamapy.metamodels.bdd_metamodel.models.utils.ordering import (
     CLAUSE_ORDERS,
     VARIABLE_ORDERS,
+    BDDOptionError,
     clause_order,
     variable_order,
 )
@@ -33,7 +35,7 @@ DEFAULT_CLAUSE_ORDER = "minspan"
 
 
 def _native_module() -> Optional[ModuleType]:
-    """flamapy_cudd (Logic2BDD on CUDD, `pip install flamapy-bdd[fast]`), if installed."""
+    """flamapy_cudd (Logic2BDD on CUDD, experimental and not released), if installed."""
     try:
         return importlib.import_module("flamapy_cudd")
     except ImportError:
@@ -43,7 +45,7 @@ def _native_module() -> Optional[ModuleType]:
 def _env_choice(name: str, default: str, choices: tuple[str, ...]) -> str:
     value = os.environ.get(name, default).strip().lower()
     if value not in choices:
-        raise ValueError(f"{name}={value!r} is not valid. Use one of {choices}.")
+        raise BDDOptionError(f"{name}={value!r} is not valid. Use one of {choices}.")
     return value
 
 
@@ -55,7 +57,7 @@ def _env_reorder() -> Optional[bool]:
         return True
     if value in ("0", "false", "no", "off"):
         return False
-    raise ValueError(f"FLAMAPY_BDD_REORDER={value!r} is not valid. Use auto, 1 or 0.")
+    raise BDDOptionError(f"FLAMAPY_BDD_REORDER={value!r} is not valid. Use auto, 1 or 0.")
 
 
 class FmToBDD(CacheableModelToModel):
@@ -106,10 +108,10 @@ class FmToBDD(CacheableModelToModel):
         self.destination_model: Optional[BDDModel] = None
         builder = builder or _env_choice("FLAMAPY_BDD_BUILDER", "python", BUILDERS)
         if builder not in BUILDERS:
-            raise ValueError(f"Unknown builder '{builder}'. Use one of {BUILDERS}.")
+            raise BDDOptionError(f"Unknown builder '{builder}'. Use one of {BUILDERS}.")
         self._native = _native_module() if builder in ("auto", "native") else None
         if builder == "native" and self._native is None:
-            raise ValueError("builder='native' needs the flamapy-cudd package "
+            raise BDDOptionError("builder='native' needs the flamapy-cudd package "
                              "(pip install flamapy-bdd[fast]).")
         self._fallback = builder == "auto"
         self.builder = "native" if self._native is not None else "python"
@@ -119,7 +121,7 @@ class FmToBDD(CacheableModelToModel):
         self.clause_order = clause_order or _env_choice("FLAMAPY_BDD_CLAUSE_ORDER",
                                                         DEFAULT_CLAUSE_ORDER, CLAUSE_ORDERS)
         if self.build not in BUILD_MODES:
-            raise ValueError(f"Unknown build mode '{self.build}'. Use one of {BUILD_MODES}.")
+            raise BDDOptionError(f"Unknown build mode '{self.build}'. Use one of {BUILD_MODES}.")
         if reorder is None:
             reorder = _env_reorder()
         # Dynamic reordering is cheap in CUDD but slow in the pure-Python engine.
@@ -171,10 +173,14 @@ class FmToBDD(CacheableModelToModel):
         if self._native is not None:
             try:
                 self.destination_model = self._build_native(secured_model, order)
-            except ValueError as error:  # Logic2BDDError is a ValueError
+            # Logic2BDDError is a ValueError; CUDD running out of memory raises MemoryError and
+            # an unreadable DDDMP dump a FlamaException. Under builder='auto' all of them fall
+            # back to dd (a crash inside the C library cannot be caught).
+            except (ValueError, MemoryError, FlamaException) as error:
                 if not self._fallback:
                     raise
-                logger.warning("Native BDD build failed (%s); building with dd.", error)
+                logger.warning("Native BDD build failed (%s: %s); building with dd.",
+                               type(error).__name__, error)
                 self.destination_model = None
         if self.destination_model is None:
             self.destination_model = self._build_python(pl_model, formula, order)

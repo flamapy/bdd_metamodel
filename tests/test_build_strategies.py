@@ -7,6 +7,7 @@ import sys
 
 import pytest
 
+from flamapy.core.exceptions import FlamaException
 from flamapy.metamodels.fm_metamodel.transformations import UVLReader
 from flamapy.metamodels.bdd_metamodel.models.utils import PLModel
 from flamapy.metamodels.bdd_metamodel.models.utils.ordering import (
@@ -210,3 +211,31 @@ def test_exact_count_matches_enumeration(path):
     expected_restricted = sum(1 for _ in bdd.pick_iter(
         restricted, care_vars=set(model.vars_order) - {first}))
     assert exact_count(bdd, restricted, n_vars - 1) == expected_restricted
+
+
+def test_invalid_options_are_flama_exceptions(monkeypatch):
+    feature_model = UVLReader("resources/models/uvl_models/Pizzas.uvl").transform()
+    with pytest.raises(FlamaException):
+        FmToBDD(feature_model, builder="unknown")
+    monkeypatch.setenv("FLAMAPY_BDD_REORDER", "sometimes")
+    with pytest.raises(FlamaException):
+        FmToBDD(feature_model)
+
+
+@pytest.mark.parametrize("failure", [ValueError("syntax"), MemoryError("cudd"),
+                                     FlamaException("bad dump")])
+def test_auto_builder_falls_back_to_dd(failure):
+    from types import SimpleNamespace  # noqa: PLC0415
+    from flamapy.metamodels.bdd_metamodel.operations import (  # noqa: PLC0415
+        BDDConfigurationsNumber as Count,
+    )
+
+    def compile_bdd(*_args, **_kwargs):
+        raise failure
+
+    feature_model = UVLReader("resources/models/uvl_models/Pizzas.uvl").transform()
+    reference = Count().execute(FmToBDD(feature_model, builder="python").transform()).get_result()
+    transformation = FmToBDD(feature_model, builder="python")
+    transformation._native = SimpleNamespace(compile_bdd=compile_bdd)  # pylint: disable=protected-access
+    transformation._fallback = True  # pylint: disable=protected-access
+    assert Count().execute(transformation.transform()).get_result() == reference

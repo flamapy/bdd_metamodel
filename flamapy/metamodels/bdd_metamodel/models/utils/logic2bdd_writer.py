@@ -80,8 +80,9 @@ def _relation_lines(relation: Relation, to_l2b: dict[str, str]) -> list[str]:
 
 def _cardinality_lines(parent: str, children: list[str], card_min: int,
                        card_max: int) -> list[str]:
-    """Same clauses as PLModel: forbid every selection outside [min, max] under the parent,
-    and any selection without the parent."""
+    """The same constraints as PLModel, not the same clauses: every selection outside
+    [min, max] under the parent is forbidden, and "no child without its parent" is one
+    ``child -> parent`` line per child where PLModel enumerates the subsets."""
     card_max = len(children) if card_max == -1 else card_max
     lines = [f"({child} -> {parent})" for child in children]
     for size in range(len(children) + 1):

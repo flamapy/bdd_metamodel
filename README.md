@@ -35,5 +35,11 @@ environment variable; explicit arguments take precedence.
 | `clause_order` | `FLAMAPY_BDD_CLAUSE_ORDER` | `minspan`, `minmax`, `model` |
 | `reorder` | `FLAMAPY_BDD_REORDER` | `auto` (on with CUDD, off otherwise), `1`, `0` |
 
-The options only change how the BDD is built, never the configurations it represents. See
+The options only change how the BDD is built, never the configurations it represents.
+
+With dd's pure-Python engine, building and walking a BDD recurses once per variable, so the
+plugin raises Python's recursion limit (to about 1,000 + 4 per variable) when it builds or loads
+a BDD. The limit applies to the whole process and is not lowered afterwards, because the
+operations on the BDD need it too; keep it in mind when flamapy-bdd runs inside a server or in
+Pyodide. See
 `flamapy/metamodels/bdd_metamodel/models/utils/ordering.py` and `benchmarks/`.

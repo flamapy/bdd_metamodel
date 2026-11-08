@@ -21,7 +21,13 @@ All functions are pure and deterministic: the same inputs always give the same r
 """
 from typing import Sequence
 
+from flamapy.core.exceptions import FlamaException
 from flamapy.metamodels.bdd_metamodel.models.utils.pl_model import PLClause
+
+
+class BDDOptionError(FlamaException, ValueError):
+    """An invalid BDD build option (argument or FLAMAPY_BDD_* variable). A FlamaException like
+    every other invalid transformation option; also a ValueError, as it was before 2.9."""
 
 
 VARIABLE_ORDERS = ("model", "tree", "force")
@@ -47,7 +53,7 @@ def variable_order(variables: Sequence[str],
         return ordered + [var for var in variables if var not in seen]
     if strategy == "force":
         return force_order(variables, [clause.support for clause in clauses])
-    raise ValueError(f"Unknown variable order '{strategy}'. Use one of {VARIABLE_ORDERS}.")
+    raise BDDOptionError(f"Unknown variable order '{strategy}'. Use one of {VARIABLE_ORDERS}.")
 
 
 def total_span(order: Sequence[str], supports: Sequence[Sequence[str]]) -> int:
@@ -121,4 +127,4 @@ def clause_order(clauses: Sequence[PLClause],
             low, high = bounds(item[1])
             return (high, low, item[0])
         return [clause for _, clause in sorted(indexed, key=max_key)]
-    raise ValueError(f"Unknown clause order '{strategy}'. Use one of {CLAUSE_ORDERS}.")
+    raise BDDOptionError(f"Unknown clause order '{strategy}'. Use one of {CLAUSE_ORDERS}.")
