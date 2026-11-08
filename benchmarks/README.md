@@ -81,12 +81,16 @@ the native one with Logic2BDD's default options.
 
 ## Reproducing
 
+The models in `resources/` are listed in `models.txt` as paths; the others come from the
+UVLHub corpus and the BeTTy synthetic set and are named there in comments. Add their paths to
+reproduce the whole table.
+
 ```bash
-# from the bdd_metamodel directory, in the flamapy workspace layout
+# from the bdd_metamodel directory
 grep -v '^#' benchmarks/models.txt | awk '{print $1}' | \
   xargs python benchmarks/bench_compile.py --label my-run --timeout 120 \
         --out benchmarks/results/compile.csv --option builder=python
 python benchmarks/summarize.py benchmarks/results/compile.csv --metric compile_s
 ```
 
-`compile.csv` also holds intermediate runs from the development of the build options.
+`compile.csv` also holds the runs made while developing the build options, under their own labels.
