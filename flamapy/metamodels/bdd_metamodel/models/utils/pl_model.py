@@ -101,7 +101,7 @@ class PLModel():
         kinds = (("mandatory", relation.is_mandatory), ("optional", relation.is_optional),
                  ("or", relation.is_or), ("alternative", relation.is_alternative),
                  ("mutex", relation.is_mutex), ("cardinality", relation.is_cardinal))
-        return next((kind for kind, check in kinds if check()), "relation")
+        return next((kind for kind, check in kinds if check()), "cardinality")
 
     def _get_relation_formula(self, relation: Relation) -> str:
         result = ""
@@ -115,7 +115,7 @@ class PLModel():
             result = self._get_alternative_formula(relation)
         elif relation.is_mutex():
             result = self._get_mutex_formula(relation)
-        elif relation.is_cardinal():
+        else:
             result = self._get_cardinality_formula(relation)
         return result
 
