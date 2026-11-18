@@ -73,7 +73,7 @@ def _relation_lines(relation: Relation, to_l2b: dict[str, str]) -> list[str]:
         lines = [f"({parent} <-> {_or(children)})", *at_most_one]
     elif relation.is_mutex():
         lines = [*(f"({child} -> {parent})" for child in children), *at_most_one]
-    elif relation.is_cardinal():
+    else:
         lines = _cardinality_lines(parent, children, relation.card_min, relation.card_max)
     return lines
 
